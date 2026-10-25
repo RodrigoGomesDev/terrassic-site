@@ -360,7 +360,7 @@ button{cursor:pointer}
 .faq-list details[open] p{animation:fadeUp .4s var(--ease)}
 .footer{background:var(--basalt-950);border-top:1px solid var(--line);padding-block:48px calc(36px + env(safe-area-inset-bottom,0px))}
 .footer-grid{display:grid;grid-template-columns:auto 1fr auto;gap:28px;align-items:center}
-.seal{width:96px;height:96px;image-rendering:pixelated}
+.seal{width:96px;height:96px}
 .footer-grid .footer-name{margin-bottom:8px;line-height:0}.footer-name img{width:min(260px,70vw);height:auto;image-rendering:pixelated}
 .footer-grid p{color:var(--muted);font-size:14px}
 .footer-links{display:flex;flex-wrap:wrap;gap:10px 18px}

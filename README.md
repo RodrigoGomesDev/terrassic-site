@@ -42,7 +42,7 @@ O script só lê o mod e gera os arquivos abaixo. Com `--soft-blocks`, ele troca
 | `public/assets/sprites.png` | ovos geradores, itens e ovos-bloco num atlas de 32 px |
 | `src/generated/species.js` | `gen_resources.SPECIES` (nomes), `gen_species.SIZES`/`GUIDE`/`SPECIES`, `lore.py` (Guia, abertura, relatório, diário, objetivos) e a versão de cada espécie no `docs/ROSTER.md` |
 | `public/assets/blocks/*.png` | texturas de blocos do mod usadas nos cenários (`textures/block/`) |
-| `public/assets/letreiro_*.png`, `selo_altar_512.png` | `art/marca/` |
+| `public/assets/letreiro_*.png` | `scripts/letreiro.py` |
 | `public/assets/monograma_*.png` (logo e favicon) | `art/marca/logo.png`, por `scripts/logo.py` |
 
 Espécie nova no mod entra no site sozinha na próxima importação.
