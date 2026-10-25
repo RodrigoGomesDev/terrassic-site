@@ -3,8 +3,14 @@ import {links} from './site-config.js';
 import {initFilm,initHeader,initMarquee,initStory,initNotebook,initEras,initMechanics,initRoadmap,initInstall,initFaq,initMotion,onScroll,paintEras} from './sections.js';
 import {initBestiary} from './bestiary.js';
 import {lazyThumbnailer} from './pictures.js';
+import {createLoader,preloadImage} from './loader.js';
+import {SPECIES} from './generated/species.js';
+import {ERAS} from './content.js';
 const $=id=>document.getElementById(id);
 
+// One loading screen until everything the visitor will see is ready (loader.js).
+document.documentElement.classList.add('is-loading');
+const loader=createLoader();
 // Text first: the page reads correctly before any 3D has loaded.
 setLang(detectLang());
 initHeader();initMotion();
@@ -21,14 +27,21 @@ const bestiary=initBestiary({viewerReady,thumbnailer});
 const refreshAll=()=>{for(const r of renders)r();bestiary.refresh()};refreshAll();
 for(const b of document.querySelectorAll('[data-lang]'))b.addEventListener('click',()=>{setLang(b.dataset.lang);refreshAll();heroStatus()});
 
+const asset=p=>new URL(`assets/${p}`,document.baseURI).href;
+loader.wait('fonts',1,document.fonts?.ready);loader.wait('3d',1,three);
+loader.wait('meteor',1,Promise.all([import('./storyfx.js'),fetch(asset('meteor/meteor.json')),preloadImage(asset('meteor/meteor.png')),preloadImage(asset('meteor/meteor_glow.png'))]));
+{const names=[...SPECIES.map(s=>s.id),'parasaurolophus-male','parasaurolophus-female',...ERAS.map(e=>`era-${e.id}`)],job=loader.track('pictures',3);let n=0;
+ for(const name of names)preloadImage(asset(`thumbs/${name}.webp`)).then(()=>job.set(++n/names.length))}
+const rexJob=loader.track('rex',6);
 let heroLoaded=0;const heroStatus=()=>{$('hero-status').textContent=heroLoaded>=1?t('hero.ready'):t('hero.loading')};
 const film=document.querySelector('.film');
 // Without 3D the opening shows the baked picture of the T. rex where the model would stand.
-const noGL=()=>{film.classList.add('no-webgl');$('hero-canvas').style.backgroundImage=`url(${new URL('assets/thumbs/tyrannosaurus.webp',document.baseURI).href})`};
+const noGL=()=>{rexJob.done();film.classList.add('no-webgl');$('hero-canvas').style.backgroundImage=`url(${new URL('assets/thumbs/tyrannosaurus.webp',document.baseURI).href})`};
 import('./hero.js').then(({Hero})=>{
  const hero=new Hero($('hero-canvas'),{
-  onProgress:p=>{heroLoaded=p;$('hero-meter').style.width=`${p*100}%`;if(p>=1){heroStatus();film.classList.add('is-loaded')}},
-  onReady:()=>film.classList.add('is-live'),
+  onProgress:p=>{heroLoaded=p;rexJob.set(p*.9);$('hero-meter').style.width=`${p*100}%`;if(p>=1){heroStatus();film.classList.add('is-loaded')}},
+  // The screen lifts only once the animal has been drawn (two frames after it is in the scene).
+  onReady:()=>{film.classList.add('is-live');requestAnimationFrame(()=>requestAnimationFrame(rexJob.done))},
   onFail:noGL});
  if(!hero.renderer)return noGL();
  if(import.meta.env.DEV)window.__hero=hero;

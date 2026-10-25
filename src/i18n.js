@@ -3,6 +3,7 @@ export const LANGS=['pt','en','es'];
 export const HTML_LANG={pt:'pt-BR',en:'en',es:'es'};
 export const UI={
  skip:['Pular para o bestiário','Skip to the bestiary','Saltar al bestiario'],
+ 'loader.text':['Acordando os dinossauros','Waking the dinosaurs','Despertando a los dinosaurios'],
  'nav.story':['História','Story','Historia'],'nav.eras':['Eras','Eras','Eras'],'nav.bestiary':['Bestiário','Bestiary','Bestiario'],'nav.play':['Como se joga','How it plays','Cómo se juega'],'nav.roadmap':['Roteiro','Roadmap','Hoja de ruta'],'nav.cta':['Jogar','Play','Jugar'],
  'hero.eyebrow':['Mod para Minecraft Java 1.20.1 · Fabric e Forge','A Minecraft Java 1.20.1 mod · Fabric and Forge','Mod para Minecraft Java 1.20.1 · Fabric y Forge'],
  'hero.lede':['Dinossauros em tamanho real, que você doma, monta e voa. Atravesse a Fenda, estude fósseis como cientista e sobreviva com pedra, osso e sílex.','Life-size dinosaurs you can tame, ride and fly. Cross the Rift, study fossils as a scientist and survive with stone, bone and flint.','Dinosaurios a tamaño real que puedes domar, montar y volar. Cruza la Grieta, estudia fósiles como científico y sobrevive con piedra, hueso y sílex.'],
