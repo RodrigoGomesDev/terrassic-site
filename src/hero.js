@@ -55,10 +55,14 @@ export class Hero{
  resize(){const w=this.host.clientWidth,h=this.host.clientHeight;this.portrait=w<h;this.renderer.setSize(w,h,false);this.camera.aspect=w/Math.max(1,h);this.camera.fov=this.portrait?48:30;this.camera.updateProjectionMatrix()}
  setProgress(p){this.target=this.reduced?.3:clamp(p,0,1)}
  tick(now){
-  requestAnimationFrame(this.tick);const ms=now-this.last,dt=Math.min(.05,ms/1000);this.last=now;if(!this.visible||document.hidden)return;this.guard?.frame(ms);this.step(dt);
+  requestAnimationFrame(this.tick);const ms=now-this.last,dt=Math.min(.05,ms/1000);this.last=now;if(!this.visible||document.hidden)return;if(!this.pixLevel)this.guard?.frame(ms);this.step(dt);
  }
  step(dt){
   this.time+=dt;this.progress=this.reduced?this.target:damp(this.progress,this.target,6,dt);const p=this.progress;
+  // The end of the dive: the picture breaks into ever bigger blocks, in steps, like the game's own pixels (the
+  // canvas is drawn at a lower resolution each step and shown with image-rendering: pixelated).
+  const lv=this.reduced?0:Math.min(6,Math.floor(clamp((p-.74)/.16,0,1)*7));
+  if(lv!==(this.pixLevel||0)){if(!this.pixLevel)this.baseRatio=this.renderer.getPixelRatio();this.pixLevel=lv;this.renderer.setPixelRatio(lv?this.baseRatio/2**lv:this.baseRatio);this.resize()}
   if(!this.rex){this.renderer.render(this.scene,this.camera);return}
   const a=this.rex.animator,bones=this.rex.model.bones;
   // The roar follows the scroll; after it, the jaw opens wide and stays open for the swallow.
