@@ -34,26 +34,25 @@
 </header>
 
 <main>
- <section class="hero" id="inicio">
-  <div class="hero-canvas" id="hero-canvas" aria-hidden="true"></div>
-  <div class="hero-shade" aria-hidden="true"></div>
-  <div class="hero-copy">
-   <p class="eyebrow" data-i18n="hero.eyebrow">Mod para Minecraft Java 1.20.1 · Fabric e Forge</p>
-   <h1 class="hero-title"><img src="./assets/letreiro_1900.png" alt="Terrassic" width="1900" height="360"></h1>
-   <p class="hero-lede" data-i18n="hero.lede">Dinossauros em tamanho real, que você doma, monta e voa. Atravesse a Fenda, estude fósseis como cientista e sobreviva com pedra, osso e sílex.</p>
-   <div class="hero-actions">
-    <a class="btn btn-primary magnetic" href="#bestiario"><span data-i18n="hero.cta">Conhecer as criaturas</span><span aria-hidden="true">→</span></a>
-    <a class="btn btn-ghost magnetic" href="https://github.com/RodrigoGomesDev/terrassic" target="_blank" rel="noopener noreferrer"><span data-i18n="hero.github">Acompanhar no GitHub</span><span aria-hidden="true">↗</span></a>
+ <section class="film" id="inicio">
+  <div class="film-stage" id="film-stage">
+   <h1 class="film-word"><img src="./assets/letreiro_1900.png" alt="Terrassic" width="1900" height="360"></h1>
+   <div class="hero-canvas" id="hero-canvas" aria-hidden="true"></div>
+   <div class="film-flash" aria-hidden="true"></div>
+   <div class="film-copy film-intro">
+    <p class="film-eyebrow" data-i18n="hero.eyebrow">Mod para Minecraft Java 1.20.1 · Fabric e Forge</p>
+    <p class="film-lede" data-i18n="hero.lede">Dinossauros em tamanho real, que você doma, monta e voa. Atravesse a Fenda, estude fósseis como cientista e sobreviva com pedra, osso e sílex.</p>
+    <div class="hero-actions">
+     <a class="btn btn-dark magnetic" href="#bestiario"><span data-i18n="hero.cta">Conhecer as criaturas</span><span aria-hidden="true">→</span></a>
+     <a class="btn btn-line magnetic" href="https://www.curseforge.com/minecraft/mc-mods/terrassic" target="_blank" rel="noopener noreferrer"><span data-i18n="hero.download">Baixar a v0.2.0</span><span aria-hidden="true">↗</span></a>
+    </div>
    </div>
-   <dl class="hero-facts">
-    <div><dt data-count="59">59</dt><dd data-i18n="hero.fact1">criaturas modeladas e animadas</dd></div>
-    <div><dt>1:1</dt><dd data-i18n="hero.fact2">1 bloco = 1 metro, do maior fóssil conhecido</dd></div>
-    <div><dt>5</dt><dd data-i18n="hero.fact3">eras, indo para trás no tempo</dd></div>
-   </dl>
+   <div class="film-copy film-quote" aria-hidden="true"><p id="film-quote"></p><span id="film-cite"></span></div>
+   <div class="film-copy film-chapter" aria-hidden="true"><p class="film-eyebrow" data-i18n="film.chapter">Capítulo 1 · Cretáceo Superior</p><h2 data-i18n="film.title">Ecos do Fim.</h2><p data-i18n="film.line">O fim do Cretáceo chega pelo céu.</p></div>
+   <div class="film-top"><span class="hero-status" aria-live="polite"><span class="hero-meter"><span id="hero-meter"></span></span><span id="hero-status" data-i18n="hero.loading">Carregando o T. rex</span></span><button type="button" class="hero-sound" id="hero-sound" aria-pressed="false"><span class="hero-sound-icon" aria-hidden="true"></span><span data-i18n="hero.sound">Ouvir o rugido</span></button></div>
+   <a class="scroll-cue" href="#historia"><span class="scroll-arrow" aria-hidden="true">↓</span><span id="scroll-label" data-i18n="film.scroll">Role para trazer o meteoro</span></a>
+   <div class="film-track" aria-hidden="true"><span id="film-fill"></span></div>
   </div>
-  <div class="hero-status" aria-live="polite"><span class="hero-meter"><span id="hero-meter"></span></span><span id="hero-status" data-i18n="hero.loading">Acordando a clareira</span></div>
-  <p class="hero-note" data-i18n="hero.note">Cena ao vivo no navegador, com os modelos e as animações do próprio mod.</p>
-  <a class="scroll-cue" href="#historia" aria-label="Rolar"><span></span></a>
  </section>
 
  <div class="marquee" aria-hidden="true"><div class="marquee-row" id="marquee-a"></div><div class="marquee-row reverse" id="marquee-b"></div></div>
@@ -210,8 +209,12 @@
    <div class="reveal">
     <p class="eyebrow" data-i18n="inst.eyebrow">Jogar</p>
     <h2 class="display" data-i18n="inst.title">Como instalar.</h2>
-    <p class="lede" data-i18n="inst.lede">O Terrassic está em desenvolvimento. Ainda não há download público: quando uma versão for publicada, o link aparece aqui.</p>
-    <a class="btn btn-primary magnetic" id="download" href="https://github.com/RodrigoGomesDev/terrassic" target="_blank" rel="noopener noreferrer"><span data-i18n="inst.github">Ver o código no GitHub</span><span aria-hidden="true">↗</span></a>
+    <p class="lede" data-i18n="inst.lede">A versão 0.2.0 já pode ser baixada, para Fabric e Forge no Minecraft Java 1.20.1. O mod continua em desenvolvimento e cada versão nova sai nas mesmas páginas.</p>
+    <div class="install-actions">
+     <a class="btn btn-primary magnetic" id="download" href="https://www.curseforge.com/minecraft/mc-mods/terrassic" target="_blank" rel="noopener noreferrer"><span data-i18n="inst.curseforge">Baixar no CurseForge</span><span aria-hidden="true">↗</span></a>
+     <a class="btn btn-ghost magnetic" id="modrinth" href="https://modrinth.com/mod/terrassic" target="_blank" rel="noopener noreferrer"><span>Modrinth</span><span aria-hidden="true">↗</span></a>
+    </div>
+    <p class="install-links"><a href="https://github.com/RodrigoGomesDev/terrassic/wiki" target="_blank" rel="noopener noreferrer" data-i18n="inst.wiki">Wiki do mod</a><a href="https://github.com/RodrigoGomesDev/terrassic" target="_blank" rel="noopener noreferrer" data-i18n="inst.github">Código no GitHub</a><a href="https://ko-fi.com/terrassic" target="_blank" rel="noopener noreferrer" data-i18n="inst.donate">Apoiar no Ko-fi</a></p>
    </div>
    <div class="loader reveal">
     <div class="seg" role="tablist" aria-label="Loader"><button type="button" role="tab" id="tab-fabric" aria-selected="true">Fabric</button><button type="button" role="tab" id="tab-forge" aria-selected="false" tabindex="-1">Forge</button></div>
@@ -232,7 +235,7 @@
  <div class="wrap footer-grid">
   <img src="./assets/selo_altar_512.png" alt="" width="96" height="96" class="seal">
   <div><p class="footer-name">Terrassic</p><p data-i18n="foot.by">Um mod de Rodrigo Gomes. Modelos, texturas, sprites e código autorais, gerados por código.</p></div>
-  <div class="footer-links"><a href="https://github.com/RodrigoGomesDev/terrassic" target="_blank" rel="noopener noreferrer">GitHub ↗</a><a href="#inicio" data-i18n="foot.top">Voltar ao topo</a></div>
+  <div class="footer-links"><a href="https://www.curseforge.com/minecraft/mc-mods/terrassic" target="_blank" rel="noopener noreferrer">CurseForge ↗</a><a href="https://modrinth.com/mod/terrassic" target="_blank" rel="noopener noreferrer">Modrinth ↗</a><a href="https://github.com/RodrigoGomesDev/terrassic" target="_blank" rel="noopener noreferrer">GitHub ↗</a><a href="https://ko-fi.com/terrassic" target="_blank" rel="noopener noreferrer">Ko-fi ↗</a><a href="#inicio" data-i18n="foot.top">Voltar ao topo</a></div>
   <p class="footer-legal" data-i18n="foot.legal">Projeto independente, sem afiliação à Mojang ou à Microsoft. Minecraft é marca da Mojang Synergies AB.</p>
  </div>
 </footer>

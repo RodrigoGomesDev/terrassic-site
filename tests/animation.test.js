@@ -44,3 +44,15 @@ test('merged rigs keep one mesh per bone and every bone',()=>{
  assert.equal(merged.bones.size,loose.bones.size);assert.ok(merged.meshes.length<=merged.bones.size&&merged.meshes.length<loose.meshes.length);
  loose.dispose();merged.dispose();
 });
+test('the web roar starts and ends at rest and keeps the jaw inside the authored limits',()=>{
+ const clip=compileClip(json('../public/assets/species/tyrannosaurus.roar.json'));
+ for(let t=0;t<=clip.length;t+=1/120){const angle=sampleTrack(clip.bones.jaw.rotation,t,clip.length)[0];assert.ok(angle>=-.5&&angle<=46,`jaw ${angle} at ${t}`)}
+ for(const tracks of Object.values(clip.bones))for(const track of Object.values(tracks)){for(const v of sampleTrack(track,0,clip.length))close(v,0,1e-3);for(const v of sampleTrack(track,clip.length,clip.length))close(v,0,1e-3)}
+ assert.ok(Object.keys(clip.bones).length>=15,'head, neck, body, arms, tail and legs move');
+});
+test('the meteor model and its looping animation load in the site format',()=>{
+ const d=json('../public/assets/meteor/meteor.json'),texture=new THREE.Texture(),model=createModel(d,texture);
+ assert.ok(model.bones.has('rock')&&model.bones.has('flames'));const clip=compileClip(d.animations.fall);assert.ok(clip.loop);
+ const r0=sampleTrack(clip.bones.rock.rotation,0,clip.length,true),r1=sampleTrack(clip.bones.rock.rotation,clip.length-1e-6,clip.length,true);close(Math.abs(r1[0]-r0[0]),360,.01);
+ model.dispose();texture.dispose();
+});

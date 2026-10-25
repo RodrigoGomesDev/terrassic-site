@@ -11,9 +11,7 @@ Gera:
 import json
 import re
 import shutil
-import struct
 import sys
-import zlib
 from pathlib import Path
 
 if len(sys.argv) != 2:
@@ -23,6 +21,7 @@ SITE = Path(__file__).resolve().parents[1]
 RES = MOD / 'common/src/main/resources/assets/terrassic'
 OUT = SITE / 'public/assets'
 sys.path.insert(0, str(MOD / 'tools/javagen'))
+sys.path.insert(0, str(Path(__file__).resolve().parent))
 import gen_resources  # noqa: E402
 import gen_species  # noqa: E402
 import lore  # noqa: E402
@@ -97,60 +96,7 @@ def compact_animations(raw):
     return r4(out)
 
 
-# ------------------------------------------------------------------ tiny PNG reader/writer (RGBA atlas)
-def read_png(path):
-    data = path.read_bytes()
-    assert data[:8] == b'\x89PNG\r\n\x1a\n'
-    pos, idat, palette, trns = 8, b'', None, None
-    while pos < len(data):
-        n, kind = struct.unpack('>I4s', data[pos:pos + 8])
-        body = data[pos + 8:pos + 8 + n]
-        pos += 12 + n
-        if kind == b'IHDR':
-            w, h, depth, ctype, _, _, interlace = struct.unpack('>IIBBBBB', body)
-            assert depth == 8 and interlace == 0, path
-        elif kind == b'PLTE':
-            palette = [body[i:i + 3] for i in range(0, len(body), 3)]
-        elif kind == b'tRNS':
-            trns = body
-        elif kind == b'IDAT':
-            idat += body
-    channels = {6: 4, 2: 3, 3: 1, 4: 2, 0: 1}[ctype]
-    raw, stride = zlib.decompress(idat), w * channels
-    rows, prev, i = [], bytearray(stride), 0
-    for _ in range(h):
-        f, line = raw[i], bytearray(raw[i + 1:i + 1 + stride])
-        i += 1 + stride
-        for x in range(stride):
-            a = line[x - channels] if x >= channels else 0
-            b, c = prev[x], prev[x - channels] if x >= channels else 0
-            if f == 1: line[x] = (line[x] + a) & 255
-            elif f == 2: line[x] = (line[x] + b) & 255
-            elif f == 3: line[x] = (line[x] + (a + b) // 2) & 255
-            elif f == 4:
-                p = a + b - c; pa, pb, pc = abs(p - a), abs(p - b), abs(p - c)
-                line[x] = (line[x] + (a if pa <= pb and pa <= pc else b if pb <= pc else c)) & 255
-        rows.append(line)
-        prev = line
-    px = []
-    for line in rows:
-        out = []
-        for x in range(w):
-            p = line[x * channels:(x + 1) * channels]
-            if ctype == 6: out.append(tuple(p))
-            elif ctype == 2: out.append((*p, 255))
-            elif ctype == 4: out.append((p[0], p[0], p[0], p[1]))
-            elif ctype == 0: out.append((p[0], p[0], p[0], 255))
-            else: out.append((*palette[p[0]], trns[p[0]] if trns and p[0] < len(trns) else 255))
-        px.append(out)
-    return w, h, px
-
-
-def write_png(path, w, h, px):
-    raw = b''.join(b'\x00' + bytes(c for p in row for c in p) for row in px)
-    chunk = lambda k, d: struct.pack('>I', len(d)) + k + d + struct.pack('>I', zlib.crc32(k + d) & 0xffffffff)
-    path.write_bytes(b'\x89PNG\r\n\x1a\n' + chunk(b'IHDR', struct.pack('>IIBBBBB', w, h, 8, 6, 0, 0, 0)) +
-                     chunk(b'IDAT', zlib.compress(raw, 9)) + chunk(b'IEND', b''))
+from png import read_png, write_png  # noqa: E402
 
 
 CELL = 32
@@ -161,6 +107,27 @@ ITEMS = ['field_notebook', 'amber_lens', 'sketching_charcoal', 'hair_brush', 'fl
 BLOCKS = ['tyrannosaurus_egg_0', 'tyrannosaurus_egg_1', 'tyrannosaurus_egg_2', 'triceratops_egg_0', 'triceratops_egg_1',
           'triceratops_egg_2', 'amber_block', 'amber_with_insect', 'amber_with_leaf', 'amber_with_feather', 'bone_pile',
           'tyrannosaurus_skull_fossil']
+
+
+# Block textures used by the scenery (the hero island, the era dioramas, the bestiary plinth).
+SCENERY = ['fern_litter', 'fern_litter_side', 'needle_litter', 'needle_litter_side', 'lateritic_soil', 'packed_earth_floor',
+           'cracked_mud', 'volcanic_ash', 'salt_crust', 'chalk', 'limestone', 'shale', 'gneiss_stacked', 'gneiss_flagstone',
+           'limestone_flagstone', 'laterite', 'basin_water', 'cretaceous_grass', 'bracken', 'royal_fern', 'horsetail',
+           'tall_bracken_bottom', 'tall_bracken_top', 'clubmoss', 'cycad_bottom', 'cycad_top', 'young_cycad', 'williamsonia',
+           'archaefructus', 'metasequoia_log', 'metasequoia_log_top', 'metasequoia_leaves', 'araucaria_log', 'araucaria_log_top',
+           'araucaria_leaves', 'magnolia_log', 'magnolia_log_top', 'magnolia_leaves', 'tree_fern_log', 'tree_fern_log_top',
+           'tree_fern_leaves', 'podocarpus_log', 'podocarpus_log_top', 'podocarpus_leaves', 'taxodium_log', 'taxodium_log_top',
+           'taxodium_leaves', 'amber_block', 'fossil_rock', 'menhir', 'menhir_top', 'bone_pile', 'rib_bone', 'lichen']
+
+
+def copy_blocks():
+    out = OUT / 'blocks'
+    out.mkdir(exist_ok=True)
+    for name in SCENERY:
+        src = RES / 'textures/block' / f'{name}.png'
+        if src.exists():
+            shutil.copy2(src, out / f'{name}.png')
+    return sorted(p.stem for p in out.glob('*.png'))
 
 
 def nearest(px, w, h, size):
@@ -270,15 +237,17 @@ def main():
             guide={k: dict(pt=v[0], en=v[1], es=v[2]) for k, v in text.items()},
         ))
     atlas = build_atlas([s['id'] for s in species])
+    blocks = copy_blocks()
     js = ('// Gerado por scripts/import-mod.py a partir do repositório do mod. Não edite à mão.\n'
           f'export const SPECIES={json.dumps(species, ensure_ascii=False, separators=(",", ":"))};\n'
           f'export const SPRITES={json.dumps(atlas, separators=(",", ":"))};\n'
+          f'export const BLOCKS={json.dumps(blocks, separators=(",", ":"))};\n'
           f'export const LORE={json.dumps(story(), ensure_ascii=False, separators=(",", ":"))};\n')
     (SITE / 'src/generated/species.js').write_text(js)
     for name in ['letreiro_950.png', 'letreiro_1900.png', 'monograma_64.png', 'monograma_256.png', 'selo_altar_512.png']:
         if (MOD / 'art/marca' / name).exists():
             shutil.copy2(MOD / 'art/marca' / name, OUT / name)
-    print(f'{len(species)} espécies, {len(atlas["index"])} sprites, textos em pt/en/es.')
+    print(f'{len(species)} espécies, {len(atlas["index"])} sprites, {len(blocks)} blocos, textos em pt/en/es.')
 
 
 main()

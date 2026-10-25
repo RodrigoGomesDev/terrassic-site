@@ -11,6 +11,25 @@ const scrollers=[];export const onScroll=fn=>scrollers.push(fn);
 let ticking=false;const frame=()=>{ticking=false;for(const fn of scrollers)fn()};
 addEventListener('scroll',()=>{if(!ticking){ticking=true;requestAnimationFrame(frame)}},{passive:true});addEventListener('resize',()=>requestAnimationFrame(frame));
 
+// The opening film: scroll progress drives the sky colour, the captions, the flash and the 3D scene.
+const SKY=[[0,[219,177,91]],[.45,[227,162,74]],[.75,[239,138,48]],[.9,[240,122,26]],[.97,[255,241,214]]];
+const sky=p=>{let i=0;while(i<SKY.length-2&&SKY[i+1][0]<p)i++;const [a,ca]=SKY[i],[b,cb]=SKY[i+1],k=smooth((p-a)/(b-a));return `rgb(${ca.map((v,j)=>Math.round(v+(cb[j]-v)*k)).join(',')})`};
+export function initFilm(){
+ const film=$('inicio'),stage=$('film-stage'),listeners=[];
+ const update=()=>{
+  const p=reduced?.62:pinProgress(film),win=(a,b,c,d)=>smooth((p-a)/(b-a))*(1-smooth((p-c)/(d-c)));
+  stage.style.setProperty('--film-bg',sky(p));stage.style.setProperty('--intro',(1-smooth(p/.1)).toFixed(3));
+  stage.style.setProperty('--quote',win(.12,.18,.3,.36).toFixed(3));stage.style.setProperty('--chapter',win(.5,.56,.76,.82).toFixed(3));
+  stage.style.setProperty('--flash',(smooth((p-.88)/.08)*(1-smooth((p-.985)/.015))).toFixed(3));
+  $('film-fill').style.width=`${p*100}%`;$('scroll-label').textContent=t(p<.3?'film.scroll':p<.85?'film.scroll2':'film.scroll3');
+  $('topbar').classList.toggle('on-light',film.getBoundingClientRect().bottom>innerHeight*.5&&p<.9);
+  for(const fn of listeners)fn(p);
+ };
+ onScroll(update);
+ const render=()=>{const page=LORE.pages.find(x=>x.day===1203)||LORE.pages.at(-1),text=pick(page.text);$('film-quote').textContent=text.slice(0,text.indexOf('.')+1);$('film-cite').textContent=`Katarina · ${t('book.day')} ${page.day}`;update()};
+ return {render,listen:fn=>{listeners.push(fn);fn(reduced?.62:pinProgress(film))}};
+}
+
 export function initHeader(){
  const bar=$('topbar'),links=[...document.querySelectorAll('.nav a')],targets=links.map(a=>document.querySelector(a.getAttribute('href')));
  onScroll(()=>{bar.classList.toggle('is-solid',scrollY>40);
@@ -85,12 +104,21 @@ function landscape(canvas,era,seed){
  if(era.id==='ice')for(let i=0;i<60;i++)px(rnd()*w,rnd()*h,1,1,'rgba(255,255,255,.8)');
  return canvas;
 }
+// Each chapter card gets a slab of that era's blocks from the mod, rendered once by the shared thumbnail renderer.
+const eraArt=new Map();
+const eraImage=url=>{const img=el('img','era-photo');img.alt='';img.src=url;return img};
+const ERA_ANIMALS={late:[['tyrannosaurus',2,1,-2.2],['triceratops',-5,2,-1.1]],jurassic:[['stegosaurus',0,1,-1.9],['dilophosaurus',-6,2,-.9]]};
+export function paintEras(thumbnailer){
+ if(!thumbnailer)return;
+ for(const e of ERAS){const list=(ERA_ANIMALS[e.id]||[]).map(([id,x,z,r])=>[SPECIES.find(s=>s.id===id),x,z,r]);
+  thumbnailer.eraScene(e.id,list).then(url=>{eraArt.set(e.id,url);const host=document.querySelector(`.era-art[data-era="${e.id}"]`);if(host&&!host.querySelector('.era-photo'))host.append(eraImage(url))}).catch(()=>{})}
+}
 export function initEras(){
  const section=$('eras'),track=$('eras-track'),fill=$('timeline-fill'),ticks=$('timeline-ticks');
  const render=()=>{
   track.replaceChildren(...ERAS.map((e,i)=>{
    const card=el('article',`era era-${e.id}`);card.style.setProperty('--era-a',e.colors[1]);
-   const art=el('div','era-art');art.append(landscape(document.createElement('canvas'),e,(i+3)*7919));
+   const art=el('div','era-art');art.append(landscape(document.createElement('canvas'),e,(i+3)*7919));if(eraArt.has(e.id))art.append(eraImage(eraArt.get(e.id)));art.dataset.era=e.id;art.style.background=`linear-gradient(180deg,${e.colors[0]},${e.colors[1]})`;
    const body=el('div','era-body');
    body.append(el('p','era-n',pick(e.n)),el('h3','',pick(e.name)),el('p','era-when',`${pick(e.era)}${e.ma?` · ${e.ma[0]}–${e.ma[1]} Ma`:''}`),el('p','era-land',pick(e.land)));
    const dl=el('dl','era-facts');for(const [k,v] of [['eras.where',e.where],['eras.event',e.event],['eras.boss',e.boss],['eras.plants',e.plants]]){const d=el('div');d.append(el('dt','',t(k)),el('dd','',pick(v)));dl.append(d)}
@@ -143,7 +171,7 @@ export function initInstall(links){
  let loader='fabric';
  const render=()=>{for(const n of ['fabric','forge']){const tab=$(`tab-${n}`);tab.setAttribute('aria-selected',String(n===loader));tab.tabIndex=n===loader?0:-1}
   $('steps').replaceChildren(...INSTALL[loader].map(s=>el('li','',pick(s))));
-  if(links.download){const a=$('download');a.href=links.download;a.firstChild.textContent=t('inst.download')}};
+  if(links.download)$('download').href=links.download;$('modrinth').hidden=!links.modrinth;if(links.modrinth)$('modrinth').href=links.modrinth};
  for(const n of ['fabric','forge']){$(`tab-${n}`).addEventListener('click',()=>{loader=n;render()});$(`tab-${n}`).addEventListener('keydown',e=>{if(e.key==='ArrowLeft'||e.key==='ArrowRight'){e.preventDefault();loader=n==='fabric'?'forge':'fabric';render();$(`tab-${loader}`).focus()}})}
  return render;
 }

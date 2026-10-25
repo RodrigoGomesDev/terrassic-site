@@ -5,10 +5,17 @@ const radians=n=>(Number(n)||0)*Math.PI/180;
 const BASE=import.meta.env?.BASE_URL??'/';
 export const assetUrl=path=>`${BASE}assets/${path}`;
 
+// Clips made for the site on the mod's rig (scripts/web-roar.py); they replace the game clip of the same name.
+const WEB_CLIPS={tyrannosaurus:{roar:'species/tyrannosaurus.roar.json'}};
 // One request per species, shared by the hero, the bestiary viewer and the thumbnails.
 const cache=new Map(),textures=new Map();
 export function loadSpecies(id){
- if(!cache.has(id))cache.set(id,fetch(assetUrl(`species/${id}.json`)).then(r=>{if(!r.ok)throw new Error(`${id}: ${r.status}`);return r.json()}).then(data=>({...data,clips:Object.fromEntries(Object.entries(data.animations).map(([k,v])=>[k,compileClip(v)]))})).catch(e=>{cache.delete(id);throw e}));
+ const get=path=>fetch(assetUrl(path)).then(r=>{if(!r.ok)throw new Error(`${path}: ${r.status}`);return r.json()});
+ if(!cache.has(id))cache.set(id,Promise.all([get(`species/${id}.json`),...Object.entries(WEB_CLIPS[id]||{}).map(([name,path])=>get(path).then(raw=>[name,raw]).catch(()=>null))]).then(([data,...extra])=>{
+  const clips=Object.fromEntries(Object.entries(data.animations).map(([k,v])=>[k,compileClip(v)]));
+  for(const e of extra)if(e)clips[e[0]]=compileClip(e[1]);
+  return {...data,clips};
+ }).catch(e=>{cache.delete(id);throw e}));
  return cache.get(id);
 }
 export function loadTexture(id,sex){
@@ -60,6 +67,8 @@ export class Animator{
   if(!this.clips[name])return false;if(this.current.name===name&&!restart)return true;
   this.previous={...this.current,elapsed:0,duration:fade};this.current={name,clip:this.clips[name],time:0};return true;
  }
+ // Holds a clip at a given time and weight, for poses driven by the page scroll instead of the clock.
+ scrub(name,time,weight){const clip=this.clips[name];this.scrubbing=clip&&weight>0?{clip,time:Math.max(0,Math.min(clip.length,time)),weight}:null}
  trigger(name,onEnd){const clip=this.clips[name];if(!clip)return false;this.action={name,clip,time:0,onEnd};return true;}
  get acting(){return !!this.action}
  update(dt){
@@ -73,6 +82,7 @@ export class Animator{
    let s=sampleBone(this.current.clip,name,this.current.time);
    if(this.previous)s=mix(sampleBone(this.previous.clip,name,this.previous.time),s,fadeW);
    if(actionW)s=mix(s,sampleBone(this.action.clip,name,this.action.time),actionW);
+   if(this.scrubbing)s=mix(s,sampleBone(this.scrubbing.clip,name,this.scrubbing.time),this.scrubbing.weight);
    // Bedrock animation channels use (-x, -y, z) relative to the Blockbench rig.
    bone.rotation.x-=radians(s.rotation[0]);bone.rotation.y-=radians(s.rotation[1]);bone.rotation.z+=radians(s.rotation[2]);
    bone.position.x-=s.position[0];bone.position.y+=s.position[1];bone.position.z+=s.position[2];

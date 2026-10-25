@@ -4,7 +4,7 @@ Site estático do [Terrassic](https://github.com/RodrigoGomesDev/terrassic), de 
 
 O que tem:
 
-- **Abertura ao vivo:** uma clareira do Cretáceo feita de blocos de 1 m, gerada por código, com 13 criaturas do mod andando, pastando, rugindo e voando (T. rex, manada de hadrossauros, Brachiosaurus, Triceratops, bando de Velociraptor, Pteranodon e Quetzalcoatlus). No celular entram só 5, para poupar a bateria.
+- **Abertura:** o céu âmbar do site antigo, o T. rex numa ilha flutuante feita com os blocos do próprio mod e um meteoro que se aproxima conforme o visitante rola a página. O rugido acompanha o scroll, a câmera treme e tudo termina num clarão. O som do rugido só toca se o visitante ligar.
 - **O Salto:** a tela de abertura do mod, uma frase por vez conforme o scroll, com a Fenda se abrindo.
 - **Caderno da Katarina:** o Relatório do Incidente e as páginas do diário, com o texto do próprio mod.
 - **Eras:** os 5 capítulos numa faixa horizontal presa ao scroll, cada um com uma paisagem em pixel desenhada por código.
@@ -41,15 +41,22 @@ O script só lê o mod e gera:
 | `public/assets/species/<id>_male.png` / `_female.png` | `textures/entity/` |
 | `public/assets/sprites.png` | ovos geradores, itens e ovos-bloco num atlas de 32 px |
 | `src/generated/species.js` | `gen_resources.SPECIES` (nomes), `gen_species.SIZES`/`GUIDE`/`SPECIES`, `lore.py` (Guia, abertura, relatório, diário, objetivos) e a versão de cada espécie no `docs/ROSTER.md` |
+| `public/assets/blocks/*.png` | texturas de blocos do mod usadas nos cenários (`textures/block/`) |
 | `public/assets/letreiro_*.png`, `monograma_*.png`, `selo_altar_512.png` | `art/marca/` |
 
 Espécie nova no mod entra no site sozinha na próxima importação.
+
+## Meteoro e rugido
+
+- `python3 -B scripts/meteor.py` gera o meteoro: `art/meteor/meteor.bbmodel` (projeto do Blockbench, abre e edita como os modelos do mod), a textura e a animação `animation.meteor.fall`, e a cópia que o site usa em `public/assets/meteor/`.
+- `python3 -B scripts/web-roar.py` gera o rugido do T. rex feito para o site (`public/assets/species/tyrannosaurus.roar.json`), no rig do mod: preparação, corpo que sobe, cabeça varrendo de um lado para o outro com a mandíbula tremendo, braços fechando e a cauda em onda. Os arquivos do jogo não mudam.
 
 ## Código
 
 - `src/rig.js`: monta o rig do Blockbench (16 px = 1 m, escala `MODEL_SCALE` do mod) e o `Animator` (transições entre loops, ações por cima).
 - `src/animation.js`: interpolação Catmull-Rom dos canais GeckoLib, testada em `tests/`.
-- `src/world.js` e `src/hero.js`: a clareira e quem anda nela.
+- `src/blocks.js`: cenários de blocos 1 m com as texturas do mod (ilha da abertura, eras, pedestal do bestiário).
+- `src/hero.js`: a abertura com o T. rex e o meteoro.
 - `src/viewer.js`: o palco do bestiário e as miniaturas.
 - `src/bestiary.js`, `src/sections.js`: as seções da página.
 - `src/i18n.js`: textos da interface em pt/en/es. `src/content.js`: eras, roteiro, armas e dúvidas, tirados de `README`, `docs/HISTORIA.md`, `docs/ROSTER.md` e `docs/RESUMO.md` do mod.
@@ -66,4 +73,4 @@ O idioma vem de `?lang=pt|en|es`, da última escolha do visitante ou do navegado
 
 ## Autoria
 
-Rodrigo Gomes. Modelos, texturas, sprites e textos são do mod e autorais. O cenário da abertura e as paisagens das eras são gerados por código. Projeto independente, sem afiliação à Mojang ou à Microsoft.
+Rodrigo Gomes. Modelos, texturas, sprites e textos são do mod e autorais. Os cenários são montados por código com os blocos do mod; nenhuma textura do Minecraft é usada. Projeto independente, sem afiliação à Mojang ou à Microsoft.

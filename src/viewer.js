@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
 import {spawn} from './rig.js';
+import {plinth,eraSlab} from './blocks.js';
 const damp=THREE.MathUtils.damp,ease=t=>t*t*(3-2*t);
 
 // A blocky field assistant, 1.8 m tall, for scale. Drawn from boxes, in the notebook's paper and leather colours.
@@ -9,14 +10,6 @@ function fieldAssistant(){
  part(.22,.8,.22,-.12,.4,0,0x5a3620);part(.22,.8,.22,.12,.4,0,0x5a3620);part(.5,.7,.26,0,1.15,0,0xd8c79e);part(.18,.68,.18,-.35,1.16,0,0xd8c79e);part(.18,.68,.18,.35,1.16,0,0xd8c79e);part(.36,.36,.36,0,1.68,0,0xb08a64);part(.4,.08,.4,0,1.87,0,0x3b2a1a);
  return g;
 }
-// A round plinth of 1 m stone blocks: the grid is the in-game scale.
-function plinth(radius){
- const cells=[];for(let x=-radius;x<=radius;x++)for(let z=-radius;z<=radius;z++)if(Math.hypot(x,z)<=radius+.3)cells.push([x,z]);
- const mesh=new THREE.InstancedMesh(new THREE.BoxGeometry(.97,.5,.97),new THREE.MeshStandardMaterial({roughness:.95}),cells.length),m=new THREE.Matrix4(),c=new THREE.Color();
- cells.forEach(([x,z],i)=>{m.makeTranslation(x,-.25,z);mesh.setMatrixAt(i,m);const edge=Math.hypot(x,z)>radius-1;c.setHex(edge?0x3a3036:(x+z)%2?0x2a2329:0x231e24);mesh.setColorAt(i,c)});
- mesh.receiveShadow=true;return mesh;
-}
-
 export class SpecimenViewer{
  constructor(host,{onLoad=()=>{},onError=()=>{},onActionEnd=()=>{}}={}){
   this.host=host;this.onLoad=onLoad;this.onError=onError;this.onActionEnd=onActionEnd;this.reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -51,8 +44,9 @@ export class SpecimenViewer{
    c.holder.position.y=-box.min.y;const span=Math.max(size.x,size.y*1.3,size.z,2.2);
    this.frame.target.set(center.x,size.y*.45,center.z);this.frame.distance=span*1.5+2.2;this.size=size;
    this.assistant.position.set(Math.max(size.x/2+1.4,1.6),0,size.z*.12);
-   if(this.plinth){this.scene.remove(this.plinth);this.plinth.geometry.dispose();this.plinth.material.dispose()}
-   this.plinth=plinth(Math.ceil(Math.max(size.x,size.z)*.62+2));this.scene.add(this.plinth);
+   // A plinth of the mod's own flagstones; each block is 1 m, so it doubles as a scale grid.
+   if(this.plinth)this.scene.remove(this.plinth);
+   this.plinth=plinth(Math.ceil(Math.max(size.x,size.z)*.62+2));this.plinth.position.set(-.5,0,-.5);this.scene.add(this.plinth);
    const k=span*1.2;Object.assign(this.key.shadow.camera,{left:-k,right:k,top:k,bottom:-k,near:.5,far:k*6});this.key.shadow.camera.updateProjectionMatrix();
    this.key.position.set(-k*.9,k*1.6,-k*1.4);this.key.target.position.copy(this.frame.target);
    if(!this.placed){this.placed=true;this.controls.target.copy(this.frame.target);this.camera.position.set(-span*1.1,span*.55,-span*1.5).setLength(this.frame.distance).add(this.frame.target);this.distance=this.frame.distance}
@@ -85,10 +79,13 @@ export class Thumbnailer{
   this.scene.add(new THREE.HemisphereLight(0xe8d6f0,0x3a2a20,2));const key=new THREE.DirectionalLight(0xffdcae,3);key.position.set(-4,6,-5);this.scene.add(key);const rim=new THREE.DirectionalLight(0xf07a1a,2);rim.position.set(5,3,6);this.scene.add(rim);
   this.queue=[];this.busy=false;
  }
+ // A chapter card: a slab of the era's blocks, optionally with an animal of that era standing on it.
+ eraScene(id,speciesList=[]){return new Promise((resolve,reject)=>{if(!this.renderer)return reject(new Error('webgl'));this.queue.push({era:id,speciesList,resolve,reject});this.next()})}
  request(species,sex='male'){return new Promise((resolve,reject)=>{if(!this.renderer)return reject(new Error('webgl'));this.queue.push({species,sex,resolve,reject});this.next()})}
  async next(){
   if(this.busy||!this.queue.length)return;this.busy=true;const job=this.queue.shift();
   try{
+   if(job.era){await this.renderEra(job);this.busy=false;this.next();return}
    const c=await spawn(job.species,{sex:job.sex,merge:true});c.animator.update(1.3);
    this.scene.add(c.holder);c.holder.updateMatrixWorld(true);
    const box=new THREE.Box3().setFromObject(c.model.root),size=box.getSize(new THREE.Vector3()),center=box.getCenter(new THREE.Vector3());
@@ -98,5 +95,21 @@ export class Thumbnailer{
    this.scene.remove(c.holder);c.dispose();job.resolve(URL.createObjectURL(blob));
   }catch(e){job.reject(e)}
   this.busy=false;this.next();
+ }
+ async renderEra(job){
+  const slab=eraSlab(job.era),group=new THREE.Group();group.add(slab);
+  const animals=await Promise.all(job.speciesList.map(([sp,x,z,rot])=>spawn(sp,{merge:true}).then(c=>{c.animator.update(.8);c.holder.position.set(x,0,z);c.holder.rotation.y=rot;group.add(c.holder);return c})));
+  // Textures load asynchronously; wait until every block image is ready before the photo.
+  const maps=new Set();group.traverse(o=>{for(const m of [].concat(o.material||[]))if(m.map)maps.add(m.map)});
+  await Promise.all([...maps].map(t=>t.image?.complete!==false&&t.image?Promise.resolve():new Promise(r=>{const i=setInterval(()=>{if(t.image){clearInterval(i);r()}},30)})));
+  this.scene.add(group);group.updateMatrixWorld(true);
+  const box=new THREE.Box3().setFromObject(slab),center=box.getCenter(new THREE.Vector3()),size=box.getSize(new THREE.Vector3());
+  this.renderer.setSize(480,300,false);this.camera.aspect=1.6;this.camera.fov=26;this.camera.updateProjectionMatrix();
+  this.camera.position.copy(center).add(new THREE.Vector3(-.55,.42,.75).setLength(Math.max(size.x,size.z)*1.95));this.camera.lookAt(center.x,center.y+1,center.z);
+  this.renderer.render(this.scene,this.camera);
+  const blob=await new Promise(res=>this.renderer.domElement.toBlob(res,'image/webp',.92));
+  this.scene.remove(group);for(const a of animals)a.dispose();
+  this.renderer.setSize(360,240,false);this.camera.aspect=1.5;this.camera.fov=24;this.camera.updateProjectionMatrix();
+  job.resolve(URL.createObjectURL(blob));
  }
 }
