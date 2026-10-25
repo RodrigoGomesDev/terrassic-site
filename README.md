@@ -92,7 +92,7 @@ O idioma vem de `?lang=pt|en|es`, da última escolha do visitante ou do navegado
 - Renders feitos no navegador, não capturas do jogo. O leitor não roda Molang nem a especificação GeckoLib inteira; o mod não usa nenhum dos dois.
 - Com "reduzir movimento" ligado, as cenas ficam paradas e as seções presas ao scroll viram páginas normais. Sem WebGL, o texto e os dados continuam.
 - A cor e a tipografia seguem a identidade "Âmbar e Basalto" do mod (`docs/IDENTIDADE.md`). Fontes: Big Shoulders Display, Hanken Grotesk e JetBrains Mono (Google Fonts), mais as três fontes do mod (Caderno para o que a Katarina escreveu, Sedimento para o relatório datilografado e Entalhe para os títulos das páginas), embutidas no CSS.
-- O som do rugido é "Dinosaur roar or scream 2", de GSMsea via Pixabay (Pixabay Content License, crédito no rodapé e em `public/assets/audio/CREDITS.txt`). Só toca se o visitante ligar e não tem link de download. Ele fica no site mesmo quando o mod ganhar o rugido próprio.
+- O som do rugido é "Dinosaur roar or scream 2", de GSMsea via Pixabay (Pixabay Content License, que não exige crédito; a fonte fica registrada em `public/assets/audio/CREDITS.txt`). Só toca se o visitante ligar e não tem link de download. Ele fica no site mesmo quando o mod ganhar o rugido próprio.
 
 ## Autoria
 
