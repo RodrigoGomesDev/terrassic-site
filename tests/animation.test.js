@@ -56,3 +56,10 @@ test('the meteor model and its looping animation load in the site format',()=>{
  const r0=sampleTrack(clip.bones.rock.rotation,0,clip.length,true),r1=sampleTrack(clip.bones.rock.rotation,clip.length-1e-6,clip.length,true);close(Math.abs(r1[0]-r0[0]),360,.01);
  model.dispose();texture.dispose();
 });
+test('the island splits along the crack and every loose piece belongs to the break',()=>{
+ const d=json('../public/assets/island/island.json'),texture=new THREE.Texture(),model=createModel(d,texture,'male',{merge:true,bias:false});
+ assert.ok(model.bones.has('left')&&model.bones.has('right'));const clip=compileClip(d.animations.break);assert.equal(clip.loop,false);
+ for(const name of model.bones.keys())if(name!=='root')assert.ok(clip.bones[name],`${name} has no motion`);
+ for(const track of Object.values(clip.bones.left))for(const v of sampleTrack(track,0,clip.length))close(v,0,1e-3);
+ model.dispose();texture.dispose();
+});

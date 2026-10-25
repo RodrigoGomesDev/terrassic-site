@@ -12,17 +12,17 @@ let ticking=false;const frame=()=>{ticking=false;for(const fn of scrollers)fn()}
 addEventListener('scroll',()=>{if(!ticking){ticking=true;requestAnimationFrame(frame)}},{passive:true});addEventListener('resize',()=>requestAnimationFrame(frame));
 
 // The opening film: scroll progress drives the sky colour, the captions, the flash and the 3D scene.
-const SKY=[[0,[219,177,91]],[.45,[227,162,74]],[.75,[239,138,48]],[.9,[240,122,26]],[.97,[255,241,214]]];
+const SKY=[[0,[219,177,91]],[.45,[227,162,74]],[.72,[239,138,48]],[.8,[240,122,26]],[.83,[255,241,214]],[.9,[196,71,58]],[1,[58,34,64]]];
 const sky=p=>{let i=0;while(i<SKY.length-2&&SKY[i+1][0]<p)i++;const [a,ca]=SKY[i],[b,cb]=SKY[i+1],k=smooth((p-a)/(b-a));return `rgb(${ca.map((v,j)=>Math.round(v+(cb[j]-v)*k)).join(',')})`};
 export function initFilm(){
  const film=$('inicio'),stage=$('film-stage'),listeners=[];
  const update=()=>{
   const p=reduced?.62:pinProgress(film),win=(a,b,c,d)=>smooth((p-a)/(b-a))*(1-smooth((p-c)/(d-c)));
   stage.style.setProperty('--film-bg',sky(p));stage.style.setProperty('--intro',(1-smooth(p/.1)).toFixed(3));
-  stage.style.setProperty('--quote',win(.12,.18,.3,.36).toFixed(3));stage.style.setProperty('--chapter',win(.5,.56,.76,.82).toFixed(3));
-  stage.style.setProperty('--flash',(smooth((p-.88)/.08)*(1-smooth((p-.985)/.015))).toFixed(3));
-  $('film-fill').style.width=`${p*100}%`;$('scroll-label').textContent=t(p<.3?'film.scroll':p<.85?'film.scroll2':'film.scroll3');
-  $('topbar').classList.toggle('on-light',film.getBoundingClientRect().bottom>innerHeight*.5&&p<.9);
+  stage.style.setProperty('--quote',win(.12,.18,.3,.36).toFixed(3));stage.style.setProperty('--chapter',win(.48,.54,.72,.77).toFixed(3));
+  stage.style.setProperty('--flash',(smooth((p-.785)/.02)*(1-smooth((p-.81)/.06))).toFixed(3));
+  $('film-fill').style.width=`${p*100}%`;$('scroll-label').textContent=t(p<.3?'film.scroll':p<.8?'film.scroll2':'film.scroll3');
+  $('topbar').classList.toggle('on-light',film.getBoundingClientRect().bottom>innerHeight*.5&&p<.86);
   for(const fn of listeners)fn(p);
  };
  onScroll(update);

@@ -4,7 +4,7 @@ Site estático do [Terrassic](https://github.com/RodrigoGomesDev/terrassic), de 
 
 O que tem:
 
-- **Abertura:** o céu âmbar do site antigo, o T. rex numa ilha flutuante feita com os blocos do próprio mod e um meteoro que se aproxima conforme o visitante rola a página. O rugido acompanha o scroll, a câmera treme e tudo termina num clarão. O som do rugido só toca se o visitante ligar.
+- **Abertura:** o céu âmbar do site antigo, o T. rex numa ilha flutuante feita com os blocos do próprio mod e um meteoro que se aproxima conforme o visitante rola a página. O rugido acompanha o scroll, o meteoro cai no meio da ilha, ela racha em duas com lava na fenda e pedaços voando, e o T. rex vai junto com a metade dele. O som do rugido só toca se o visitante ligar.
 - **O Salto:** a tela de abertura do mod, uma frase por vez conforme o scroll, com a Fenda se abrindo.
 - **Caderno da Katarina:** o Relatório do Incidente e as páginas do diário, com o texto do próprio mod.
 - **Eras:** os 5 capítulos numa faixa horizontal presa ao scroll, cada um com uma paisagem em pixel desenhada por código.
@@ -46,7 +46,9 @@ O script só lê o mod e gera:
 
 Espécie nova no mod entra no site sozinha na próxima importação.
 
-## Meteoro e rugido
+## Meteoro, ilha e rugido
+
+- `python3 -B scripts/island.py` gera a ilha: `art/island/island.bbmodel` (projeto do Blockbench com UV por face num atlas das texturas de bloco do mod e a animação `animation.island.break`) e a cópia do site em `public/assets/island/`. Rode depois do `import-mod.py`.
 
 - `python3 -B scripts/meteor.py` gera o meteoro: `art/meteor/meteor.bbmodel` (projeto do Blockbench, abre e edita como os modelos do mod), a textura e a animação `animation.meteor.fall`, e a cópia que o site usa em `public/assets/meteor/`.
 - `python3 -B scripts/web-roar.py` gera o rugido do T. rex feito para o site (`public/assets/species/tyrannosaurus.roar.json`), no rig do mod: preparação, corpo que sobe, cabeça varrendo de um lado para o outro com a mandíbula tremendo, braços fechando e a cauda em onda. Os arquivos do jogo não mudam.

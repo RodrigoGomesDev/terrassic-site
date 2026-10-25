@@ -27,13 +27,13 @@ export function addClip(id,name,raw){return loadSpecies(id).then(d=>{d.clips[nam
 
 // Builds the Blockbench rig (16 px = 1 m) from the compact model. BoxGeometry face order: east, west, up, down, south, north.
 // merge: one draw call per bone (for scenes with many creatures); the per-cube depth bias becomes a tiny inflate.
-export function createModel(data,texture,sex='male',{shadows=false,merge=false}={}){
+export function createModel(data,texture,sex='male',{shadows=false,merge=false,bias=true}={}){
  const model=data.model??data,root=new THREE.Group(),bones=new Map(),[w,h]=model.res;
  const material=new THREE.MeshStandardMaterial({map:texture,roughness:1,metalness:0,alphaTest:.3,side:THREE.FrontSide,polygonOffset:true,polygonOffsetFactor:0,polygonOffsetUnits:0});
  const meshes=[];
  function cube(index,parent,pivot){
   const [name,from,to,origin,rotation,inflate,faces]=model.cubes[index];
-  const size=from.map((n,i)=>Math.max(.005,to[i]-n+2*(inflate||0)+(merge?index*.0016:0)));
+  const size=from.map((n,i)=>Math.max(.005,to[i]-n+2*(inflate||0)+(merge&&bias?index*.0016:0)));
   const geo=new THREE.BoxGeometry(...size),uv=geo.attributes.uv;
   faces.forEach((f,i)=>{
    const coords=[[f[0]/w,1-f[1]/h],[f[2]/w,1-f[1]/h],[f[0]/w,1-f[3]/h],[f[2]/w,1-f[3]/h]];
@@ -43,7 +43,7 @@ export function createModel(data,texture,sex='male',{shadows=false,merge=false}=
   if(merge){const m=new THREE.Matrix4().compose(new THREE.Vector3(...origin.map((v,i)=>v-pivot[i])),new THREE.Quaternion().setFromEuler(new THREE.Euler(...rotation.map(radians),'ZYX')),new THREE.Vector3(1,1,1)).multiply(new THREE.Matrix4().makeTranslation(...from.map((v,i)=>(v+to[i])/2-origin[i])));geo.applyMatrix4(m);(parent.userData.parts??=[]).push(geo);return;}
   const mesh=new THREE.Mesh(geo,material);mesh.name=name;mesh.castShadow=shadows;mesh.receiveShadow=shadows;
   // Skin cubes can share a coplanar boundary across moving bones; a tiny per-cube depth bias keeps them stable.
-  const bias=-(index+1)*.25;mesh.onBeforeRender=(_r,_s,_c,_g,mat)=>{mat.polygonOffsetUnits=bias};
+  const depth=-(index+1)*.25;mesh.onBeforeRender=(_r,_s,_c,_g,mat)=>{mat.polygonOffsetUnits=depth};
   const holder=new THREE.Group();holder.position.set(...origin.map((v,i)=>v-pivot[i]));holder.rotation.set(...rotation.map(radians),'ZYX');
   mesh.position.set(...from.map((v,i)=>(v+to[i])/2-origin[i]));holder.add(mesh);parent.add(holder);meshes.push(mesh);
  }
