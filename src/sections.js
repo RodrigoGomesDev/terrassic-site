@@ -4,6 +4,7 @@ import {t,pick} from './i18n.js';
 import {sprite,paintSprite} from './sprites.js';
 import {picture} from './pictures.js';
 import {initBite} from './bite.js';
+import {eggCanvas,eggStage} from './egg.js';
 const $=id=>document.getElementById(id),clamp=(v,a,b)=>Math.min(b,Math.max(a,v)),smooth=x=>{x=clamp(x,0,1);return x*x*(3-2*x)};
 const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
 const el=(tag,cls,text)=>{const e=document.createElement(tag);if(cls)e.className=cls;if(text!==undefined)e.textContent=text;return e};
@@ -145,10 +146,10 @@ export function initEras(){
 }
 
 export function initMechanics(thumbnailer){
- // Egg block: the mod's three crack stages, then it hatches and starts again.
- const egg=$('egg-sprite'),stage=$('egg-stage');let step=0;
- const stages=['block:triceratops_egg_0','block:triceratops_egg_1','block:triceratops_egg_2'];paintSprite(egg,stages[0],96);egg.style.width='78px';egg.style.backgroundPosition=egg.style.backgroundPosition.replace(/^-?\d+px/,m=>`${parseInt(m)-9}px`);
- if(!reduced)setInterval(()=>{step=(step+1)%4;stage.dataset.step=step;if(step<3){paintSprite(egg,stages[step],96);egg.style.width='78px';egg.style.backgroundPosition=egg.style.backgroundPosition.replace(/^-?\d+px/,m=>`${parseInt(m)-9}px`)}},1600);
+ // The egg in pixel art: whole, a crack, cracked across, then it hatches and starts again.
+ const stage=$('egg-stage'),egg=eggCanvas(),eg=egg.getContext('2d');let step=0;
+ $('egg-sprite').replaceWith(egg);eggStage(eg,0);
+ if(!reduced)setInterval(()=>{step=(step+1)%4;stage.dataset.step=step;eggStage(eg,step)},1600);
  for(const s of document.querySelectorAll('[data-sprite]'))paintSprite(s,s.dataset.sprite,32);
  const para=SPECIES.find(s=>s.id==='parasaurolophus');
  const pair=new IntersectionObserver(([e])=>{if(!e.isIntersecting)return;pair.disconnect();for(const sex of ['male','female'])picture(`parasaurolophus-${sex}`,()=>thumbnailer().then(t=>t.request(para,sex))).then(url=>{$(`pair-${sex}`).src=url}).catch(()=>{})},{rootMargin:'400px'});pair.observe($('sex-pair'));
