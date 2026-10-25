@@ -27,8 +27,8 @@ export const UI={
  'eras.lede':['Você avança indo cada vez mais fundo no passado, atrás da Katarina. Toda era visitada fica aberta para sempre.','You move forward by going ever deeper into the past, after Katarina. Every era you visit stays open for good.','Avanzas yendo cada vez más atrás en el pasado, tras Katarina. Cada era visitada queda abierta para siempre.'],
  'eras.event':['Evento','Event','Evento'],'eras.boss':['Chefe','Boss','Jefe'],'eras.where':['Onde','Where','Dónde'],'eras.fauna':['Quem vive lá','Who lives there','Quién vive allí'],'eras.plants':['Plantas','Plants','Plantas'],
  'best.eyebrow':['Bestiário','Bestiary','Bestiario'],'best.title':['Veja cada uma de perto.','See each one up close.','Mira cada una de cerca.'],
- 'best.lede':['Todas as criaturas já modeladas, com macho e fêmea e as animações do jogo. Arraste para girar. A pessoa ao lado tem 1,8 m.','Every creature modelled so far, male and female, with the in-game animations. Drag to turn. The person beside it is 1.8 m tall.','Todas las criaturas ya modeladas, con macho y hembra y las animaciones del juego. Arrastra para girar. La persona al lado mide 1,8 m.'],
- 'best.male':['Macho','Male','Macho'],'best.female':['Fêmea','Female','Hembra'],'best.scale':['Pessoa de 1,8 m','1.8 m person','Persona de 1,8 m'],'best.sound':['Som','Sound','Sonido'],
+ 'best.lede':['Todas as criaturas já modeladas, com macho e fêmea e as animações do jogo. Arraste para girar. Cada bloco do pedestal tem 1 metro.','Every creature modelled so far, male and female, with the in-game animations. Drag to turn. Each block of the plinth is 1 metre.','Todas las criaturas ya modeladas, con macho y hembra y las animaciones del juego. Arrastra para girar. Cada bloque del pedestal mide 1 metro.'],
+ 'best.male':['Macho','Male','Macho'],'best.female':['Fêmea','Female','Hembra'],'best.sound':['Som','Sound','Sonido'],
  'best.search':['Buscar espécie','Search species','Buscar especie'],'best.sort':['Ordenar','Sort','Ordenar'],'best.sortSize':['Maior primeiro','Largest first','Más grande primero'],'best.sortName':['Nome','Name','Nombre'],'best.sortVersion':['Versão','Version','Versión'],
  'best.count':['{n} de {total} criaturas','{n} of {total} creatures','{n} de {total} criaturas'],'best.none':['Nenhuma espécie com esse nome.','No species by that name.','Ninguna especie con ese nombre.'],
  'best.noteBy':['Katarina','Katarina','Katarina'],'best.loading':['Carregando o modelo…','Loading the model…','Cargando el modelo…'],'best.static':['Seu navegador não abriu o 3D. Os dados continuam aqui.','Your browser could not open 3D. The data is still here.','Tu navegador no pudo abrir el 3D. Los datos siguen aquí.'],
@@ -82,8 +82,8 @@ export const pick=obj=>obj?.[lang]??obj?.pt??'';
 export function detectLang(){
  let stored=null;try{stored=localStorage.getItem('terrassic.lang')}catch{}
  const query=new URLSearchParams(location.search).get('lang');
- const nav=(navigator.languages||[navigator.language||'pt']).map(l=>l.slice(0,2));
- return [query,stored,...nav].find(l=>LANGS.includes(l))||'pt';
+ // English by default; Portuguese and Spanish when chosen or asked for in the address (?lang=pt).
+ return [query,stored].find(l=>LANGS.includes(l))||'en';
 }
 export function setLang(next){
  lang=LANGS.includes(next)?next:'pt';try{localStorage.setItem('terrassic.lang',lang)}catch{}

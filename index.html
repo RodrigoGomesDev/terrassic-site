@@ -1,14 +1,14 @@
 <!doctype html>
-<html lang="pt-BR">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Terrassic</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <meta name="theme-color" content="#1c181e">
-<meta name="description" content="Terrassic: dinossauros em tamanho real, domesticáveis e montáveis, num mod autoral para Minecraft 1.20.1 (Fabric e Forge).">
+<meta name="description" content="Terrassic: life-size dinosaurs you can tame, ride and fly, in an original mod for Minecraft 1.20.1 (Fabric and Forge).">
 <meta property="og:title" content="Terrassic">
-<meta property="og:description" content="Dinossauros em tamanho real para Minecraft 1.20.1. Atravesse a Fenda, estude fósseis e sobreviva com pedra, osso e sílex.">
+<meta property="og:description" content="Life-size dinosaurs for Minecraft 1.20.1. Cross the Rift, study fossils and survive with stone, bone and flint.">
 <link rel="icon" href="./assets/monograma_64.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -16,21 +16,21 @@
 <link rel="stylesheet" href="./src/style.css">
 </head>
 <body>
-<a class="skip" href="#bestiario" data-i18n="skip">Pular para o bestiário</a>
+<a class="skip" href="#bestiario" data-i18n="skip">Skip to the bestiary</a>
 
 <header class="topbar" id="topbar">
  <a class="brand" href="#inicio" aria-label="Terrassic"><img src="./assets/monograma_64.png" alt="" width="32" height="32"><img class="brand-word" src="./assets/letreiro_950.png" alt="Terrassic" width="950" height="180"></a>
- <nav class="nav" id="nav" aria-label="Seções">
-  <a href="#historia" data-i18n="nav.story">História</a>
+ <nav class="nav" id="nav" aria-label="Sections">
+  <a href="#historia" data-i18n="nav.story">Story</a>
   <a href="#eras" data-i18n="nav.eras">Eras</a>
-  <a href="#bestiario" data-i18n="nav.bestiary">Bestiário</a>
-  <a href="#mecanicas" data-i18n="nav.play">Como se joga</a>
-  <a href="#roteiro" data-i18n="nav.roadmap">Roteiro</a>
+  <a href="#bestiario" data-i18n="nav.bestiary">Bestiary</a>
+  <a href="#mecanicas" data-i18n="nav.play">How it plays</a>
+  <a href="#roteiro" data-i18n="nav.roadmap">Roadmap</a>
  </nav>
  <div class="lang" role="group" aria-label="Idioma / Language">
-  <button type="button" data-lang="pt" aria-pressed="true">PT</button><button type="button" data-lang="en" aria-pressed="false">EN</button><button type="button" data-lang="es" aria-pressed="false">ES</button>
+  <button type="button" data-lang="pt" aria-pressed="false">PT</button><button type="button" data-lang="en" aria-pressed="true">EN</button><button type="button" data-lang="es" aria-pressed="false">ES</button>
  </div>
- <a class="nav-cta" href="#jogar" data-i18n="nav.cta">Jogar</a>
+ <a class="nav-cta" href="#jogar" data-i18n="nav.cta">Play</a>
 </header>
 
 <main>
@@ -40,17 +40,17 @@
    <div class="hero-canvas" id="hero-canvas" aria-hidden="true"></div>
    <div class="film-flash" aria-hidden="true"></div>
    <div class="film-copy film-intro">
-    <p class="film-eyebrow" data-i18n="hero.eyebrow">Mod para Minecraft Java 1.20.1 · Fabric e Forge</p>
-    <p class="film-lede" data-i18n="hero.lede">Dinossauros em tamanho real, que você doma, monta e voa. Atravesse a Fenda, estude fósseis como cientista e sobreviva com pedra, osso e sílex.</p>
+    <p class="film-eyebrow" data-i18n="hero.eyebrow">A Minecraft Java 1.20.1 mod · Fabric and Forge</p>
+    <p class="film-lede" data-i18n="hero.lede">Life-size dinosaurs you can tame, ride and fly. Cross the Rift, study fossils as a scientist and survive with stone, bone and flint.</p>
     <div class="hero-actions">
-     <a class="btn btn-dark magnetic" href="#bestiario"><span data-i18n="hero.cta">Conhecer as criaturas</span><span aria-hidden="true">→</span></a>
-     <a class="btn btn-line magnetic" href="https://www.curseforge.com/minecraft/mc-mods/terrassic" target="_blank" rel="noopener noreferrer"><span data-i18n="hero.download">Baixar a v0.2.0</span><span aria-hidden="true">↗</span></a>
+     <a class="btn btn-dark magnetic" href="#bestiario"><span data-i18n="hero.cta">Meet the creatures</span><span aria-hidden="true">→</span></a>
+     <a class="btn btn-line magnetic" href="https://www.curseforge.com/minecraft/mc-mods/terrassic" target="_blank" rel="noopener noreferrer"><span data-i18n="hero.download">Download v0.2.0</span><span aria-hidden="true">↗</span></a>
     </div>
    </div>
    <div class="film-copy film-quote" aria-hidden="true"><p id="film-quote"></p><span id="film-cite"></span></div>
-   <div class="film-copy film-chapter" aria-hidden="true"><p class="film-eyebrow" data-i18n="film.chapter">Capítulo 1 · Cretáceo Superior</p><h2 data-i18n="film.title">Ecos do Fim.</h2><p data-i18n="film.line">O fim do Cretáceo chega pelo céu.</p></div>
-   <div class="film-top"><span class="hero-status" aria-live="polite"><span class="hero-meter"><span id="hero-meter"></span></span><span id="hero-status" data-i18n="hero.loading">Carregando o T. rex</span></span><button type="button" class="hero-sound" id="hero-sound" aria-pressed="false"><span class="hero-sound-icon" aria-hidden="true"></span><span data-i18n="hero.sound">Ouvir o rugido</span></button></div>
-   <a class="scroll-cue" href="#historia"><span class="scroll-arrow" aria-hidden="true">↓</span><span id="scroll-label" data-i18n="film.scroll">Role para trazer o meteoro</span></a>
+   <div class="film-copy film-chapter" aria-hidden="true"><p class="film-eyebrow" data-i18n="film.chapter">Chapter 1 · Late Cretaceous</p><h2 data-i18n="film.title">Echoes of the End.</h2><p data-i18n="film.line">The end of the Cretaceous comes from the sky.</p></div>
+   <div class="film-top"><span class="hero-status" aria-live="polite"><span class="hero-meter"><span id="hero-meter"></span></span><span id="hero-status" data-i18n="hero.loading">Loading the T. rex</span></span><button type="button" class="hero-sound" id="hero-sound" aria-pressed="false"><span class="hero-sound-icon" aria-hidden="true"></span><span data-i18n="hero.sound">Hear the roar</span></button></div>
+   <a class="scroll-cue" href="#historia"><span class="scroll-arrow" aria-hidden="true">↓</span><span id="scroll-label" data-i18n="film.scroll">Scroll to bring the meteor</span></a>
    <div class="film-track" aria-hidden="true"><span id="film-fill"></span></div>
   </div>
  </section>
@@ -61,23 +61,23 @@
   <div class="story-pin">
    <canvas class="story-sky" id="story-sky" aria-hidden="true"></canvas>
    <div class="story-meteor" id="story-meteor" aria-hidden="true"></div>
-   <div class="story-lines" id="story-lines"><p class="story-kicker" data-i18n="story.kicker">A história · O Salto</p></div>
+   <div class="story-lines" id="story-lines"><p class="story-kicker" data-i18n="story.kicker">The story · The Leap</p></div>
   </div>
  </section>
 
  <section class="chronicle band" id="cronica">
   <div class="wrap chronicle-grid">
    <div class="chronicle-copy reveal">
-    <p class="eyebrow" data-i18n="chron.eyebrow">O Projeto Terrassic</p>
-    <h2 class="display" data-i18n="chron.title">Uma máquina para olhar o passado.</h2>
-    <p data-i18n="chron.p1">Num sítio de fósseis do Triássico, a equipe achou um âmbar que brilha sozinho: o Âmbar Temporal. Em volta dele, o laboratório construiu uma máquina para observar o passado. Só observar.</p>
-    <p data-i18n="chron.p2">A Dra. Katarina Usha atravessou e não voltou. Você entra na câmara para buscá-la, a máquina falha e você acorda no Cretáceo de mãos vazias. Siga as anotações dela, reconstrua o Altar do Salto e vá cada vez mais fundo no tempo.</p>
-    <p class="rule" data-i18n="chron.rule">A história nunca move você sozinha. As eras ficam sempre abertas e quem só quer dinossauros pode ignorá-la.</p>
+    <p class="eyebrow" data-i18n="chron.eyebrow">The Terrassic Project</p>
+    <h2 class="display" data-i18n="chron.title">A machine to look at the past.</h2>
+    <p data-i18n="chron.p1">At a Triassic fossil site, the team found amber that glows on its own: Temporal Amber. Around it, the lab built a machine to observe the past. Only to observe.</p>
+    <p data-i18n="chron.p2">Dr. Katarina Usha went through and never came back. You step into the chamber to find her, the machine fails, and you wake up in the Cretaceous empty-handed. Follow her notes, rebuild the Leap Altar and travel ever deeper into time.</p>
+    <p class="rule" data-i18n="chron.rule">The story never moves you on its own. Eras always stay open, and players who just want dinosaurs can ignore it.</p>
    </div>
    <div class="notebook reveal" id="notebook">
-    <div class="notebook-tabs" role="tablist" aria-label="Caderno de Campo" id="notebook-tabs"></div>
+    <div class="notebook-tabs" role="tablist" aria-label="Field Notebook" id="notebook-tabs"></div>
     <article class="page" id="notebook-page" aria-live="polite"></article>
-    <div class="notebook-nav"><button type="button" class="icon-btn" id="page-prev" aria-label="Página anterior">←</button><span id="page-count"></span><button type="button" class="icon-btn" id="page-next" aria-label="Próxima página">→</button></div>
+    <div class="notebook-nav"><button type="button" class="icon-btn" id="page-prev" aria-label="Previous page">←</button><span id="page-count"></span><button type="button" class="icon-btn" id="page-next" aria-label="Next page">→</button></div>
    </div>
   </div>
  </section>
@@ -85,9 +85,9 @@
  <section class="eras" id="eras">
   <div class="eras-pin">
    <div class="eras-head wrap">
-    <p class="eyebrow" data-i18n="eras.eyebrow">Capítulos</p>
-    <h2 class="display" data-i18n="eras.title">Uma era de cada vez.</h2>
-    <p class="lede" data-i18n="eras.lede">Você avança indo cada vez mais fundo no passado, atrás da Katarina. Toda era visitada fica aberta para sempre.</p>
+    <p class="eyebrow" data-i18n="eras.eyebrow">Chapters</p>
+    <h2 class="display" data-i18n="eras.title">One era at a time.</h2>
+    <p class="lede" data-i18n="eras.lede">You move forward by going ever deeper into the past, after Katarina. Every era you visit stays open for good.</p>
    </div>
    <div class="eras-track" id="eras-track"></div>
    <div class="timeline wrap" aria-hidden="true"><div class="timeline-bar"><span id="timeline-fill"></span></div><div class="timeline-ticks" id="timeline-ticks"></div></div>
@@ -97,23 +97,22 @@
  <section class="bestiary band" id="bestiario">
   <div class="wrap">
    <div class="section-head reveal">
-    <p class="eyebrow" data-i18n="best.eyebrow">Bestiário</p>
-    <h2 class="display" data-i18n="best.title">Veja cada uma de perto.</h2>
-    <p class="lede" data-i18n="best.lede">Todas as criaturas já modeladas, com macho e fêmea e as animações do jogo. Arraste para girar. A pessoa ao lado tem 1,8 m.</p>
+    <p class="eyebrow" data-i18n="best.eyebrow">Bestiary</p>
+    <h2 class="display" data-i18n="best.title">See each one up close.</h2>
+    <p class="lede" data-i18n="best.lede">Every creature modelled so far, male and female, with the in-game animations. Drag to turn. Each block of the plinth is 1 metre.</p>
    </div>
    <div class="specimen">
     <div class="stage" id="stage">
-     <div class="stage-canvas" id="stage-canvas" tabindex="0" role="img" aria-label="Modelo 3D"></div>
+     <div class="stage-canvas" id="stage-canvas" tabindex="0" role="img" aria-label="3D model"></div>
      <div class="stage-top">
-      <div class="seg" role="group" aria-label="Sexo"><button type="button" id="sex-male" aria-pressed="true" data-i18n="best.male">Macho</button><button type="button" id="sex-female" aria-pressed="false" data-i18n="best.female">Fêmea</button></div>
+      <div class="seg" role="group" aria-label="Sex"><button type="button" id="sex-male" aria-pressed="true" data-i18n="best.male">Male</button><button type="button" id="sex-female" aria-pressed="false" data-i18n="best.female">Female</button></div>
       <div class="stage-tools">
-       <button type="button" class="icon-btn" id="zoom-out" aria-label="Afastar">−</button>
-       <button type="button" class="icon-btn" id="zoom-in" aria-label="Aproximar">+</button>
-       <button type="button" class="chip" id="scale-toggle" aria-pressed="true" data-i18n="best.scale">Pessoa de 1,8 m</button>
-       <button type="button" class="chip" id="sound-toggle" aria-pressed="false" hidden data-i18n="best.sound">Som</button>
+       <button type="button" class="icon-btn" id="zoom-out" aria-label="Zoom out">−</button>
+       <button type="button" class="icon-btn" id="zoom-in" aria-label="Zoom in">+</button>
+       <button type="button" class="chip" id="sound-toggle" aria-pressed="false" hidden data-i18n="best.sound">Sound</button>
       </div>
      </div>
-     <div class="stage-bottom"><div class="anim-chips" id="anim-chips" role="group" aria-label="Animação"></div></div>
+     <div class="stage-bottom"><div class="anim-chips" id="anim-chips" role="group" aria-label="Animation"></div></div>
      <p class="stage-status" id="stage-status" aria-live="polite"></p>
     </div>
     <aside class="dossier" id="dossier" aria-live="polite">
@@ -122,17 +121,17 @@
       <div><p class="dossier-group" id="dossier-group"></p><h3 id="dossier-name">Tyrannosaurus</h3><p class="dossier-latin" id="dossier-latin"></p></div>
      </div>
      <dl class="facts" id="dossier-facts"></dl>
-     <div class="ruler" id="dossier-ruler" aria-hidden="true"><div class="ruler-bar"><span id="ruler-fill"></span><i id="ruler-human"></i></div><div class="ruler-scale"><span>0</span><span>10 m</span><span>20 m</span><span>30 m</span></div></div>
+     <div class="ruler" id="dossier-ruler" aria-hidden="true"><div class="ruler-bar"><span id="ruler-fill"></span></div><div class="ruler-scale"><span>0</span><span>10 m</span><span>20 m</span><span>30 m</span></div></div>
      <div class="guide-tabs" role="tablist" id="guide-tabs"></div>
      <p class="guide-text" id="guide-text"></p>
      <blockquote class="note" id="dossier-note"><p id="note-text"></p><cite data-i18n="best.noteBy">Katarina</cite></blockquote>
     </aside>
    </div>
    <div class="roster-bar">
-    <div class="filters" id="filters" role="group" aria-label="Filtrar"></div>
+    <div class="filters" id="filters" role="group" aria-label="Filter"></div>
     <div class="roster-tools">
-     <label class="search"><span class="sr-only" data-i18n="best.search">Buscar espécie</span><input id="search" type="search" autocomplete="off" data-i18n-placeholder="best.search" placeholder="Buscar espécie"></label>
-     <label class="sort"><span class="sr-only" data-i18n="best.sort">Ordenar</span><select id="sort"><option value="size" data-i18n="best.sortSize">Maior primeiro</option><option value="name" data-i18n="best.sortName">Nome</option><option value="version" data-i18n="best.sortVersion">Versão</option></select></label>
+     <label class="search"><span class="sr-only" data-i18n="best.search">Search species</span><input id="search" type="search" autocomplete="off" data-i18n-placeholder="best.search" placeholder="Search species"></label>
+     <label class="sort"><span class="sr-only" data-i18n="best.sort">Sort</span><select id="sort"><option value="size" data-i18n="best.sortSize">Largest first</option><option value="name" data-i18n="best.sortName">Name</option><option value="version" data-i18n="best.sortVersion">Version</option></select></label>
     </div>
    </div>
    <p class="roster-count" id="roster-count"></p>
@@ -143,49 +142,49 @@
  <section class="mechanics band" id="mecanicas">
   <div class="wrap">
    <div class="section-head reveal">
-    <p class="eyebrow" data-i18n="mech.eyebrow">Como se joga</p>
-    <h2 class="display" data-i18n="mech.title">Sobreviva com o que a época oferece.</h2>
-    <p class="lede" data-i18n="mech.lede">Pedra, osso, couro e sílex. Nada de metal ou vidro: nada atravessa a Fenda além de seres vivos.</p>
+    <p class="eyebrow" data-i18n="mech.eyebrow">How it plays</p>
+    <h2 class="display" data-i18n="mech.title">Survive with what the age provides.</h2>
+    <p class="lede" data-i18n="mech.lede">Stone, bone, hide and flint. No metal, no glass: nothing crosses the Rift but living things.</p>
    </div>
    <div class="bento">
     <article class="tile tile-egg reveal">
      <div class="egg-stage" id="egg-stage" aria-hidden="true"><span class="sprite egg-sprite" id="egg-sprite"></span><span class="egg-crack"></span></div>
-     <h3 data-i18n="mech.egg.t">Ovos que chocam</h3>
-     <p data-i18n="mech.egg.p">A fêmea põe um ovo perto dela. Ele racha duas vezes e choca em alguns minutos. O filhote marca o jogador mais próximo como família e já nasce domesticado.</p>
+     <h3 data-i18n="mech.egg.t">Eggs that hatch</h3>
+     <p data-i18n="mech.egg.p">The female lays an egg near her. It cracks twice and hatches in a few minutes. The baby imprints on the nearest player as family and is born tamed.</p>
     </article>
     <article class="tile tile-sex reveal">
-     <div class="pair" id="sex-pair"><figure><img id="pair-male" alt=""><figcaption data-i18n="best.male">Macho</figcaption></figure><figure><img id="pair-female" alt=""><figcaption data-i18n="best.female">Fêmea</figcaption></figure></div>
-     <h3 data-i18n="mech.sex.t">Macho e fêmea</h3>
-     <p data-i18n="mech.sex.p">O sexo é sorteado ao nascer e aparece no corpo: o macho tem as cores de exibição, a fêmea é mais discreta. Crista, vela e babado também mudam. Só um casal procria.</p>
+     <div class="pair" id="sex-pair"><figure><img id="pair-male" alt=""><figcaption data-i18n="best.male">Male</figcaption></figure><figure><img id="pair-female" alt=""><figcaption data-i18n="best.female">Female</figcaption></figure></div>
+     <h3 data-i18n="mech.sex.t">Male and female</h3>
+     <p data-i18n="mech.sex.p">Sex is rolled at birth and shows on the body: males wear the display colours, females are more discreet. Crests, sails and frills change too. Only a pair can breed.</p>
     </article>
     <article class="tile tile-tame reveal">
      <ol class="tame-steps">
-      <li><span class="sprite" data-sprite="item:raw_dino_meat"></span><span data-i18n="mech.tame.s1">Herbívoros aceitam comida na mão.</span></li>
-      <li><span class="sprite" data-sprite="egg:tyrannosaurus"></span><span data-i18n="mech.tame.s2">Predadores só se criam desde filhotes.</span></li>
-      <li><span class="sprite" data-sprite="item:tranq_dart"></span><span data-i18n="mech.tame.s3">Os gigantes cedem ao nocaute, na v0.7.</span></li>
+      <li><span class="sprite" data-sprite="item:raw_dino_meat"></span><span data-i18n="mech.tame.s1">Herbivores take food from your hand.</span></li>
+      <li><span class="sprite" data-sprite="egg:tyrannosaurus"></span><span data-i18n="mech.tame.s2">Predators can only be raised from babies.</span></li>
+      <li><span class="sprite" data-sprite="item:tranq_dart"></span><span data-i18n="mech.tame.s3">Giants give in to a knockout, in v0.7.</span></li>
      </ol>
-     <h3 data-i18n="mech.tame.t">Domesticação</h3>
-     <p data-i18n="mech.tame.p">Domesticado, ele senta, segue e defende você, e ataca o que você atacar. A comida também cura.</p>
+     <h3 data-i18n="mech.tame.t">Taming</h3>
+     <p data-i18n="mech.tame.p">Once tamed, it sits, follows and defends you, and attacks whatever you attack. Food heals it too.</p>
     </article>
     <article class="tile tile-ride reveal">
      <svg class="flight" viewBox="0 0 400 140" aria-hidden="true"><path class="flight-path" d="M10 120 C 90 120, 110 30, 200 40 S 320 110, 390 30"/><circle class="flight-dot" r="5"/></svg>
-     <h3 data-i18n="mech.ride.t">Montaria e voo</h3>
-     <p data-i18n="mech.ride.p">Ponha a sela, monte e pule com espaço. No Pteranodon, pular decola, o olhar dirige e soltar plana. Os titãs ganham sela de plataforma para construir em cima.</p>
+     <h3 data-i18n="mech.ride.t">Riding and flight</h3>
+     <p data-i18n="mech.ride.p">Saddle up, ride and jump with space. On the Pteranodon, jumping takes off, your gaze steers and letting go glides. Titans get a platform saddle to build on.</p>
     </article>
     <article class="tile tile-science reveal">
-     <h3 data-i18n="mech.sci.t">O jogador é cientista</h3>
-     <p data-i18n="mech.sci.p">Estudar uma espécie deixa você mais forte com ela. O Guia do Caderno de Campo sobe de nível conforme você aprende.</p>
+     <h3 data-i18n="mech.sci.t">You are the scientist</h3>
+     <p data-i18n="mech.sci.p">Studying a species makes you stronger against it. The Field Notebook’s Guide levels up as you learn.</p>
      <ol class="levels" id="levels"></ol>
      <ul class="tools" id="tools"></ul>
     </article>
     <article class="tile tile-arms reveal">
-     <h3 data-i18n="mech.arms.t">Armas da época</h3>
+     <h3 data-i18n="mech.arms.t">Weapons of the age</h3>
      <ul class="slots" id="weapons"></ul>
-     <p class="small" data-i18n="mech.arms.p">Dano corpo a corpo. A lança vai na mão ou no arremesso: segure o clique direito e solte.</p>
+     <p class="small" data-i18n="mech.arms.p">Melee damage. Spears work in hand or thrown: hold right click and let go.</p>
     </article>
     <article class="tile tile-journal reveal">
-     <h3 data-i18n="mech.journal.t">Diário de Campo</h3>
-     <p data-i18n="mech.journal.p">Doze objetivos por capítulo, em quatro temas. Complete dois de três num tema e ganhe um fragmento de âmbar. Quatro fragmentos acendem o Altar do Salto, quando você quiser.</p>
+     <h3 data-i18n="mech.journal.t">Field Journal</h3>
+     <p data-i18n="mech.journal.p">Twelve objectives per chapter, in four themes. Complete two of three in a theme to earn an amber fragment. Four fragments light the Leap Altar, whenever you choose.</p>
      <div class="journal" id="journal"></div>
     </article>
    </div>
@@ -195,10 +194,10 @@
  <section class="roadmap band" id="roteiro">
   <div class="wrap roadmap-grid">
    <div class="section-head sticky-head reveal">
-    <p class="eyebrow" data-i18n="road.eyebrow">Roteiro</p>
-    <h2 class="display" data-i18n="road.title">Mais de 150 criaturas, era por era.</h2>
-    <p class="lede" data-i18n="road.lede">Cada era vira um capítulo jogável do começo ao fim antes de começar a próxima.</p>
-    <div class="progress-card"><p><strong id="road-made">59</strong> <span data-i18n="road.made">criaturas já modeladas</span></p><div class="progress"><span id="road-progress"></span></div><p class="small" data-i18n="road.of">de 152 planejadas no roteiro</p></div>
+    <p class="eyebrow" data-i18n="road.eyebrow">Roadmap</p>
+    <h2 class="display" data-i18n="road.title">Over 150 creatures, era by era.</h2>
+    <p class="lede" data-i18n="road.lede">Each era becomes a chapter you can play from start to finish before the next one begins.</p>
+    <div class="progress-card"><p><strong id="road-made">59</strong> <span data-i18n="road.made">creatures already modelled</span></p><div class="progress"><span id="road-progress"></span></div><p class="small" data-i18n="road.of">of 152 planned on the roadmap</p></div>
    </div>
    <ol class="versions" id="versions"></ol>
   </div>
@@ -207,14 +206,14 @@
  <section class="install band" id="jogar">
   <div class="wrap install-grid">
    <div class="reveal">
-    <p class="eyebrow" data-i18n="inst.eyebrow">Jogar</p>
-    <h2 class="display" data-i18n="inst.title">Como instalar.</h2>
-    <p class="lede" data-i18n="inst.lede">A versão 0.2.0 já pode ser baixada, para Fabric e Forge no Minecraft Java 1.20.1. O mod continua em desenvolvimento e cada versão nova sai nas mesmas páginas.</p>
+    <p class="eyebrow" data-i18n="inst.eyebrow">Play</p>
+    <h2 class="display" data-i18n="inst.title">How to install.</h2>
+    <p class="lede" data-i18n="inst.lede">Version 0.2.0 is out, for Fabric and Forge on Minecraft Java 1.20.1. The mod is still in development and every new version comes out on the same pages.</p>
     <div class="install-actions">
-     <a class="btn btn-primary magnetic" id="download" href="https://www.curseforge.com/minecraft/mc-mods/terrassic" target="_blank" rel="noopener noreferrer"><span data-i18n="inst.curseforge">Baixar no CurseForge</span><span aria-hidden="true">↗</span></a>
+     <a class="btn btn-primary magnetic" id="download" href="https://www.curseforge.com/minecraft/mc-mods/terrassic" target="_blank" rel="noopener noreferrer"><span data-i18n="inst.curseforge">Download on CurseForge</span><span aria-hidden="true">↗</span></a>
      <a class="btn btn-ghost magnetic" id="modrinth" href="https://modrinth.com/mod/terrassic" target="_blank" rel="noopener noreferrer"><span>Modrinth</span><span aria-hidden="true">↗</span></a>
     </div>
-    <p class="install-links"><a href="https://github.com/RodrigoGomesDev/terrassic/wiki" target="_blank" rel="noopener noreferrer" data-i18n="inst.wiki">Wiki do mod</a><a href="https://github.com/RodrigoGomesDev/terrassic" target="_blank" rel="noopener noreferrer" data-i18n="inst.github">Código no GitHub</a><a href="https://ko-fi.com/terrassic" target="_blank" rel="noopener noreferrer" data-i18n="inst.donate">Apoiar no Ko-fi</a></p>
+    <p class="install-links"><a href="https://github.com/RodrigoGomesDev/terrassic/wiki" target="_blank" rel="noopener noreferrer" data-i18n="inst.wiki">Mod wiki</a><a href="https://github.com/RodrigoGomesDev/terrassic" target="_blank" rel="noopener noreferrer" data-i18n="inst.github">Code on GitHub</a><a href="https://ko-fi.com/terrassic" target="_blank" rel="noopener noreferrer" data-i18n="inst.donate">Support on Ko-fi</a></p>
    </div>
    <div class="loader reveal">
     <div class="seg" role="tablist" aria-label="Loader"><button type="button" role="tab" id="tab-fabric" aria-selected="true">Fabric</button><button type="button" role="tab" id="tab-forge" aria-selected="false" tabindex="-1">Forge</button></div>
@@ -225,7 +224,7 @@
 
  <section class="faq band" id="duvidas">
   <div class="wrap faq-grid">
-   <h2 class="display reveal" data-i18n="faq.title">Antes de jogar.</h2>
+   <h2 class="display reveal" data-i18n="faq.title">Before you play.</h2>
    <div class="faq-list reveal" id="faq"></div>
   </div>
  </section>
@@ -234,9 +233,9 @@
 <footer class="footer">
  <div class="wrap footer-grid">
   <img src="./assets/selo_altar_512.png" alt="" width="96" height="96" class="seal">
-  <div><p class="footer-name">Terrassic</p><p data-i18n="foot.by">Um mod de Rodrigo Gomes. Modelos, texturas, sprites e código autorais, gerados por código.</p></div>
-  <div class="footer-links"><a href="https://www.curseforge.com/minecraft/mc-mods/terrassic" target="_blank" rel="noopener noreferrer">CurseForge ↗</a><a href="https://modrinth.com/mod/terrassic" target="_blank" rel="noopener noreferrer">Modrinth ↗</a><a href="https://github.com/RodrigoGomesDev/terrassic" target="_blank" rel="noopener noreferrer">GitHub ↗</a><a href="https://ko-fi.com/terrassic" target="_blank" rel="noopener noreferrer">Ko-fi ↗</a><a href="#inicio" data-i18n="foot.top">Voltar ao topo</a></div>
-  <p class="footer-legal" data-i18n="foot.legal">Projeto independente, sem afiliação à Mojang ou à Microsoft. Minecraft é marca da Mojang Synergies AB.</p>
+  <div><p class="footer-name">Terrassic</p><p data-i18n="foot.by">A mod by Rodrigo Gomes. Original models, textures, sprites and code, all generated by code.</p></div>
+  <div class="footer-links"><a href="https://www.curseforge.com/minecraft/mc-mods/terrassic" target="_blank" rel="noopener noreferrer">CurseForge ↗</a><a href="https://modrinth.com/mod/terrassic" target="_blank" rel="noopener noreferrer">Modrinth ↗</a><a href="https://github.com/RodrigoGomesDev/terrassic" target="_blank" rel="noopener noreferrer">GitHub ↗</a><a href="https://ko-fi.com/terrassic" target="_blank" rel="noopener noreferrer">Ko-fi ↗</a><a href="#inicio" data-i18n="foot.top">Back to top</a></div>
+  <p class="footer-legal" data-i18n="foot.legal">Independent project, not affiliated with Mojang or Microsoft. Minecraft is a trademark of Mojang Synergies AB.</p>
  </div>
 </footer>
 <script type="module" src="./src/main.js"></script>

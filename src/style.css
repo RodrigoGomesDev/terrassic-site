@@ -218,7 +218,6 @@ button{cursor:pointer}
 .facts dd{margin:3px 0 0;font-size:14px;color:var(--bone);font-variant-numeric:tabular-nums}
 .ruler-bar{position:relative;height:10px;border-radius:5px;background:var(--basalt-950);border:1px solid var(--line)}
 .ruler-bar span{position:absolute;left:0;top:0;bottom:0;width:0;border-radius:5px;background:linear-gradient(90deg,var(--amber-700),var(--amber));transition:width .8s var(--ease)}
-.ruler-bar i{position:absolute;top:-6px;width:2px;height:20px;background:var(--sky)}
 .ruler-scale{display:flex;justify-content:space-between;font:10px var(--mono);color:var(--muted);margin-top:5px}
 .guide-tabs{display:flex;gap:4px;flex-wrap:wrap;border-bottom:1px solid var(--line)}
 .guide-tabs button{border:0;background:transparent;color:var(--muted);font-size:13px;padding:8px 10px;border-bottom:2px solid transparent;margin-bottom:-1px}

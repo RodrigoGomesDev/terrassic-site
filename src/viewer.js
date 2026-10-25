@@ -4,12 +4,6 @@ import {spawn,QualityGuard} from './rig.js';
 import {plinth,eraSlab} from './blocks.js';
 const damp=THREE.MathUtils.damp,ease=t=>t*t*(3-2*t);
 
-// A blocky field assistant, 1.8 m tall, for scale. Drawn from boxes, in the notebook's paper and leather colours.
-function fieldAssistant(){
- const g=new THREE.Group(),part=(w,h,d,x,y,z,color)=>{const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),new THREE.MeshStandardMaterial({color,roughness:1}));m.position.set(x,y,z);m.castShadow=true;g.add(m)};
- part(.22,.8,.22,-.12,.4,0,0x5a3620);part(.22,.8,.22,.12,.4,0,0x5a3620);part(.5,.7,.26,0,1.15,0,0xd8c79e);part(.18,.68,.18,-.35,1.16,0,0xd8c79e);part(.18,.68,.18,.35,1.16,0,0xd8c79e);part(.36,.36,.36,0,1.68,0,0xb08a64);part(.4,.08,.4,0,1.87,0,0x3b2a1a);
- return g;
-}
 export class SpecimenViewer{
  constructor(host,{onLoad=()=>{},onError=()=>{},onActionEnd=()=>{}}={}){
   this.host=host;this.onLoad=onLoad;this.onError=onError;this.onActionEnd=onActionEnd;this.reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -21,10 +15,9 @@ export class SpecimenViewer{
   this.key=new THREE.DirectionalLight(0xffdcae,3.2);this.key.castShadow=true;this.key.shadow.mapSize.set(2048,2048);this.key.shadow.bias=-.0005;this.key.shadow.normalBias=.03;this.scene.add(this.key,this.key.target);this.guard=new QualityGuard(r,{shadows:[this.key]});
   const rim=new THREE.DirectionalLight(0xf07a1a,2.2);rim.position.set(6,5,12);this.scene.add(rim);
   const cool=new THREE.DirectionalLight(0x8fb4c8,.8);cool.position.set(10,3,-8);this.scene.add(cool);
-  this.assistant=fieldAssistant();this.scene.add(this.assistant);
   this.controls=new OrbitControls(this.camera,r.domElement);Object.assign(this.controls,{enableDamping:true,enablePan:false,enableZoom:false,rotateSpeed:.7,maxPolarAngle:Math.PI*.52,minPolarAngle:Math.PI*.08,autoRotate:!this.reduced,autoRotateSpeed:.55});
   this.controls.addEventListener('start',()=>{this.controls.autoRotate=false;this.host.classList.add('is-dragging')});this.controls.addEventListener('end',()=>this.host.classList.remove('is-dragging'));
-  this.zoom=1;this.distance=10;this.frame={target:new THREE.Vector3(),distance:10};this.current=null;this.leaving=[];this.request=0;this.showScale=true;this.visible=true;this.last=performance.now();
+  this.zoom=1;this.distance=10;this.frame={target:new THREE.Vector3(),distance:10};this.current=null;this.leaving=[];this.request=0;this.visible=true;this.last=performance.now();
   new ResizeObserver(()=>this.resize()).observe(host);this.resize();
   new IntersectionObserver(([e])=>{this.visible=e.isIntersecting},{rootMargin:'100px'}).observe(host);
   r.domElement.addEventListener('webglcontextlost',e=>{e.preventDefault();this.visible=false;onError(new Error('webgl'))});
@@ -43,7 +36,6 @@ export class SpecimenViewer{
    c.holder.updateMatrixWorld(true);const box=new THREE.Box3().setFromObject(c.model.root),size=box.getSize(new THREE.Vector3()),center=box.getCenter(new THREE.Vector3());
    c.holder.position.y=-box.min.y;const span=Math.max(size.x,size.y*1.3,size.z,2.2);
    this.frame.target.set(center.x,size.y*.45,center.z);this.frame.distance=span*1.5+2.2;this.size=size;
-   this.assistant.position.set(Math.max(size.x/2+1.4,1.6),0,size.z*.12);
    // A plinth of the mod's own flagstones; each block is 1 m, so it doubles as a scale grid.
    if(this.plinth)this.scene.remove(this.plinth);
    this.plinth=plinth(Math.ceil(Math.max(size.x,size.z)*.62+2));this.plinth.position.set(-.5,0,-.5);this.scene.add(this.plinth);
@@ -54,7 +46,6 @@ export class SpecimenViewer{
   }catch(e){if(req===this.request)this.onError(e)}
  }
  play(name){const a=this.current?.animator;if(!a)return;const clip=a.clips[name];if(!clip)return;if(clip.loop)a.play(name);else a.trigger(name,()=>this.onActionEnd(name));}
- setScale(on){this.showScale=on;this.assistant.visible=on}
  setZoom(f){this.zoom=THREE.MathUtils.clamp(f,.45,1.6)}
  resetView(){this.zoom=1;this.controls.autoRotate=!this.reduced}
  tick(now){
