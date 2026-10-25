@@ -94,10 +94,18 @@ export class Thumbnailer{
   const maps=new Set();group.traverse(o=>{for(const m of [].concat(o.material||[]))if(m.map)maps.add(m.map)});
   await Promise.all([...maps].map(t=>t.image?.complete!==false&&t.image?Promise.resolve():new Promise(r=>{const i=setInterval(()=>{if(t.image){clearInterval(i);r()}},30)})));
   this.scene.add(group);group.updateMatrixWorld(true);
-  const box=new THREE.Box3().setFromObject(slab),center=box.getCenter(new THREE.Vector3()),size=box.getSize(new THREE.Vector3());
-  this.renderer.setSize(480,300,false);this.camera.aspect=1.6;this.camera.fov=26;this.camera.updateProjectionMatrix();
-  this.camera.position.copy(center).add(new THREE.Vector3(-.55,.42,.75).setLength(Math.max(size.x,size.z)*1.95));this.camera.lookAt(center.x,center.y+1,center.z);
-  this.renderer.render(this.scene,this.camera);
+  // Frame the whole diorama (ground, trees and animals): move the camera back until every corner of its box is
+  // inside the picture with a margin, then centre it, so nothing is ever cut off.
+  const box=new THREE.Box3().setFromObject(group),center=box.getCenter(new THREE.Vector3()),size=box.getSize(new THREE.Vector3());
+  this.renderer.setSize(480,300,false);this.camera.aspect=1.6;this.camera.fov=26;this.camera.clearViewOffset();this.camera.updateProjectionMatrix();
+  const dir=new THREE.Vector3(-.55,.42,.75).normalize(),corners=[];for(let i=0;i<8;i++)corners.push(new THREE.Vector3(i&1?box.max.x:box.min.x,i&2?box.max.y:box.min.y,i&4?box.max.z:box.min.z));
+  let dist=Math.max(size.x,size.z)*1.95,lo,hi;
+  const measure=()=>{this.camera.position.copy(center).addScaledVector(dir,dist);this.camera.lookAt(center);this.camera.updateMatrixWorld();
+   lo=new THREE.Vector2(9,9);hi=new THREE.Vector2(-9,-9);for(const c of corners){const v=c.clone().project(this.camera);lo.min(v);hi.max(v)}
+   return Math.max(hi.x-lo.x,hi.y-lo.y)/2};
+  for(let i=0;i<10;i++)dist*=measure()/.94;
+  measure();this.camera.setViewOffset(480,300,(lo.x+hi.x)/2*240,-(lo.y+hi.y)/2*150,480,300);
+  this.renderer.render(this.scene,this.camera);this.camera.clearViewOffset();
   const blob=await new Promise(res=>this.renderer.domElement.toBlob(res,'image/webp',.92));
   this.scene.remove(group);for(const a of animals)a.dispose();
   this.renderer.setSize(360,240,false);this.camera.aspect=1.5;this.camera.fov=24;this.camera.updateProjectionMatrix();
