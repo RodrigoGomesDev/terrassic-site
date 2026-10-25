@@ -1,0 +1,4 @@
+Terrassic Tyrannosaurus threat sound, copied from the mod's own sound set.
+Original sources and licenses (PD-USGov / CC0):
+https://github.com/RodrigoGomesDev/terrassic/blob/main/docs/LICENSES-SOUNDS.md
+Credits: National Park Service, US Fish and Wildlife Service and the CC0 creators listed in the project's source manifest.
