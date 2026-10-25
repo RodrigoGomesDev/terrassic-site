@@ -74,7 +74,7 @@ export function initNotebook(){
   const pages=books[book](),tabs=$('notebook-tabs');page=clamp(page,0,pages.length-1);
   tabs.replaceChildren(...Object.keys(books).map(k=>{const b=el('button','',t(`book.${k}`));b.type='button';b.role='tab';b.setAttribute('aria-selected',String(k===book));b.addEventListener('click',()=>{book=k;page=0;render()});return b}));
   const art=$('notebook-page'),p=pages[page];art.replaceChildren(el('h3','',p.title),...p.text.split('\n\n').map(x=>el('p','',x)));
-  art.classList.remove('turn');void art.offsetWidth;art.classList.add('turn');
+  art.classList.toggle('typed',book==='report');art.classList.remove('turn');void art.offsetWidth;art.classList.add('turn');
   $('page-count').textContent=`${page+1} / ${pages.length}`;$('page-prev').disabled=page===0;$('page-next').disabled=page===pages.length-1;
  };
  $('page-prev').addEventListener('click',()=>{page--;render()});$('page-next').addEventListener('click',()=>{page++;render()});
