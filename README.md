@@ -1,6 +1,15 @@
-# Terrassic — site e experiência 3D
+# Terrassic: site do mod
 
-Site estático do [Terrassic](https://github.com/RodrigoGomesDev/terrassic), de Rodrigo Gomes. A abertura usa o scroll nativo para conduzir uma pequena mudança de ângulo e aproximar a cabeça do T. rex. O elenco, as seções de recursos, a história, a instalação e as dúvidas completam a apresentação.
+Site estático do [Terrassic](https://github.com/RodrigoGomesDev/terrassic), de Rodrigo Gomes, em português, inglês e espanhol.
+
+O que tem:
+
+- **Abertura ao vivo:** uma clareira do Cretáceo feita de blocos de 1 m, gerada por código, com 13 criaturas do mod andando, pastando, rugindo e voando (T. rex, manada de hadrossauros, Brachiosaurus, Triceratops, bando de Velociraptor, Pteranodon e Quetzalcoatlus). No celular entram só 5, para poupar a bateria.
+- **O Salto:** a tela de abertura do mod, uma frase por vez conforme o scroll, com a Fenda se abrindo.
+- **Caderno da Katarina:** o Relatório do Incidente e as páginas do diário, com o texto do próprio mod.
+- **Eras:** os 5 capítulos numa faixa horizontal presa ao scroll, cada um com uma paisagem em pixel desenhada por código.
+- **Bestiário 3D:** as 59 espécies com modelo, macho e fêmea, todas as animações do jogo com transição suave, uma pessoa de 1,8 m e um piso de blocos de 1 m para dar a escala, o Guia de Campo (ciência, comportamento, domesticação, utilidade e a nota da Katarina) e as miniaturas renderizadas dos próprios modelos.
+- **Como se joga, roteiro, instalação e dúvidas**, com os sprites do mod (ovos, itens, armas).
 
 ## Rodar
 
@@ -9,49 +18,52 @@ Node.js 22.12+ ou 24:
 ```sh
 npm ci
 npm run dev
-npm run check
-npm run build
+npm run check   # sintaxe + testes
+npm run build   # gera dist/
 npm run preview
 ```
 
-Publique `dist/` em um host estático HTTPS. Sem backend, banco de dados ou segredos de aplicação. A CI verifica sintaxe, regressões e build.
+`dist/` funciona em qualquer host estático e em qualquer subpasta (a base é relativa). Sem backend.
 
-## Animação
+## Atualizar a partir do mod
 
-- O giro completo foi substituído por uma mudança limitada de ângulo e uma aproximação gradual. O elenco não gira sozinho.
-- As curvas numéricas do mod marcadas Catmull-Rom são interpoladas suavemente; os canais são compilados uma vez.
-- A mandíbula usa tangentes que preservam a forma da curva para evitar ultrapassar as poses de boca fechada/aberta.
-- O botão **Rugir** dispara uma ação de apresentação com preparação, movimento do pescoço, corpo, braços e cauda e retorno suave à pose atual.
-- O clip de apresentação tem 109 poses em 3,6 segundos; a reprodução interpola entre elas conforme os quadros da tela. Isso não é uma garantia de taxa de quadros em todo dispositivo.
-- O botão **Som off/on** permite ouvir o áudio do próprio mod, apenas por ação do visitante. Não há reprodução automática.
-- **Abrir boca** continua controlando a articulação diretamente.
-- As oito espécies têm controle de aparência e animações. O arraste fica ativo no elenco; a rolagem vertical permanece nativa.
+Os modelos, animações, texturas, sprites e textos vêm do repositório do mod. Depois de mudar o mod, rode:
 
-A revisão do ritmo do rugido foi discutida com o Claude Code instalado, em uma consulta sem ferramentas de escrita. O rig e os recursos do jogo não foram alterados. O clip novo é específico da apresentação web e pode ser regenerado com `python3 scripts/presentation-roar.py`.
+```sh
+python3 -B scripts/import-mod.py /caminho/para/terrassic
+```
 
-## Renderização
+O script só lê o mod e gera:
 
-Os modelos são cubos fechados do Blockbench. O visualizador descarta faces traseiras e aplica um viés de profundidade mínimo e determinístico às faces coplanares, estabilizando as camadas que se encontram na bochecha. A faixa de profundidade da câmera foi reduzida para melhorar a precisão no close.
+| Saída | Origem no mod |
+|---|---|
+| `public/assets/species/<id>.json` | cubos do `art/<id>/<id>.bbmodel` + `animations/entity/<id>.animation.json`, compactados |
+| `public/assets/species/<id>_male.png` / `_female.png` | `textures/entity/` |
+| `public/assets/sprites.png` | ovos geradores, itens e ovos-bloco num atlas de 32 px |
+| `src/generated/species.js` | `gen_resources.SPECIES` (nomes), `gen_species.SIZES`/`GUIDE`/`SPECIES`, `lore.py` (Guia, abertura, relatório, diário, objetivos) e a versão de cada espécie no `docs/ROSTER.md` |
+| `public/assets/letreiro_*.png`, `monograma_*.png`, `selo_altar_512.png` | `art/marca/` |
 
-Os renders não são capturas de gameplay. Modelos e tamanhos são ajustados ao enquadramento. O leitor não implementa expressões Molang nem toda a especificação GeckoLib. A preferência por redução de movimento pula a sequência de scroll; ações pedidas pelo visitante ainda podem ser reproduzidas. Sem WebGL, há prévias estáticas.
+Espécie nova no mod entra no site sozinha na próxima importação.
 
-## Conteúdo e links
+## Código
 
-- `src/site-config.js`: URLs oficiais de download, comunidade, trailer e redes. Campos vazios não geram links falsos.
-- `src/content.js`: abas Criar/Pesquisar/Explorar e revelação das seções.
-- `src/animation.js`: compilação, interpolação e pesos de transição.
-- `src/scroll-scene.js`: sequência e câmera.
-- `src/viewer.js`: leitura do modelo e reprodução.
-- `src/main.js`: controles e navegação.
-- `public/assets/`: recursos do Terrassic; créditos de áudio em `audio/CREDITS.txt`.
-- `tests/animation.test.js`: continuidade do loop, continuidade de velocidade, limites do rugido e colisão de faces na bochecha.
+- `src/rig.js`: monta o rig do Blockbench (16 px = 1 m, escala `MODEL_SCALE` do mod) e o `Animator` (transições entre loops, ações por cima).
+- `src/animation.js`: interpolação Catmull-Rom dos canais GeckoLib, testada em `tests/`.
+- `src/world.js` e `src/hero.js`: a clareira e quem anda nela.
+- `src/viewer.js`: o palco do bestiário e as miniaturas.
+- `src/bestiary.js`, `src/sections.js`: as seções da página.
+- `src/i18n.js`: textos da interface em pt/en/es. `src/content.js`: eras, roteiro, armas e dúvidas, tirados de `README`, `docs/HISTORIA.md`, `docs/ROSTER.md` e `docs/RESUMO.md` do mod.
+- `src/site-config.js`: links oficiais. Quando houver download (Modrinth, CurseForge), preencha `links.download` e o botão de instalar passa a apontar para ele.
 
-No levantamento desta entrega o repositório do mod não tinha releases públicas. Por isso o site promove o GitHub, sem oferecer um download inexistente. Preencha `links.download` quando uma versão for aprovada/publicada.
+O idioma vem de `?lang=pt|en|es`, da última escolha do visitante ou do navegador.
+
+## Notas
+
+- Renders feitos no navegador, não capturas do jogo. O leitor não roda Molang nem a especificação GeckoLib inteira; o mod não usa nenhum dos dois.
+- Com "reduzir movimento" ligado, as cenas ficam paradas e as seções presas ao scroll viram páginas normais. Sem WebGL, o texto e os dados continuam.
+- A cor e a tipografia seguem a identidade "Âmbar e Basalto" do mod (`docs/IDENTIDADE.md`). Fontes: Big Shoulders Display, Hanken Grotesk, JetBrains Mono e Caveat (Google Fonts).
+- O som do rugido é o do próprio mod (`public/assets/audio/CREDITS.txt`) e só toca se o visitante ligar.
 
 ## Autoria
 
-Rodrigo Gomes. Marca, cubos, UVs e texturas foram preservados. O checkout do mod não foi modificado. Fontes Barlow Condensed e IBM Plex via Google Fonts, com fallback de sistema. Nenhuma licença de redistribuição foi acrescentada aos assets do mod.
-
-## Composição das áreas claras
-
-As pegadas de três dedos são um SVG próprio, decorativo e sem interação. Aparecem em sequência nas seções claras, com animação suspensa fora da tela e versão estática para redução de movimento. Na seção de recursos, o modelo e seu item usam células separadas; o item não é mais uma camada posicionada sobre o modelo.
+Rodrigo Gomes. Modelos, texturas, sprites e textos são do mod e autorais. O cenário da abertura e as paisagens das eras são gerados por código. Projeto independente, sem afiliação à Mojang ou à Microsoft.

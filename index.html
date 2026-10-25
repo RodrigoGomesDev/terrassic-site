@@ -1,34 +1,241 @@
 <!doctype html>
-<html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#dbb15b"><title>Terrassic — Dinossauros no Minecraft</title><meta name="description" content="Um encontro com o Terrassic. Explore os dinossauros do mod em uma experiência 3D controlada pelo scroll."><meta property="og:title" content="Terrassic"><meta property="og:description" content="Dinossauros no Minecraft. Veja de perto."><link rel="icon" href="/assets/monograma_64.png"><link rel="stylesheet" href="/src/style.css"></head>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Terrassic</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="theme-color" content="#1c181e">
+<meta name="description" content="Terrassic: dinossauros em tamanho real, domesticáveis e montáveis, num mod autoral para Minecraft 1.20.1 (Fabric e Forge).">
+<meta property="og:title" content="Terrassic">
+<meta property="og:description" content="Dinossauros em tamanho real para Minecraft 1.20.1. Atravesse a Fenda, estude fósseis e sobreviva com pedra, osso e sílex.">
+<link rel="icon" href="./assets/monograma_64.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;800;900&family=Hanken+Grotesk:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500&family=Caveat:wght@500;700&display=swap">
+<link rel="stylesheet" href="./src/style.css">
+</head>
 <body>
-<a class="skip" href="#instalar">Pular a experiência 3D</a>
+<a class="skip" href="#bestiario" data-i18n="skip">Pular para o bestiário</a>
+
+<header class="topbar" id="topbar">
+ <a class="brand" href="#inicio" aria-label="Terrassic"><img src="./assets/monograma_64.png" alt="" width="32" height="32"><img class="brand-word" src="./assets/letreiro_950.png" alt="Terrassic" width="950" height="180"></a>
+ <nav class="nav" id="nav" aria-label="Seções">
+  <a href="#historia" data-i18n="nav.story">História</a>
+  <a href="#eras" data-i18n="nav.eras">Eras</a>
+  <a href="#bestiario" data-i18n="nav.bestiary">Bestiário</a>
+  <a href="#mecanicas" data-i18n="nav.play">Como se joga</a>
+  <a href="#roteiro" data-i18n="nav.roadmap">Roteiro</a>
+ </nav>
+ <div class="lang" role="group" aria-label="Idioma / Language">
+  <button type="button" data-lang="pt" aria-pressed="true">PT</button><button type="button" data-lang="en" aria-pressed="false">EN</button><button type="button" data-lang="es" aria-pressed="false">ES</button>
+ </div>
+ <a class="nav-cta" href="#jogar" data-i18n="nav.cta">Jogar</a>
+</header>
+
 <main>
- <section class="film" id="inicio" aria-label="Encontro com o Tyrannosaurus"><span id="girar" class="scene-anchor turn-anchor" aria-hidden="true"></span><span id="rugido" class="scene-anchor jaw-anchor" aria-hidden="true"></span><span id="elenco" class="gallery-anchor" aria-hidden="true"></span>
-  <div class="stage" id="stage">
-   <header><a class="brand" href="#inicio" aria-label="Terrassic, início"><img src="/assets/letreiro_950.png" alt="Terrassic" width="950" height="180"></a><nav aria-label="Navegação"><a href="#elenco">Criaturas</a><a href="#no-jogo">O mod</a><a href="#instalar">Jogar <span>↗</span></a></nav></header>
-   <div class="wordmark" aria-hidden="true">TERRASSIC</div><div class="roar-word" aria-hidden="true">REX.</div>
-   <div id="creature-canvas" tabindex="0" role="img" aria-label="Tyrannosaurus 3D. Role a página para mudar o ângulo, aproximar e abrir a mandíbula."><img class="model-fallback" src="/assets/tyrannosaurus/preview.png" alt="Tyrannosaurus"></div>
-   <div class="intro-caption film-copy"><h1>Dinossauros.<br>Dentro do Minecraft.</h1><p>Java 1.20.1 / Fabric + Forge</p></div>
-   <div class="turn-caption film-copy"><span>Tyrannosaurus rex</span><h2>Outro<br>ângulo.</h2></div>
-   <div class="jaw-caption film-copy"><span>Continue rolando.</span><h2>De perto.</h2></div>
-   <div class="gallery" id="gallery" inert>
-    <div class="gallery-heading"><div><span id="species-category">Predador ápice</span><h2 id="species-name">Tyrannosaurus</h2></div><p id="species-description"></p></div>
-    <div class="gallery-options"><div class="segmented" role="group" aria-label="Aparência"><button id="male" aria-pressed="true">Macho</button><button id="female" aria-pressed="false">Fêmea</button></div><select id="animation" aria-label="Animação da criatura"><option value="idle">Em repouso</option></select><button id="reset-camera" aria-label="Restaurar câmera">⤢</button></div>
-    <div class="species-selector" role="group" aria-label="Escolha uma criatura"></div>
+ <section class="hero" id="inicio">
+  <div class="hero-canvas" id="hero-canvas" aria-hidden="true"></div>
+  <div class="hero-shade" aria-hidden="true"></div>
+  <div class="hero-copy">
+   <p class="eyebrow" data-i18n="hero.eyebrow">Mod para Minecraft Java 1.20.1 · Fabric e Forge</p>
+   <h1 class="hero-title"><img src="./assets/letreiro_1900.png" alt="Terrassic" width="1900" height="360"></h1>
+   <p class="hero-lede" data-i18n="hero.lede">Dinossauros em tamanho real, que você doma, monta e voa. Atravesse a Fenda, estude fósseis como cientista e sobreviva com pedra, osso e sílex.</p>
+   <div class="hero-actions">
+    <a class="btn btn-primary magnetic" href="#bestiario"><span data-i18n="hero.cta">Conhecer as criaturas</span><span aria-hidden="true">→</span></a>
+    <a class="btn btn-ghost magnetic" href="https://github.com/RodrigoGomesDev/terrassic" target="_blank" rel="noopener noreferrer"><span data-i18n="hero.github">Acompanhar no GitHub</span><span aria-hidden="true">↗</span></a>
    </div>
-   <div class="stage-footer"><a class="scroll-cue" id="scene-next" href="#girar"><span class="scroll-arrow">↓</span><span id="scroll-label">Role para começar</span></a><span id="stage-status" role="status">Carregando o modelo…</span><div class="stage-actions"><button id="sound-toggle" aria-pressed="false" aria-label="Ativar som do rugido">Som off</button><button id="roar-trigger">Rugir <span>↗</span></button><button id="jaw-toggle" aria-pressed="false"><span>+</span> Abrir boca</button></div></div>
-   <div class="scroll-track" aria-hidden="true"><span id="scroll-fill"></span></div>
+   <dl class="hero-facts">
+    <div><dt data-count="59">59</dt><dd data-i18n="hero.fact1">criaturas modeladas e animadas</dd></div>
+    <div><dt>1:1</dt><dd data-i18n="hero.fact2">1 bloco = 1 metro, do maior fóssil conhecido</dd></div>
+    <div><dt>5</dt><dd data-i18n="hero.fact3">eras, indo para trás no tempo</dd></div>
+   </dl>
+  </div>
+  <div class="hero-status" aria-live="polite"><span class="hero-meter"><span id="hero-meter"></span></span><span id="hero-status" data-i18n="hero.loading">Acordando a clareira</span></div>
+  <p class="hero-note" data-i18n="hero.note">Cena ao vivo no navegador, com os modelos e as animações do próprio mod.</p>
+  <a class="scroll-cue" href="#historia" aria-label="Rolar"><span></span></a>
+ </section>
+
+ <div class="marquee" aria-hidden="true"><div class="marquee-row" id="marquee-a"></div><div class="marquee-row reverse" id="marquee-b"></div></div>
+
+ <section class="story" id="historia">
+  <div class="story-pin">
+   <canvas class="story-sky" id="story-sky" aria-hidden="true"></canvas>
+   <svg class="rift" viewBox="0 0 120 900" preserveAspectRatio="none" aria-hidden="true"><path id="rift-path" d="M64 0 L52 90 L70 150 L46 260 L66 330 L54 420 L74 500 L50 610 L68 690 L56 790 L62 900"/></svg>
+   <div class="story-lines" id="story-lines"><p class="story-kicker" data-i18n="story.kicker">A história · O Salto</p></div>
   </div>
  </section>
- <section class="play-features" id="no-jogo"><div class="trackway trackway-edge" aria-hidden="true"><span class="track"></span><span class="track"></span><span class="track"></span><span class="track"></span><span class="track"></span><span class="track"></span></div>
-  <div class="section-intro reveal"><h2>Dentro<br>do jogo.</h2><p>Crie animais, explore com suas montarias e estude as espécies que encontrar pelo caminho.</p></div>
-  <div class="feature-tabs" role="tablist" aria-label="Recursos do Terrassic"><button id="feature-breed" data-feature="breed" role="tab" aria-selected="true" aria-controls="feature-panel">Criar</button><button id="feature-research" data-feature="research" role="tab" aria-selected="false" aria-controls="feature-panel" tabindex="-1">Pesquisar</button><button id="feature-explore" data-feature="explore" role="tab" aria-selected="false" aria-controls="feature-panel" tabindex="-1">Explorar</button></div>
-  <div id="feature-panel" role="tabpanel" aria-labelledby="feature-breed" class="feature-panel reveal"><div class="feature-art"><div class="feature-model"><img id="feature-image" src="/assets/triceratops/preview.png" alt="Modelo do Triceratops" loading="lazy"></div><div class="feature-prop"><img id="feature-item" src="/assets/items/triceratops_spawn_egg.png" alt="Ovo gerador do Triceratops" loading="lazy"></div><small>Modelos e itens do próprio mod.</small></div><div class="feature-copy" aria-live="polite"><h3 id="feature-title">Ovos e filhotes.</h3><p id="feature-description">Cuide dos ovos e acompanhe o crescimento dos animais. Os filhotes podem criar um vínculo com o jogador desde o nascimento.</p><p id="feature-detail">Herbívoros aceitam alimento. Para criar um predador, comece ainda filhote.</p></div></div>
+
+ <section class="chronicle band" id="cronica">
+  <div class="wrap chronicle-grid">
+   <div class="chronicle-copy reveal">
+    <p class="eyebrow" data-i18n="chron.eyebrow">O Projeto Terrassic</p>
+    <h2 class="display" data-i18n="chron.title">Uma máquina para olhar o passado.</h2>
+    <p data-i18n="chron.p1">Num sítio de fósseis do Triássico, a equipe achou um âmbar que brilha sozinho: o Âmbar Temporal. Em volta dele, o laboratório construiu uma máquina para observar o passado. Só observar.</p>
+    <p data-i18n="chron.p2">A Dra. Katarina Usha atravessou e não voltou. Você entra na câmara para buscá-la, a máquina falha e você acorda no Cretáceo de mãos vazias. Siga as anotações dela, reconstrua o Altar do Salto e vá cada vez mais fundo no tempo.</p>
+    <p class="rule" data-i18n="chron.rule">A história nunca move você sozinha. As eras ficam sempre abertas e quem só quer dinossauros pode ignorá-la.</p>
+   </div>
+   <div class="notebook reveal" id="notebook">
+    <div class="notebook-tabs" role="tablist" aria-label="Caderno de Campo" id="notebook-tabs"></div>
+    <article class="page" id="notebook-page" aria-live="polite"></article>
+    <div class="notebook-nav"><button type="button" class="icon-btn" id="page-prev" aria-label="Página anterior">←</button><span id="page-count"></span><button type="button" class="icon-btn" id="page-next" aria-label="Próxima página">→</button></div>
+   </div>
+  </div>
  </section>
- <section class="lore" id="historia"><div class="lore-heading reveal"><span>A história do Terrassic</span><h2>O<br>Salto.</h2><svg class="rift-line" viewBox="0 0 60 230" aria-hidden="true"><path d="M36 0L24 48L34 71L16 125L31 143L22 182L27 230"/></svg></div><div class="lore-copy reveal"><h3>Uma máquina para observar o passado.<br>Alguém resolveu atravessar.</h3><p>A Dra. Katarina Usha desapareceu depois de usar a máquina do Projeto Terrassic. Você entra para buscá-la, o equipamento falha e o destino é a pré-história.</p><p>As anotações que ela deixou ajudam a entender o que aconteceu. Você decide se quer seguir os rastros dela ou simplesmente viver entre os dinossauros.</p><div class="lore-status"><span>Primeiro capítulo</span><strong>Cretáceo Superior</strong><small>História em desenvolvimento.</small></div></div></section>
- <section class="install" id="instalar"><div class="trackway trackway-cross" aria-hidden="true"><span class="track"></span><span class="track"></span><span class="track"></span><span class="track"></span><span class="track"></span><span class="track"></span></div><div class="install-top"><h2>Como<br>jogar.</h2><div><p>Terrassic é um mod autoral de dinossauros para Minecraft. Crie filhotes, explore com suas montarias e estude as espécies no Caderno de Campo.</p><a class="download" href="https://github.com/RodrigoGomesDev/terrassic" target="_blank" rel="noopener noreferrer">Acompanhar no GitHub <span>↗</span></a><span class="development">Downloads públicos serão ligados aqui quando uma versão for publicada.</span></div></div><div class="install-bottom"><span>Minecraft Java 1.20.1</span><div><div class="loader-tabs" role="tablist" aria-label="Loader"><button role="tab" id="tab-fabric" aria-selected="true" aria-controls="install-panel">Fabric</button><button role="tab" id="tab-forge" aria-selected="false" aria-controls="install-panel" tabindex="-1">Forge</button></div><div id="install-panel" role="tabpanel" aria-labelledby="tab-fabric"><p id="loader-description">Instale o Fabric Loader e adicione Architectury API, GeckoLib e Fabric API nas versões compatíveis. Coloque o arquivo do Terrassic na pasta mods.</p></div></div></div></section>
- <section class="questions" id="duvidas"><div class="trackway trackway-corner" aria-hidden="true"><span class="track"></span><span class="track"></span><span class="track"></span><span class="track"></span><span class="track"></span><span class="track"></span></div><div class="reveal"><h2>Antes<br>de jogar.</h2></div><div class="question-list reveal"><details><summary>Qual Minecraft preciso ter?<span>+</span></summary><p>O alvo atual é Minecraft Java 1.20.1, com Fabric ou Forge. As dependências e os arquivos corretos devem ser conferidos na versão que você instalar.</p></details><details><summary>A história é obrigatória?<span>+</span></summary><p>Não. Você pode construir, criar animais e explorar sem seguir a história. As anotações da Katarina são um caminho possível.</p></details><details><summary>Esse elenco é a lista da próxima versão?<span>+</span></summary><p>O site mostra oito modelos do projeto. O conteúdo efetivamente disponível em cada lançamento será descrito nas notas da versão.</p></details><details><summary>O que aparece no site é uma captura do Minecraft?<span>+</span></summary><p>Os modelos, texturas e animações vêm do mod. Aqui eles são renderizados no navegador para apresentação, com câmera e iluminação próprias.</p></details></div></section>
- <section class="follow" id="acompanhar"><h2>O projeto<br>continua.</h2><div><p>O Terrassic está em desenvolvimento. O código e o histórico das mudanças estão no GitHub.</p><div id="community-links"><a href="https://github.com/RodrigoGomesDev/terrassic" target="_blank" rel="noopener noreferrer">Acompanhar o Terrassic <span>↗</span></a></div></div></section>
+
+ <section class="eras" id="eras">
+  <div class="eras-pin">
+   <div class="eras-head wrap">
+    <p class="eyebrow" data-i18n="eras.eyebrow">Capítulos</p>
+    <h2 class="display" data-i18n="eras.title">Uma era de cada vez.</h2>
+    <p class="lede" data-i18n="eras.lede">Você avança indo cada vez mais fundo no passado, atrás da Katarina. Toda era visitada fica aberta para sempre.</p>
+   </div>
+   <div class="eras-track" id="eras-track"></div>
+   <div class="timeline wrap" aria-hidden="true"><div class="timeline-bar"><span id="timeline-fill"></span></div><div class="timeline-ticks" id="timeline-ticks"></div></div>
+  </div>
+ </section>
+
+ <section class="bestiary band" id="bestiario">
+  <div class="wrap">
+   <div class="section-head reveal">
+    <p class="eyebrow" data-i18n="best.eyebrow">Bestiário</p>
+    <h2 class="display" data-i18n="best.title">Veja cada uma de perto.</h2>
+    <p class="lede" data-i18n="best.lede">Todas as criaturas já modeladas, com macho e fêmea e as animações do jogo. Arraste para girar. A pessoa ao lado tem 1,8 m.</p>
+   </div>
+   <div class="specimen">
+    <div class="stage" id="stage">
+     <div class="stage-canvas" id="stage-canvas" tabindex="0" role="img" aria-label="Modelo 3D"></div>
+     <div class="stage-top">
+      <div class="seg" role="group" aria-label="Sexo"><button type="button" id="sex-male" aria-pressed="true" data-i18n="best.male">Macho</button><button type="button" id="sex-female" aria-pressed="false" data-i18n="best.female">Fêmea</button></div>
+      <div class="stage-tools">
+       <button type="button" class="icon-btn" id="zoom-out" aria-label="Afastar">−</button>
+       <button type="button" class="icon-btn" id="zoom-in" aria-label="Aproximar">+</button>
+       <button type="button" class="chip" id="scale-toggle" aria-pressed="true" data-i18n="best.scale">Pessoa de 1,8 m</button>
+       <button type="button" class="chip" id="sound-toggle" aria-pressed="false" hidden data-i18n="best.sound">Som</button>
+      </div>
+     </div>
+     <div class="stage-bottom"><div class="anim-chips" id="anim-chips" role="group" aria-label="Animação"></div></div>
+     <p class="stage-status" id="stage-status" aria-live="polite"></p>
+    </div>
+    <aside class="dossier" id="dossier" aria-live="polite">
+     <div class="dossier-head">
+      <span class="sprite" id="dossier-egg" aria-hidden="true"></span>
+      <div><p class="dossier-group" id="dossier-group"></p><h3 id="dossier-name">Tyrannosaurus</h3><p class="dossier-latin" id="dossier-latin"></p></div>
+     </div>
+     <dl class="facts" id="dossier-facts"></dl>
+     <div class="ruler" id="dossier-ruler" aria-hidden="true"><div class="ruler-bar"><span id="ruler-fill"></span><i id="ruler-human"></i></div><div class="ruler-scale"><span>0</span><span>10 m</span><span>20 m</span><span>30 m</span></div></div>
+     <div class="guide-tabs" role="tablist" id="guide-tabs"></div>
+     <p class="guide-text" id="guide-text"></p>
+     <blockquote class="note" id="dossier-note"><p id="note-text"></p><cite data-i18n="best.noteBy">Katarina</cite></blockquote>
+    </aside>
+   </div>
+   <div class="roster-bar">
+    <div class="filters" id="filters" role="group" aria-label="Filtrar"></div>
+    <div class="roster-tools">
+     <label class="search"><span class="sr-only" data-i18n="best.search">Buscar espécie</span><input id="search" type="search" autocomplete="off" data-i18n-placeholder="best.search" placeholder="Buscar espécie"></label>
+     <label class="sort"><span class="sr-only" data-i18n="best.sort">Ordenar</span><select id="sort"><option value="size" data-i18n="best.sortSize">Maior primeiro</option><option value="name" data-i18n="best.sortName">Nome</option><option value="version" data-i18n="best.sortVersion">Versão</option></select></label>
+    </div>
+   </div>
+   <p class="roster-count" id="roster-count"></p>
+   <ul class="roster" id="roster"></ul>
+  </div>
+ </section>
+
+ <section class="mechanics band" id="mecanicas">
+  <div class="wrap">
+   <div class="section-head reveal">
+    <p class="eyebrow" data-i18n="mech.eyebrow">Como se joga</p>
+    <h2 class="display" data-i18n="mech.title">Sobreviva com o que a época oferece.</h2>
+    <p class="lede" data-i18n="mech.lede">Pedra, osso, couro e sílex. Nada de metal ou vidro: nada atravessa a Fenda além de seres vivos.</p>
+   </div>
+   <div class="bento">
+    <article class="tile tile-egg reveal">
+     <div class="egg-stage" id="egg-stage" aria-hidden="true"><span class="sprite egg-sprite" id="egg-sprite"></span><span class="egg-crack"></span></div>
+     <h3 data-i18n="mech.egg.t">Ovos que chocam</h3>
+     <p data-i18n="mech.egg.p">A fêmea põe um ovo perto dela. Ele racha duas vezes e choca em alguns minutos. O filhote marca o jogador mais próximo como família e já nasce domesticado.</p>
+    </article>
+    <article class="tile tile-sex reveal">
+     <div class="pair" id="sex-pair"><figure><img id="pair-male" alt=""><figcaption data-i18n="best.male">Macho</figcaption></figure><figure><img id="pair-female" alt=""><figcaption data-i18n="best.female">Fêmea</figcaption></figure></div>
+     <h3 data-i18n="mech.sex.t">Macho e fêmea</h3>
+     <p data-i18n="mech.sex.p">O sexo é sorteado ao nascer e aparece no corpo: o macho tem as cores de exibição, a fêmea é mais discreta. Crista, vela e babado também mudam. Só um casal procria.</p>
+    </article>
+    <article class="tile tile-tame reveal">
+     <ol class="tame-steps">
+      <li><span class="sprite" data-sprite="item:raw_dino_meat"></span><span data-i18n="mech.tame.s1">Herbívoros aceitam comida na mão.</span></li>
+      <li><span class="sprite" data-sprite="egg:tyrannosaurus"></span><span data-i18n="mech.tame.s2">Predadores só se criam desde filhotes.</span></li>
+      <li><span class="sprite" data-sprite="item:tranq_dart"></span><span data-i18n="mech.tame.s3">Os gigantes cedem ao nocaute, na v0.7.</span></li>
+     </ol>
+     <h3 data-i18n="mech.tame.t">Domesticação</h3>
+     <p data-i18n="mech.tame.p">Domesticado, ele senta, segue e defende você, e ataca o que você atacar. A comida também cura.</p>
+    </article>
+    <article class="tile tile-ride reveal">
+     <svg class="flight" viewBox="0 0 400 140" aria-hidden="true"><path class="flight-path" d="M10 120 C 90 120, 110 30, 200 40 S 320 110, 390 30"/><circle class="flight-dot" r="5"/></svg>
+     <h3 data-i18n="mech.ride.t">Montaria e voo</h3>
+     <p data-i18n="mech.ride.p">Ponha a sela, monte e pule com espaço. No Pteranodon, pular decola, o olhar dirige e soltar plana. Os titãs ganham sela de plataforma para construir em cima.</p>
+    </article>
+    <article class="tile tile-science reveal">
+     <h3 data-i18n="mech.sci.t">O jogador é cientista</h3>
+     <p data-i18n="mech.sci.p">Estudar uma espécie deixa você mais forte com ela. O Guia do Caderno de Campo sobe de nível conforme você aprende.</p>
+     <ol class="levels" id="levels"></ol>
+     <ul class="tools" id="tools"></ul>
+    </article>
+    <article class="tile tile-arms reveal">
+     <h3 data-i18n="mech.arms.t">Armas da época</h3>
+     <ul class="slots" id="weapons"></ul>
+     <p class="small" data-i18n="mech.arms.p">Dano corpo a corpo. A lança vai na mão ou no arremesso: segure o clique direito e solte.</p>
+    </article>
+    <article class="tile tile-journal reveal">
+     <h3 data-i18n="mech.journal.t">Diário de Campo</h3>
+     <p data-i18n="mech.journal.p">Doze objetivos por capítulo, em quatro temas. Complete dois de três num tema e ganhe um fragmento de âmbar. Quatro fragmentos acendem o Altar do Salto, quando você quiser.</p>
+     <div class="journal" id="journal"></div>
+    </article>
+   </div>
+  </div>
+ </section>
+
+ <section class="roadmap band" id="roteiro">
+  <div class="wrap roadmap-grid">
+   <div class="section-head sticky-head reveal">
+    <p class="eyebrow" data-i18n="road.eyebrow">Roteiro</p>
+    <h2 class="display" data-i18n="road.title">Mais de 150 criaturas, era por era.</h2>
+    <p class="lede" data-i18n="road.lede">Cada era vira um capítulo jogável do começo ao fim antes de começar a próxima.</p>
+    <div class="progress-card"><p><strong id="road-made">59</strong> <span data-i18n="road.made">criaturas já modeladas</span></p><div class="progress"><span id="road-progress"></span></div><p class="small" data-i18n="road.of">de 152 planejadas no roteiro</p></div>
+   </div>
+   <ol class="versions" id="versions"></ol>
+  </div>
+ </section>
+
+ <section class="install band" id="jogar">
+  <div class="wrap install-grid">
+   <div class="reveal">
+    <p class="eyebrow" data-i18n="inst.eyebrow">Jogar</p>
+    <h2 class="display" data-i18n="inst.title">Como instalar.</h2>
+    <p class="lede" data-i18n="inst.lede">O Terrassic está em desenvolvimento. Ainda não há download público: quando uma versão for publicada, o link aparece aqui.</p>
+    <a class="btn btn-primary magnetic" id="download" href="https://github.com/RodrigoGomesDev/terrassic" target="_blank" rel="noopener noreferrer"><span data-i18n="inst.github">Ver o código no GitHub</span><span aria-hidden="true">↗</span></a>
+   </div>
+   <div class="loader reveal">
+    <div class="seg" role="tablist" aria-label="Loader"><button type="button" role="tab" id="tab-fabric" aria-selected="true">Fabric</button><button type="button" role="tab" id="tab-forge" aria-selected="false" tabindex="-1">Forge</button></div>
+    <ol class="steps" id="steps"></ol>
+   </div>
+  </div>
+ </section>
+
+ <section class="faq band" id="duvidas">
+  <div class="wrap faq-grid">
+   <h2 class="display reveal" data-i18n="faq.title">Antes de jogar.</h2>
+   <div class="faq-list reveal" id="faq"></div>
+  </div>
+ </section>
 </main>
-<footer><a href="#inicio">TERRASSIC</a><span>Rodrigo Gomes · 2026</span><a href="https://github.com/RodrigoGomesDev/terrassic" target="_blank" rel="noopener noreferrer">GitHub ↗</a><small>Projeto independente. Sem afiliação à Mojang ou Microsoft. Modelos de apresentação do próprio mod.</small></footer>
-<script type="module" src="/src/main.js"></script><script type="module" src="/src/content.js"></script></body></html>
+
+<footer class="footer">
+ <div class="wrap footer-grid">
+  <img src="./assets/selo_altar_512.png" alt="" width="96" height="96" class="seal">
+  <div><p class="footer-name">Terrassic</p><p data-i18n="foot.by">Um mod de Rodrigo Gomes. Modelos, texturas, sprites e código autorais, gerados por código.</p></div>
+  <div class="footer-links"><a href="https://github.com/RodrigoGomesDev/terrassic" target="_blank" rel="noopener noreferrer">GitHub ↗</a><a href="#inicio" data-i18n="foot.top">Voltar ao topo</a></div>
+  <p class="footer-legal" data-i18n="foot.legal">Projeto independente, sem afiliação à Mojang ou à Microsoft. Minecraft é marca da Mojang Synergies AB.</p>
+ </div>
+</footer>
+<script type="module" src="./src/main.js"></script>
+</body>
+</html>

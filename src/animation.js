@@ -1,11 +1,16 @@
 // Compile numeric GeckoLib/Bedrock channels once, then sample them at display rate.
+// Two inputs are accepted: the mod's raw animation.json clips and the compact clips written by
+// scripts/import-mod.py ({len, loop, bones:{bone:{rotation:{time:[x,y,z]}}}}, Catmull-Rom by default).
 const vector=v=>Array.isArray(v)?v.map(n=>Number.isFinite(Number(n))?Number(n):0):vector(v?.post??v?.vector??[0,0,0]);
-export function compileTrack(raw,{monotone=false}={}){
+export function compileTrack(raw,{monotone=false,mode='linear'}={}){
  if(Array.isArray(raw))return {constant:vector(raw)};
- const keys=Object.entries(raw||{}).map(([t,v])=>({t:Number(t),v:vector(v),mode:v?.lerp_mode||'linear'})).filter(k=>Number.isFinite(k.t)).sort((a,b)=>a.t-b.t);
+ const keys=Object.entries(raw||{}).map(([t,v])=>({t:Number(t),v:vector(v),mode:v?.lerp_mode||mode})).filter(k=>Number.isFinite(k.t)).sort((a,b)=>a.t-b.t);
  return {keys,monotone};
 }
-export function compileClip(raw){return {length:raw.animation_length||4,loop:raw.loop===true,bones:Object.fromEntries(Object.entries(raw.bones||{}).map(([name,b])=>[name,Object.fromEntries(['rotation','position'].filter(c=>b[c]).map(c=>[c,compileTrack(b[c],{monotone:name==='jaw'&&c==='rotation'})]))]))};}
+export function compileClip(raw,{compact='len' in (raw||{})}={}){
+ const mode=compact?'catmullrom':'linear';
+ return {length:raw.len??raw.animation_length??4,loop:raw.loop===true,bones:Object.fromEntries(Object.entries(raw.bones||{}).map(([name,b])=>[name,Object.fromEntries(['rotation','position','scale'].filter(c=>b[c]).map(c=>[c,compileTrack(b[c],{monotone:name==='jaw'&&c==='rotation',mode})]))]))};
+}
 export function sampleTrack(track,time,length=4,loop=false){
  if(!track)return [0,0,0];if(track.constant)return track.constant;
  const keys=track.keys;if(!keys.length)return [0,0,0];if(keys.length===1)return keys[0].v;
@@ -32,5 +37,8 @@ export function sampleTrack(track,time,length=4,loop=false){
   return (2*u3-3*u2+1)*v+(u3-2*u2+u)*span*m0+(-2*u3+3*u2)*b.v[n]+(u3-u2)*span*m1;
  });
 }
-export function sampleBone(clip,name,time){const b=clip?.bones[name];return {rotation:sampleTrack(b?.rotation,time,clip?.length,clip?.loop),position:sampleTrack(b?.position,time,clip?.length,clip?.loop)};}
+const ONE=[1,1,1];
+export function sampleBone(clip,name,time){const b=clip?.bones[name];return {rotation:sampleTrack(b?.rotation,time,clip?.length,clip?.loop),position:sampleTrack(b?.position,time,clip?.length,clip?.loop),scale:b?.scale?sampleTrack(b.scale,time,clip?.length,clip?.loop):ONE};}
 export function actionWeight(time,length){const smooth=x=>{x=Math.max(0,Math.min(1,x));return x*x*(3-2*x)};return smooth(time/.2)*smooth((length-time)/.35);}
+// Weight of the incoming clip during a cross-fade: eased so the hand-off has no visible corner.
+export function fadeWeight(elapsed,duration=.35){const x=Math.max(0,Math.min(1,elapsed/duration));return x*x*(3-2*x);}

@@ -7,7 +7,7 @@
     "dev": "vite --host 127.0.0.1",
     "build": "vite build",
     "preview": "vite preview --host 127.0.0.1",
-    "check": "node --check src/main.js && node --check src/viewer.js && node --check src/scroll-scene.js && node --check src/animation.js && node --check src/content.js && node --check src/site-config.js && node --check src/data.js && node --test tests/*.test.js"
+    "check": "for f in src/*.js src/generated/*.js; do node --check \"$f\" || exit 1; done && node --test tests/*.test.js"
   },
   "dependencies": {
     "three": "^0.180.0"

@@ -1,22 +1,29 @@
-import {species} from './data.js';
-const $=id=>document.getElementById(id);let scene,selected=0,sex='male',galleryWasActive=false,lastCopy='',staticMode=false;
-const labels={presentation_roar:'Rugido suave',idle:'Em repouso',walk:'Caminhar',run:'Correr',attack:'Atacar',roar:'Rugir',sit:'Descansar',eat:'Alimentar',graze:'Pastar',fly:'Voar',glide:'Planar',tame:'Domesticar',beg:'Pedir comida',knocked_out:'Nocauteado',wake:'Despertar'};
-const selector=document.querySelector('.species-selector');
-species.forEach((s,i)=>{const b=document.createElement('button');b.className='species-choice';b.setAttribute('aria-label',`Ver ${s.name} em 3D`);b.setAttribute('aria-pressed',String(i===0));b.innerHTML=`<img src="/assets/${s.id}/preview.png" alt="" loading="lazy"><span>${s.name}</span>`;b.addEventListener('click',()=>selectSpecies(i));selector.append(b)});
-function updateInfo(i){const s=species[i];$('creature-canvas').setAttribute('aria-label',`Modelo 3D de ${s.name}. Role para explorar; no elenco, arraste para girar.`);$('species-name').textContent=s.name;$('species-category').textContent=s.category;$('species-description').textContent=s.description;selector.querySelectorAll('button').forEach((b,j)=>b.setAttribute('aria-pressed',String(i===j)));}
-function selectSpecies(i){selected=i;updateInfo(i);$('stage-status').textContent='Carregando…';scene?.setManualJaw(false);$('jaw-toggle').setAttribute('aria-pressed','false');scene?.renderer&&!staticMode?scene.load(species[i].id,sex):($('creature-canvas').querySelector('.model-fallback').src=`/assets/${species[i].id}/preview.png`,$('stage-status').textContent='Visualização estática')}
-updateInfo(0);
-function updateProgress(p){const copy=p<.15?'intro':p<.46?'turn':p<.84?'jaw':'';if(copy!==lastCopy){for(const name of ['intro','turn','jaw'])document.querySelector(`.${name}-caption`).setAttribute('aria-hidden',String(name!==copy));lastCopy=copy;}$('scroll-fill').style.width=`${p*100}%`;$('scene-next').href=p<.15?'#girar':p<.55?'#rugido':p<.9?'#elenco':'#instalar';$('scroll-label').textContent=p<.14?'Role para explorar':p<.45?'Uma mudança de perspectiva':p<.57?'Aproxime-se':p<.83?'O scroll abre a mandíbula':p<.9?'Continue para explorar':'Arraste para girar';const gallery=p>.895;if(galleryWasActive&&!gallery){selected=0;sex='male';updateInfo(0);$('male').setAttribute('aria-pressed','true');$('female').setAttribute('aria-pressed','false')}galleryWasActive=gallery;}
-function onLoad(animations){$('stage-status').textContent='';const select=$('animation'),previous=select.value;select.replaceChildren();for(const a of animations){const opt=document.createElement('option');opt.value=a;opt.textContent=labels[a]||a;select.append(opt)}select.value=scene?.inGallery&&animations.includes(previous)?previous:'idle';scene?.setAnimation(select.value);$('jaw-toggle').hidden=!scene?.model?.bones.has('jaw');$('roar-trigger').hidden=!(scene?.clips?.presentation_roar||scene?.clips?.roar);$('roar-trigger').disabled=false;$('roar-trigger').innerHTML='Rugir <span>↗</span>';if(scene)scene.onActionEnd=()=>{$('roar-trigger').disabled=false;$('roar-trigger').innerHTML='Rugir <span>↗</span>';};}
-function onFailure(){staticMode=true;$('creature-canvas').querySelector('.model-fallback').hidden=false;document.body.classList.add('no-webgl');$('gallery').inert=false;$('stage-status').textContent='Visualização estática';$('jaw-toggle').hidden=true;$('reset-camera').disabled=true;$('animation').disabled=true;$('male').disabled=true;$('female').disabled=true;$('roar-trigger').hidden=true;$('sound-toggle').hidden=true;}
-try{const {ScrollScene}=await import('./scroll-scene.js');scene=new ScrollScene($('creature-canvas'),{onProgress:updateProgress,onLoaded:onLoad,onFailure});if(!scene.renderer)onFailure();}catch{onFailure()}
-for(const s of ['male','female'])$(s).addEventListener('click',()=>{sex=s;$('male').setAttribute('aria-pressed',String(s==='male'));$('female').setAttribute('aria-pressed',String(s==='female'));$('stage-status').textContent='Carregando…';scene?.load(species[selected].id,s)});
-$('animation').addEventListener('change',e=>scene?.setAnimation(e.target.value));$('reset-camera').addEventListener('click',()=>scene?.reset());
-$('jaw-toggle').addEventListener('click',()=>{const open=$('jaw-toggle').getAttribute('aria-pressed')!=='true';$('jaw-toggle').setAttribute('aria-pressed',String(open));scene?.setManualJaw(open)});
-const roarAudio=new Audio('/assets/audio/tyrannosaurus.ogg');roarAudio.preload='none';roarAudio.volume=.55;let soundEnabled=false;
-$('sound-toggle').addEventListener('click',()=>{soundEnabled=!soundEnabled;$('sound-toggle').setAttribute('aria-pressed',String(soundEnabled));$('sound-toggle').setAttribute('aria-label',soundEnabled?'Desativar som do rugido':'Ativar som do rugido');$('sound-toggle').textContent=soundEnabled?'Som on':'Som off';if(!soundEnabled)roarAudio.pause()});
-$('roar-trigger').addEventListener('click',()=>{if(!scene)return;scene.setManualJaw(false);$('jaw-toggle').setAttribute('aria-pressed','false');if(scene.playAction(scene.clips?.presentation_roar?'presentation_roar':'roar')){$('roar-trigger').disabled=true;$('roar-trigger').textContent='Rugindo…';if(soundEnabled&&scene.id==='tyrannosaurus'){roarAudio.currentTime=0;roarAudio.play().catch(()=>{});}}});
-$('creature-canvas').addEventListener('keydown',e=>{if(!scene?.inGallery)return;if(['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.key)){e.preventDefault();scene.autoRotate=false;const pos=scene.camera.position;if(e.key==='ArrowLeft'||e.key==='ArrowRight')pos.applyAxisAngle({x:0,y:1,z:0},e.key==='ArrowLeft'?.15:-.15);else pos.multiplyScalar(e.key==='ArrowUp'?.93:1.07);scene.controls.update()}});
-function setLoader(loader){for(const name of ['fabric','forge']){const tab=$(`tab-${name}`);tab.setAttribute('aria-selected',String(name===loader));tab.tabIndex=name===loader?0:-1}$('install-panel').setAttribute('aria-labelledby',`tab-${loader}`);$('loader-description').textContent=loader==='fabric'?'Instale o Fabric Loader e adicione Architectury API, GeckoLib e Fabric API nas versões compatíveis. Coloque o arquivo do Terrassic na pasta mods.':'Instale o Forge 1.20.1 e adicione Architectury API e GeckoLib nas versões compatíveis. Coloque o arquivo do Terrassic na pasta mods.';}
-for(const name of ['fabric','forge']){$(`tab-${name}`).addEventListener('click',()=>setLoader(name));$(`tab-${name}`).addEventListener('keydown',e=>{if(e.key==='ArrowLeft'||e.key==='ArrowRight'){e.preventDefault();const next=name==='fabric'?'forge':'fabric';setLoader(next);$(`tab-${next}`).focus()}})}
-window.addEventListener('pagehide',e=>{if(!e.persisted){roarAudio.pause();scene?.dispose()}});
+import {detectLang,setLang,t} from './i18n.js';
+import {links} from './site-config.js';
+import {initHeader,initMarquee,initStory,initNotebook,initEras,initMechanics,initRoadmap,initInstall,initFaq,initMotion,onScroll} from './sections.js';
+import {initBestiary} from './bestiary.js';
+const $=id=>document.getElementById(id);
+
+// Text first: the page reads correctly before any 3D has loaded.
+setLang(detectLang());
+initHeader();initMotion();
+const renders=[initMarquee(),initStory(),initNotebook(),initEras(),initRoadmap(),initInstall(links),initFaq()];
+
+// Three.js is loaded on demand so the copy is never blocked by WebGL.
+const three=import('./viewer.js').catch(()=>null);
+const thumbnailer=await three.then(m=>{try{const t=m&&new m.Thumbnailer();return t?.renderer?t:null}catch{return null}});
+renders.push(initMechanics(thumbnailer));
+const viewerReady=three.then(m=>{if(!m)return null;const v=new m.SpecimenViewer($('stage-canvas'));return v.renderer?v:null}).catch(()=>null);
+const bestiary=initBestiary({viewerReady,thumbnailer});
+const refreshAll=()=>{for(const r of renders)r();bestiary.refresh()};refreshAll();
+for(const b of document.querySelectorAll('[data-lang]'))b.addEventListener('click',()=>{setLang(b.dataset.lang);refreshAll();heroStatus()});
+
+let heroLoaded=0;const heroStatus=()=>{$('hero-status').textContent=heroLoaded>=1?t('hero.ready'):t('hero.loading')};
+import('./hero.js').then(({Hero})=>{
+ const hero=new Hero($('hero-canvas'),{
+  onProgress:p=>{heroLoaded=p;$('hero-meter').style.width=`${p*100}%`;if(p>=1){heroStatus();document.querySelector('.hero').classList.add('is-loaded')}},
+  onReady:()=>document.querySelector('.hero').classList.add('is-live'),
+  onFail:()=>document.querySelector('.hero').classList.add('no-webgl')});
+ if(!hero.renderer)return document.querySelector('.hero').classList.add('no-webgl');
+ const heroEl=document.querySelector('.hero');onScroll(()=>{const p=Math.min(1,scrollY/heroEl.offsetHeight);hero.setScroll(p);heroEl.style.setProperty('--hero-p',p.toFixed(3))});
+}).catch(()=>document.querySelector('.hero').classList.add('no-webgl'));
