@@ -52,7 +52,9 @@ export class Hero{
   spawn(rex,{shadows:true}).then(c=>{this.rex=c;c.holder.rotation.y=-2.55;this.scene.add(c.holder);onProgress(1);onReady()}).catch(e=>{console.warn(e);onFail(e)});
   requestAnimationFrame(this.tick);
  }
- resize(){const w=this.host.clientWidth,h=this.host.clientHeight;this.portrait=w<h;this.renderer.setSize(w,h,false);this.camera.aspect=w/Math.max(1,h);this.camera.fov=this.portrait?48:30;this.camera.updateProjectionMatrix()}
+ resize(){const w=this.host.clientWidth,h=this.host.clientHeight;this.portrait=w<h;this.renderer.setSize(w,h,false);this.camera.aspect=w/Math.max(1,h);this.camera.fov=this.portrait?48:30;
+  // On a phone the animal is drawn higher, between the title and the copy, so it never covers the text.
+  if(this.portrait)this.camera.setViewOffset(w,h,0,h*.14,w,h);else this.camera.clearViewOffset();this.camera.updateProjectionMatrix()}
  setProgress(p){this.target=this.reduced?.3:clamp(p,0,1)}
  tick(now){
   requestAnimationFrame(this.tick);const ms=now-this.last,dt=Math.min(.05,ms/1000);this.last=now;if(!this.visible||document.hidden)return;if(!this.pixLevel)this.guard?.frame(ms);this.step(dt);

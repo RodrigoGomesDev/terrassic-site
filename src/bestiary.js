@@ -29,11 +29,13 @@ export function initBestiary({viewerReady,thumbnailer}){
 
  const filters=$('filters');
  for(const g of GROUPS){const b=document.createElement('button');b.type='button';b.className='chip';b.dataset.group=g;b.addEventListener('click',()=>{group=g;renderRoster()});filters.append(b)}
- $('search').addEventListener('input',e=>{query=e.target.value.trim().toLowerCase();renderRoster()});
+ // Search ignores case and accents, and also finds the short names people use ("rex" for the Tyrannosaurus).
+ const norm=x=>x.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase(),ALIAS={tyrannosaurus:'t. rex trex',velociraptor:'raptor',triceratops:'trike'};
+ $('search').addEventListener('input',e=>{query=norm(e.target.value.trim());renderRoster()});
  $('sort').addEventListener('change',e=>{sort=e.target.value;renderRoster()});
 
  function visible(){
-  const list=SPECIES.filter(s=>(group==='all'||s.group===group)&&(!query||Object.values(s.name).some(n=>n.toLowerCase().includes(query))));
+  const list=SPECIES.filter(s=>(group==='all'||s.group===group)&&(!query||[...Object.values(s.name),s.id,ALIAS[s.id]||''].some(n=>norm(n).includes(query))));
   const name=s=>pick(s.name);
   return list.sort(sort==='name'?(a,b)=>name(a).localeCompare(name(b)):sort==='version'?(a,b)=>{const x=ver(a.version),y=ver(b.version);return x[0]-y[0]||x[1]-y[1]||b.length-a.length}:(a,b)=>b.length-a.length);
  }

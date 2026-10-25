@@ -26,7 +26,9 @@ export class StoryMeteor{
   loadMeteor().then(m=>{this.meteor=m;this.scene.add(m.holder)});
   this.tick=this.tick.bind(this);requestAnimationFrame(this.tick);
  }
- resize(){const w=this.host.clientWidth,h=this.host.clientHeight;this.renderer.setSize(w,h,false);this.camera.aspect=w/Math.max(1,h);this.camera.updateProjectionMatrix();this.span=Math.tan(THREE.MathUtils.degToRad(20))*30}
+ resize(){const w=this.host.clientWidth,h=this.host.clientHeight;this.renderer.setSize(w,h,false);this.camera.aspect=w/Math.max(1,h);this.camera.updateProjectionMatrix();this.span=Math.tan(THREE.MathUtils.degToRad(20))*30;
+  // A narrow (phone) screen gets a smaller meteor and trail, so it never fills the screen.
+  this.fit=Math.min(1,.35+this.camera.aspect*.65)}
  setProgress(p){this.target=clamp(p,0,1)}
  tick(now){
   requestAnimationFrame(this.tick);const ms=now-this.last,dt=Math.min(.05,ms/1000);this.last=now;if(!this.visible||document.hidden||!this.meteor)return;this.guard.frame(ms);this.time+=dt;
@@ -35,14 +37,14 @@ export class StoryMeteor{
   const u=Math.pow(smooth(p,.02,this.impact),1.5),landed=p>=this.impact,m=this.meteor;
   const a=new THREE.Vector3(w*.7,h*1.35,-14),c=new THREE.Vector3(w*.55,h*.2,-8),b=new THREE.Vector3(w*.1,-h*.7,2);
   const curve=t=>a.clone().multiplyScalar((1-t)*(1-t)).add(c.clone().multiplyScalar(2*t*(1-t))).add(b.clone().multiplyScalar(t*t));
-  const pos=curve(u),dir=curve(Math.min(1,u+.01)).sub(curve(Math.max(0,u-.01))).normalize(),size=lerp(.45,2,u*u);
+  const pos=curve(u),dir=curve(Math.min(1,u+.01)).sub(curve(Math.max(0,u-.01))).normalize(),size=lerp(.45,2,u*u)*this.fit;
   m.holder.visible=!landed&&p>.01;m.holder.position.copy(pos);m.holder.lookAt(pos.clone().sub(dir));m.holder.scale.setScalar(size);m.animator.update(this.reduced?0:dt);
   this.halo.visible=m.holder.visible;this.halo.position.copy(pos).addScaledVector(dir,-size*.8);this.halo.scale.setScalar(size*9*(1+Math.sin(this.time*9)*.05));this.halo.material.opacity=.35+u*.25;
-  if(!landed&&p>.01&&!this.reduced)this.trail.emit(pos.clone().addScaledVector(dir,-size*1.6),dir,Math.ceil(3+u*8),lerp(.7,2.6,u));
+  if(!landed&&p>.01&&!this.reduced)this.trail.emit(pos.clone().addScaledVector(dir,-size*1.6),dir,Math.ceil(3+u*8),lerp(.7,2.6,u)*this.fit);
   if(landed&&!this.burst){this.burst=true;this.flashT=0;if(!this.reduced)for(let i=0;i<10;i++)this.trail.emit(b.clone(),new THREE.Vector3(Math.random()-.5,Math.random()*.6-.1,.3).normalize(),26,3.6)}
   if(p<this.impact-.03)this.burst=false;
   // The burst: a quick bright flash that swells and fades.
-  if(this.burst){this.flashT=(this.flashT||0)+dt;const f=Math.min(1,this.flashT/1.1);this.flash.visible=f<1;this.flash.position.copy(b);this.flash.scale.setScalar(lerp(4,48,1-Math.pow(1-f,3)));this.flash.material.opacity=1-f}else this.flash.visible=false;
+  if(this.burst){this.flashT=(this.flashT||0)+dt;const f=Math.min(1,this.flashT/1.1);this.flash.visible=f<1;this.flash.position.copy(b);this.flash.scale.setScalar(lerp(4,48,1-Math.pow(1-f,3))*this.fit);this.flash.material.opacity=1-f}else this.flash.visible=false;
   this.trail.update(this.reduced?0:dt);this.renderer.render(this.scene,this.camera);
  }
 }
