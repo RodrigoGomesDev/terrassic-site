@@ -7,12 +7,14 @@
     "dev": "vite --host 127.0.0.1",
     "build": "vite build",
     "preview": "vite preview --host 127.0.0.1",
-    "check": "for f in src/*.js src/generated/*.js; do node --check \"$f\" || exit 1; done && node --test tests/*.test.js"
+    "check": "for f in src/*.js src/generated/*.js; do node --check \"$f\" || exit 1; done && node --test tests/*.test.js",
+    "thumbs": "node scripts/bake-thumbs.mjs"
   },
   "dependencies": {
     "three": "^0.180.0"
   },
   "devDependencies": {
+    "playwright-core": "^1.48.2",
     "vite": "^7.1.0"
   }
 }

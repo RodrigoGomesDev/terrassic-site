@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import {SPECIES} from './generated/species.js';
-import {spawn,createModel,assetUrl,Animator} from './rig.js';
+import {spawn,createModel,assetUrl,Animator,QualityGuard} from './rig.js';
 import {compileClip} from './animation.js';
 const clamp=THREE.MathUtils.clamp,lerp=THREE.MathUtils.lerp,damp=THREE.MathUtils.damp;
 const smooth=(p,a,b)=>{const x=clamp((p-a)/(b-a),0,1);return x*x*x*(x*(x*6-15)+10)};
@@ -16,6 +16,8 @@ async function loadIsland(){
  for(const t of [map,glow]){t.magFilter=t.minFilter=THREE.NearestFilter;t.generateMipmaps=false;t.colorSpace=THREE.SRGBColorSpace}
  const model=createModel(data,map,'male',{shadows:true,merge:true,bias:false});Object.assign(model.material,{emissive:new THREE.Color(0xffffff),emissiveMap:glow,emissiveIntensity:1.6,alphaTest:.5});
  model.root.scale.setScalar(1/16);
+ // The island receives the T. rex's shadow but does not shadow itself: block-on-block shadows at grazing angles break into triangles.
+ for(const m of model.meshes){m.castShadow=false;m.receiveShadow=true}
  return {model,data,animator:new Animator(model,{rest:compileClip({len:1,loop:true,bones:{}}),break:compileClip(data.animations.break)},{name:'rest'})};
 }
 
@@ -52,7 +54,7 @@ export class Hero{
   r.shadowMap.enabled=true;r.shadowMap.type=THREE.PCFSoftShadowMap;host.append(r.domElement);
   this.scene=new THREE.Scene();this.camera=new THREE.PerspectiveCamera(32,1,.3,1200);
   this.scene.add(new THREE.HemisphereLight(0xfff0d0,0x6b4a2a,1.9));
-  const sun=new THREE.DirectionalLight(0xfff1d6,2.6);sun.position.set(24,40,30);sun.castShadow=true;sun.shadow.mapSize.set(2048,2048);Object.assign(sun.shadow.camera,{left:-18,right:18,top:18,bottom:-18,near:1,far:120});sun.shadow.bias=-.0004;sun.shadow.normalBias=.04;this.scene.add(sun);
+  const sun=new THREE.DirectionalLight(0xfff1d6,2.6);sun.position.set(24,40,30);sun.castShadow=true;sun.shadow.mapSize.set(this.mobile?1024:2048,this.mobile?1024:2048);Object.assign(sun.shadow.camera,{left:-18,right:18,top:18,bottom:-18,near:1,far:120});sun.shadow.bias=-.0004;sun.shadow.normalBias=.04;this.scene.add(sun);this.guard=new QualityGuard(r,{shadows:[sun]});
   this.fire=new THREE.PointLight(0xff8a2a,0,160,1.4);this.scene.add(this.fire);
   this.scene.add(clouds());this.trail=new Trail(this.scene);this.path=curve(new THREE.Vector3(0,1,-1));
   this.progress=0;this.target=0;this.time=0;this.last=performance.now();this.pointer=new THREE.Vector2();this.look=new THREE.Vector2();this.visible=true;this.roarPlayed=false;
@@ -73,7 +75,7 @@ export class Hero{
  resize(){const w=this.host.clientWidth,h=this.host.clientHeight;this.portrait=w<h;this.renderer.setSize(w,h,false);this.camera.aspect=w/Math.max(1,h);this.camera.fov=this.portrait?50:32;this.camera.updateProjectionMatrix()}
  setProgress(p){this.target=this.reduced?.62:clamp(p,0,1)}
  tick(now){
-  requestAnimationFrame(this.tick);const dt=Math.min(.05,(now-this.last)/1000);this.last=now;if(!this.visible||document.hidden)return;this.step(dt);
+  requestAnimationFrame(this.tick);const ms=now-this.last,dt=Math.min(.05,ms/1000);this.last=now;if(!this.visible||document.hidden)return;this.guard?.frame(ms);this.step(dt);
  }
  step(dt){
   this.time+=dt;this.progress=this.reduced?this.target:damp(this.progress,this.target,6,dt);const p=this.progress;

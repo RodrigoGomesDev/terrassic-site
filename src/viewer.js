@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
-import {spawn} from './rig.js';
+import {spawn,QualityGuard} from './rig.js';
 import {plinth,eraSlab} from './blocks.js';
 const damp=THREE.MathUtils.damp,ease=t=>t*t*(3-2*t);
 
@@ -18,7 +18,7 @@ export class SpecimenViewer{
   host.append(r.domElement);
   this.scene=new THREE.Scene();this.camera=new THREE.PerspectiveCamera(30,1,.1,800);
   this.scene.add(new THREE.HemisphereLight(0xe6d6ee,0x3a2a20,2.2));
-  this.key=new THREE.DirectionalLight(0xffdcae,3.2);this.key.castShadow=true;this.key.shadow.mapSize.set(2048,2048);this.key.shadow.bias=-.0005;this.key.shadow.normalBias=.03;this.scene.add(this.key,this.key.target);
+  this.key=new THREE.DirectionalLight(0xffdcae,3.2);this.key.castShadow=true;this.key.shadow.mapSize.set(2048,2048);this.key.shadow.bias=-.0005;this.key.shadow.normalBias=.03;this.scene.add(this.key,this.key.target);this.guard=new QualityGuard(r,{shadows:[this.key]});
   const rim=new THREE.DirectionalLight(0xf07a1a,2.2);rim.position.set(6,5,12);this.scene.add(rim);
   const cool=new THREE.DirectionalLight(0x8fb4c8,.8);cool.position.set(10,3,-8);this.scene.add(cool);
   this.assistant=fieldAssistant();this.scene.add(this.assistant);
@@ -58,7 +58,7 @@ export class SpecimenViewer{
  setZoom(f){this.zoom=THREE.MathUtils.clamp(f,.45,1.6)}
  resetView(){this.zoom=1;this.controls.autoRotate=!this.reduced}
  tick(now){
-  requestAnimationFrame(this.tick);const dt=Math.min(.05,(now-this.last)/1000);this.last=now;if(!this.visible||document.hidden)return;
+  requestAnimationFrame(this.tick);const ms=now-this.last,dt=Math.min(.05,ms/1000);this.last=now;if(!this.visible||document.hidden)return;this.guard?.frame(ms);
   if(this.current){const c=this.current;c.animator.update(dt);
    // Flying clips lift the animal off the plinth.
    const air=/^(fly|glide)$/.test(c.animator.current.name)?Math.max(1.2,this.size.y*.55)+Math.sin(now*.0015)*.25:0;c.lift=damp(c.lift||0,air,3,dt);c.holder.position.y=(c.groundY??=c.holder.position.y)+c.lift;if(c.fade<1){c.fade=Math.min(1,c.fade+dt*2.2);c.model.material.opacity=ease(c.fade);c.holder.scale.setScalar(.94+.06*ease(c.fade));if(c.fade===1){c.model.material.transparent=false;c.model.material.needsUpdate=true}}}

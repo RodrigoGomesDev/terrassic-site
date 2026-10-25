@@ -12,8 +12,9 @@ const cache=new Map(),textures=new Map();
 export function loadSpecies(id){
  const get=path=>fetch(assetUrl(path)).then(r=>{if(!r.ok)throw new Error(`${path}: ${r.status}`);return r.json()});
  if(!cache.has(id))cache.set(id,Promise.all([get(`species/${id}.json`),...Object.entries(WEB_CLIPS[id]||{}).map(([name,path])=>get(path).then(raw=>[name,raw]).catch(()=>null))]).then(([data,...extra])=>{
-  const clips=Object.fromEntries(Object.entries(data.animations).map(([k,v])=>[k,compileClip(v)]));
-  for(const e of extra)if(e)clips[e[0]]=compileClip(e[1]);
+  // Clips compile on first use: a thumbnail only needs the idle pose, not all twelve animations.
+  const clips={},raw={...data.animations};for(const e of extra)if(e)raw[e[0]]=e[1];
+  for(const [k,v] of Object.entries(raw))Object.defineProperty(clips,k,{enumerable:true,configurable:true,get(){const c=compileClip(v);Object.defineProperty(clips,k,{value:c,enumerable:true});return c}});
   return {...data,clips};
  }).catch(e=>{cache.delete(id);throw e}));
  return cache.get(id);
@@ -23,7 +24,7 @@ export function loadTexture(id,sex){
  if(!textures.has(key))textures.set(key,new THREE.TextureLoader().loadAsync(assetUrl(`species/${key}.png`)).then(t=>{t.magFilter=THREE.NearestFilter;t.minFilter=THREE.NearestFilter;t.generateMipmaps=false;t.colorSpace=THREE.SRGBColorSpace;return t}).catch(e=>{textures.delete(key);throw e}));
  return textures.get(key);
 }
-export function addClip(id,name,raw){return loadSpecies(id).then(d=>{d.clips[name]=compileClip(raw);return d})}
+export function addClip(id,name,raw){return loadSpecies(id).then(d=>{Object.defineProperty(d.clips,name,{value:compileClip(raw),enumerable:true,configurable:true});return d})}
 
 // Builds the Blockbench rig (16 px = 1 m) from the compact model. BoxGeometry face order: east, west, up, down, south, north.
 // merge: one draw call per bone (for scenes with many creatures); the per-cube depth bias becomes a tiny inflate.
@@ -62,7 +63,7 @@ export function createModel(data,texture,sex='male',{shadows=false,merge=false,b
 // Plays the mod's clips with cross-fades between loops and one-shot actions layered on top.
 export class Animator{
  constructor(model,clips,{name='idle',fade=.35}={}){this.model=model;this.clips=clips;this.fade=fade;this.current={name,clip:clips[name]||clips.idle,time:Math.random()*4};this.previous=null;this.action=null;this.speed=1;}
- has(name){return !!this.clips[name]}
+ has(name){return name in this.clips}
  play(name,{fade=this.fade,restart=false}={}){
   if(!this.clips[name])return false;if(this.current.name===name&&!restart)return true;
   this.previous={...this.current,elapsed:0,duration:fade};this.current={name,clip:this.clips[name],time:0};return true;
@@ -98,6 +99,19 @@ export async function spawn(species,{sex='male',shadows=false,animation='idle',m
  const [data,texture]=await Promise.all([loadSpecies(species.id),loadTexture(species.id,sex)]);
  const model=createModel(data,texture,sex,{shadows,merge});
  const holder=new THREE.Group();holder.add(model.root);model.root.scale.setScalar(species.scale/16);
- const animator=new Animator(model,data.clips,{name:data.clips[animation]?animation:'idle'});
+ const animator=new Animator(model,data.clips,{name:animation in data.clips?animation:'idle'});
  return {species,holder,model,animator,data,dispose(){model.dispose()}};
+}
+
+// Drops resolution, then shadows, when a device cannot keep the frame rate; it never raises them again.
+export class QualityGuard{
+ constructor(renderer,{shadows=[]}={}){this.renderer=renderer;this.shadows=shadows;this.samples=[];this.level=0;this.cool=0}
+ frame(ms){
+  if(document.hidden||ms>250)return;this.samples.push(ms);if(this.samples.length<90)return;
+  const avg=this.samples.reduce((a,b)=>a+b,0)/this.samples.length;this.samples.length=0;
+  if(avg<24||this.level>=3)return;this.level++;
+  if(this.level<3)this.renderer.setPixelRatio(Math.max(.75,this.renderer.getPixelRatio()*.75));
+  else{this.renderer.shadowMap.enabled=false;for(const l of this.shadows)l.castShadow=false}
+  this.renderer.setSize(this.renderer.domElement.clientWidth,this.renderer.domElement.clientHeight,false);
+ }
 }

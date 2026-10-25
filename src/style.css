@@ -370,6 +370,7 @@ button{cursor:pointer}
 }
 @media (max-width:760px){
  .topbar{gap:10px}.nav-cta{display:none}
+ .topbar.is-solid{backdrop-filter:none;background:rgba(20,16,20,.96)}.topbar.on-light.is-solid{background:rgba(236,200,128,.96)}
   .film{height:440svh}
  .film-word{top:calc(70px + env(safe-area-inset-top,0px))}
  .film-intro{bottom:64px;right:var(--gutter-r)}

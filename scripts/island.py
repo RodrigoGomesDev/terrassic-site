@@ -48,7 +48,7 @@ for x in range(-R - 2, R + 3):
         depth = max(1, round((edge - r) * .9 + rng.random() * 2))
         for d in range(depth):
             y = -1 - d
-            cells[(x, y, z)] = 'fern_ground' if d == 0 else 'soil' if d < 3 else 'fossil' if rng.random() < .07 else 'shale' if rng.random() < .5 else 'limestone'
+            cells[(x, y, z)] = 'fern_ground' if d == 0 else 'soil' if d < 3 else 'fossil' if rng.random() < .03 else 'shale' if rng.random() < .5 else 'limestone'
 cells[(4, -2, -8)] = 'amber'
 cells[(-7, -3, 5)] = 'amber'
 

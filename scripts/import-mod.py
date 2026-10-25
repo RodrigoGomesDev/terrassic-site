@@ -14,7 +14,7 @@ import shutil
 import sys
 from pathlib import Path
 
-if len(sys.argv) != 2:
+if len(sys.argv) < 2:
     raise SystemExit('Uso: python3 -B scripts/import-mod.py /caminho/terrassic')
 MOD = Path(sys.argv[1]).resolve()
 SITE = Path(__file__).resolve().parents[1]
@@ -238,6 +238,10 @@ def main():
         ))
     atlas = build_atlas([s['id'] for s in species])
     blocks = copy_blocks()
+    # Optional: the site's own softer drawings of the scenery blocks (scripts/blocktex.py), still under review.
+    if '--soft-blocks' in sys.argv:
+        import blocktex
+        blocktex.main()
     js = ('// Gerado por scripts/import-mod.py a partir do repositório do mod. Não edite à mão.\n'
           f'export const SPECIES={json.dumps(species, ensure_ascii=False, separators=(",", ":"))};\n'
           f'export const SPRITES={json.dumps(atlas, separators=(",", ":"))};\n'

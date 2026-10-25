@@ -2,6 +2,7 @@ import {SPECIES,LORE} from './generated/species.js';
 import {t,pick,getLang} from './i18n.js';
 import {sprite,paintSprite} from './sprites.js';
 import {assetUrl} from './rig.js';
+import {picture} from './pictures.js';
 const $=id=>document.getElementById(id);
 const GROUPS=['all','predator','herbivore','flyer','water'];
 const GUIDE_KEYS=['sci','behavior','taming','utility'];
@@ -23,7 +24,7 @@ export function initBestiary({viewerReady,thumbnailer}){
   b.addEventListener('pointermove',e=>{const r=b.getBoundingClientRect();b.style.setProperty('--mx',`${(e.clientX-r.left)/r.width*100}%`);b.style.setProperty('--my',`${(e.clientY-r.top)/r.height*100}%`)});
   li.append(b);cards.set(s.id,{li,button:b,img:b.querySelector('img')});
  }
- const thumbs=new IntersectionObserver(entries=>{for(const e of entries){if(!e.isIntersecting)continue;thumbs.unobserve(e.target);const s=SPECIES.find(x=>x.id===e.target.dataset.id),card=cards.get(s.id);thumbnailer?.request(s).then(url=>{card.img.src=url;card.button.classList.add('has-art')}).catch(()=>card.button.classList.add('no-art'))}},{rootMargin:'300px'});
+ const thumbs=new IntersectionObserver(entries=>{for(const e of entries){if(!e.isIntersecting)continue;thumbs.unobserve(e.target);const s=SPECIES.find(x=>x.id===e.target.dataset.id),card=cards.get(s.id);picture(s.id,()=>thumbnailer().then(t=>t.request(s))).then(url=>{card.img.src=url;card.button.classList.add('has-art')}).catch(()=>card.button.classList.add('no-art'))}},{rootMargin:'300px'});
  for(const {button} of cards.values())thumbs.observe(button);
 
  const filters=$('filters');

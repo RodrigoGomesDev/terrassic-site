@@ -33,7 +33,7 @@ Os modelos, animações, texturas, sprites e textos vêm do repositório do mod.
 python3 -B scripts/import-mod.py /caminho/para/terrassic
 ```
 
-O script só lê o mod e gera:
+O script só lê o mod e gera os arquivos abaixo. Com `--soft-blocks`, ele troca as texturas de bloco dos cenários pelas versões suaves de `scripts/blocktex.py`, que ainda estão em avaliação:
 
 | Saída | Origem no mod |
 |---|---|
@@ -45,6 +45,22 @@ O script só lê o mod e gera:
 | `public/assets/letreiro_*.png`, `monograma_*.png`, `selo_altar_512.png` | `art/marca/` |
 
 Espécie nova no mod entra no site sozinha na próxima importação.
+
+## Miniaturas
+
+As miniaturas do bestiário, dos capítulos e do macho e fêmea são imagens prontas em `public/assets/thumbs/`, então o visitante não precisa renderizar 59 modelos no navegador. Depois de mudar um modelo ou um bloco:
+
+```sh
+npm run build && npm run thumbs   # precisa do Google Chrome instalado (CHROME=/caminho troca o executável)
+```
+
+Se faltar alguma imagem, o site desenha a miniatura no navegador.
+
+## Desempenho
+
+- Cada cena 3D só desenha quando está na tela, e para quando a aba fica escondida.
+- Se o aparelho não segura a taxa de quadros, a cena baixa sozinha a resolução e depois desliga as sombras (`QualityGuard` em `src/rig.js`).
+- As animações dos modelos só são preparadas quando alguém usa uma delas.
 
 ## Meteoro, ilha e rugido
 

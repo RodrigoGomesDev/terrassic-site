@@ -2,6 +2,7 @@ import {SPECIES,LORE} from './generated/species.js';
 import {ERAS,VERSIONS,GUIDE_LEVELS,TOOLS,WEAPONS,INSTALL,FAQ} from './content.js';
 import {t,pick} from './i18n.js';
 import {sprite,paintSprite} from './sprites.js';
+import {picture} from './pictures.js';
 const $=id=>document.getElementById(id),clamp=(v,a,b)=>Math.min(b,Math.max(a,v)),smooth=x=>{x=clamp(x,0,1);return x*x*(3-2*x)};
 const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
 const el=(tag,cls,text)=>{const e=document.createElement(tag);if(cls)e.className=cls;if(text!==undefined)e.textContent=text;return e};
@@ -107,11 +108,13 @@ function landscape(canvas,era,seed){
 // Each chapter card gets a slab of that era's blocks from the mod, rendered once by the shared thumbnail renderer.
 const eraArt=new Map();
 const eraImage=url=>{const img=el('img','era-photo');img.alt='';img.src=url;return img};
-const ERA_ANIMALS={late:[['tyrannosaurus',2,1,-2.2],['triceratops',-5,2,-1.1]],jurassic:[['stegosaurus',0,1,-1.9],['dilophosaurus',-6,2,-.9]]};
+export const ERA_ANIMALS={late:[['tyrannosaurus',2,1,-2.2],['triceratops',-5,2,-1.1]],jurassic:[['stegosaurus',0,1,-1.9],['dilophosaurus',-6,2,-.9]]};
 export function paintEras(thumbnailer){
- if(!thumbnailer)return;
- for(const e of ERAS){const list=(ERA_ANIMALS[e.id]||[]).map(([id,x,z,r])=>[SPECIES.find(s=>s.id===id),x,z,r]);
-  thumbnailer.eraScene(e.id,list).then(url=>{eraArt.set(e.id,url);const host=document.querySelector(`.era-art[data-era="${e.id}"]`);if(host&&!host.querySelector('.era-photo'))host.append(eraImage(url))}).catch(()=>{})}
+ const section=$('eras');
+ const io=new IntersectionObserver(([e])=>{if(!e.isIntersecting)return;io.disconnect();
+  for(const e of ERAS){const list=()=>(ERA_ANIMALS[e.id]||[]).map(([id,x,z,r])=>[SPECIES.find(s=>s.id===id),x,z,r]);
+   picture(`era-${e.id}`,()=>thumbnailer().then(t=>t.eraScene(e.id,list()))).then(url=>{eraArt.set(e.id,url);const host=document.querySelector(`.era-art[data-era="${e.id}"]`);if(host&&!host.querySelector('.era-photo'))host.append(eraImage(url))}).catch(()=>{})}
+ },{rootMargin:'800px'});io.observe(section);
 }
 export function initEras(){
  const section=$('eras'),track=$('eras-track'),fill=$('timeline-fill'),ticks=$('timeline-ticks');
@@ -146,7 +149,7 @@ export function initMechanics(thumbnailer){
  if(!reduced)setInterval(()=>{step=(step+1)%4;stage.dataset.step=step;if(step<3){paintSprite(egg,stages[step],96);egg.style.width='78px';egg.style.backgroundPosition=egg.style.backgroundPosition.replace(/^-?\d+px/,m=>`${parseInt(m)-9}px`)}},1600);
  for(const s of document.querySelectorAll('[data-sprite]'))paintSprite(s,s.dataset.sprite,32);
  const para=SPECIES.find(s=>s.id==='parasaurolophus');
- const pair=new IntersectionObserver(([e])=>{if(!e.isIntersecting)return;pair.disconnect();for(const sex of ['male','female'])thumbnailer?.request(para,sex).then(url=>{$(`pair-${sex}`).src=url})},{rootMargin:'400px'});pair.observe($('sex-pair'));
+ const pair=new IntersectionObserver(([e])=>{if(!e.isIntersecting)return;pair.disconnect();for(const sex of ['male','female'])picture(`parasaurolophus-${sex}`,()=>thumbnailer().then(t=>t.request(para,sex))).then(url=>{$(`pair-${sex}`).src=url}).catch(()=>{})},{rootMargin:'400px'});pair.observe($('sex-pair'));
  return ()=>{
   $('levels').replaceChildren(...GUIDE_LEVELS.map((l,i)=>{const li=el('li');li.style.setProperty('--i',i);li.append(el('strong','',pick(l.name)),el('span','',pick(l.how)));return li}));
   $('tools').replaceChildren(...TOOLS.map(x=>{const li=el('li');li.append(sprite(x.sprite,32),el('span','',pick(x.name)));return li}));

@@ -2,6 +2,7 @@ import {detectLang,setLang,t} from './i18n.js';
 import {links} from './site-config.js';
 import {initFilm,initHeader,initMarquee,initStory,initNotebook,initEras,initMechanics,initRoadmap,initInstall,initFaq,initMotion,onScroll,paintEras} from './sections.js';
 import {initBestiary} from './bestiary.js';
+import {lazyThumbnailer} from './pictures.js';
 const $=id=>document.getElementById(id);
 
 // Text first: the page reads correctly before any 3D has loaded.
@@ -12,7 +13,7 @@ const renders=[renderFilm,initMarquee(),initStory(),initNotebook(),initEras(),in
 
 // Three.js is loaded on demand so the copy is never blocked by WebGL.
 const three=import('./viewer.js').catch(()=>null);
-const thumbnailer=await three.then(m=>{try{const t=m&&new m.Thumbnailer();return t?.renderer?t:null}catch{return null}});
+const thumbnailer=lazyThumbnailer(()=>three.then(m=>m||Promise.reject(new Error('three'))));
 renders.push(initMechanics(thumbnailer));paintEras(thumbnailer);
 const viewerReady=three.then(m=>{if(!m)return null;const v=new m.SpecimenViewer($('stage-canvas'));return v.renderer?v:null}).catch(()=>null);
 const bestiary=initBestiary({viewerReady,thumbnailer});
@@ -34,3 +35,14 @@ import('./hero.js').then(({Hero})=>{
  hero.onRoar=()=>{if(sound&&hero.visible)setTimeout(()=>{roar.currentTime=0;roar.play().catch(()=>{})},350)};
  filmProgress(p=>hero.setProgress(p));
 }).catch(()=>film.classList.add('no-webgl'));
+
+// Used by scripts/bake-thumbs.mjs to save the thumbnails as static images.
+if(new URLSearchParams(location.search).has('bake'))window.__bake=async()=>{
+ const t=await thumbnailer(),{SPECIES}=await import('./generated/species.js'),{ERAS}=await import('./content.js');
+ const data=url=>fetch(url).then(r=>r.blob()).then(b=>new Promise(res=>{const f=new FileReader();f.onload=()=>res(f.result);f.readAsDataURL(b)}));
+ const out={};for(const s of SPECIES)out[s.id]=await data(await t.request(s));
+ const para=SPECIES.find(s=>s.id==='parasaurolophus');for(const sex of ['male','female'])out[`parasaurolophus-${sex}`]=await data(await t.request(para,sex));
+ const {ERA_ANIMALS}=await import('./sections.js');
+ for(const e of ERAS)out[`era-${e.id}`]=await data(await t.eraScene(e.id,(ERA_ANIMALS[e.id]||[]).map(([id,x,z,r])=>[SPECIES.find(s=>s.id===id),x,z,r])));
+ return out;
+};
