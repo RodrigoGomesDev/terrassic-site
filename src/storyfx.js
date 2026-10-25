@@ -5,7 +5,7 @@ const clamp=THREE.MathUtils.clamp,lerp=THREE.MathUtils.lerp,damp=THREE.MathUtils
 const smooth=(p,a,b)=>{const x=clamp((p-a)/(b-a),0,1);return x*x*x*(x*(x*6-15)+10)};
 // The story's meteor: it falls from the top of the screen while the intro is read and bursts on "Então veio a luz".
 export class StoryMeteor{
- constructor(host,{impact=.66}={}){
+ constructor(host,{impact=.75}={}){
   this.host=host;this.impact=impact;this.reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
   try{this.renderer=new THREE.WebGLRenderer({antialias:true,alpha:true})}catch{return}
   const r=this.renderer;r.setPixelRatio(Math.min(devicePixelRatio,innerWidth<760?1.25:1.5));r.outputColorSpace=THREE.SRGBColorSpace;r.toneMapping=THREE.ACESFilmicToneMapping;r.setClearColor(0,0);host.append(r.domElement);

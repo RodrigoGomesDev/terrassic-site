@@ -4,8 +4,8 @@ Site estático do [Terrassic](https://github.com/RodrigoGomesDev/terrassic), de 
 
 O que tem:
 
-- **Abertura:** o céu âmbar do site antigo, o T. rex numa ilha flutuante feita com os blocos do próprio mod e um meteoro que se aproxima conforme o visitante rola a página. O rugido acompanha o scroll, o meteoro cai no meio da ilha, ela racha em duas com lava na fenda e pedaços voando, e o T. rex vai junto com a metade dele. O som do rugido só toca se o visitante ligar.
-- **O Salto:** a tela de abertura do mod, uma frase por vez conforme o scroll, com a Fenda se abrindo.
+- **Abertura:** fundo âmbar neutro e o T. rex sozinho. Rolando, ele ruge enquanto a câmera se afasta; depois abre a boca, a câmera mergulha nela e as mandíbulas fecham a tela, que escurece para a história. O som do rugido só toca se o visitante ligar.
+- **O Salto:** a tela de abertura do mod, uma frase por vez conforme o scroll, com o meteoro descendo pela tela e explodindo depois de "Então veio a luz".
 - **Caderno da Katarina:** o Relatório do Incidente e as páginas do diário, com o texto do próprio mod.
 - **Eras:** os 5 capítulos numa faixa horizontal presa ao scroll, cada um com uma paisagem em pixel desenhada por código.
 - **Bestiário 3D:** as 59 espécies com modelo, macho e fêmea, todas as animações do jogo com transição suave, uma pessoa de 1,8 m e um piso de blocos de 1 m para dar a escala, o Guia de Campo (ciência, comportamento, domesticação, utilidade e a nota da Katarina) e as miniaturas renderizadas dos próprios modelos.
