@@ -1,0 +1,6 @@
+{
+  "_": "Random turn per block, from art/blocos-site/LEIAME.md: 'full' turns the top 0/90/180/270 and mirrors the sides; 'half' mirrors the sides and turns the top only 0/180 (layered rock keeps its layers lying down); 'mirror' only mirrors left-right; anything not listed stays as drawn.",
+  "full": ["lateritic_soil", "volcanic_ash", "laterite", "amber_block"],
+  "half": ["shale", "limestone"],
+  "mirror": ["metasequoia_leaves", "ginkgo_leaves"]
+}

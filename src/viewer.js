@@ -77,7 +77,7 @@ export class Thumbnailer{
   if(this.busy||!this.queue.length)return;this.busy=true;const job=this.queue.shift();
   try{
    if(job.era){await this.renderEra(job);this.busy=false;this.next();return}
-   const c=await spawn(job.species,{sex:job.sex,merge:true});c.animator.update(1.3);
+   const c=await spawn(job.species,{sex:job.sex,merge:true});c.animator.current.time=0;c.animator.update(1.3);
    this.scene.add(c.holder);c.holder.updateMatrixWorld(true);
    const box=new THREE.Box3().setFromObject(c.model.root),size=box.getSize(new THREE.Vector3()),center=box.getCenter(new THREE.Vector3());
    const span=Math.max(size.x,size.y*1.5,size.z*.8);this.camera.position.copy(center).add(new THREE.Vector3(-.78,.32,-.62).setLength(span*2.15));this.camera.lookAt(center);

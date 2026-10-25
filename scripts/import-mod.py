@@ -117,7 +117,7 @@ SCENERY = ['fern_litter', 'fern_litter_side', 'needle_litter', 'needle_litter_si
            'archaefructus', 'metasequoia_log', 'metasequoia_log_top', 'metasequoia_leaves', 'araucaria_log', 'araucaria_log_top',
            'araucaria_leaves', 'magnolia_log', 'magnolia_log_top', 'magnolia_leaves', 'tree_fern_log', 'tree_fern_log_top',
            'tree_fern_leaves', 'podocarpus_log', 'podocarpus_log_top', 'podocarpus_leaves', 'taxodium_log', 'taxodium_log_top',
-           'taxodium_leaves', 'amber_block', 'fossil_rock', 'menhir', 'menhir_top', 'bone_pile', 'rib_bone', 'lichen']
+           'taxodium_leaves', 'ginkgo_log', 'ginkgo_log_top', 'ginkgo_leaves', 'amber_block', 'fossil_rock', 'menhir', 'menhir_top', 'bone_pile', 'rib_bone', 'lichen']
 
 
 def copy_blocks():
@@ -127,6 +127,9 @@ def copy_blocks():
         src = RES / 'textures/block' / f'{name}.png'
         if src.exists():
             shutil.copy2(src, out / f'{name}.png')
+    # Blocks redrawn for the site and approved before they reach the mod (art/blocos-site/LEIAME.md) win over the mod's.
+    for png in sorted((SITE / 'art/blocos-site').glob('*.png')):
+        shutil.copy2(png, out / png.name)
     return sorted(p.stem for p in out.glob('*.png'))
 
 

@@ -18,6 +18,7 @@ import math
 import random
 import sys
 import uuid
+import hashlib
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
@@ -33,7 +34,8 @@ KINDS = {  # kind: (side, top, bottom)
     'fern_ground': ('fern_litter_side', 'fern_litter', 'lateritic_soil'), 'soil': ('lateritic_soil',) * 3,
     'shale': ('shale',) * 3, 'limestone': ('limestone',) * 3, 'fossil': ('fossil_rock',) * 3, 'amber': ('amber_block',) * 3,
     'metasequoia': ('metasequoia_log', 'metasequoia_log_top', 'metasequoia_log_top'), 'metasequoia_leaves': ('metasequoia_leaves',) * 3,
-    'tree_fern': ('tree_fern_log', 'tree_fern_log_top', 'tree_fern_log_top'), 'tree_fern_leaves': ('tree_fern_leaves',) * 3,
+    'ginkgo': ('ginkgo_log', 'ginkgo_log_top', 'ginkgo_log_top'), 'ginkgo_leaves': ('ginkgo_leaves',) * 3,
+    'ash': ('volcanic_ash',) * 3, 'laterite': ('laterite',) * 3,
 }
 cells = {}
 R = 11
@@ -48,9 +50,14 @@ for x in range(-R - 2, R + 3):
         depth = max(1, round((edge - r) * .9 + rng.random() * 2))
         for d in range(depth):
             y = -1 - d
-            cells[(x, y, z)] = 'fern_ground' if d == 0 else 'soil' if d < 3 else 'fossil' if rng.random() < .03 else 'shale' if rng.random() < .5 else 'limestone'
-cells[(4, -2, -8)] = 'amber'
-cells[(-7, -3, 5)] = 'amber'
+            # Like the reference scene: lateritic soil with patches of volcanic ash, then shale over limestone.
+            top = 'ash' if math.sin(x * .45 + 1) + math.cos(z * .5) > 1.1 else 'soil'
+            cells[(x, y, z)] = top if d == 0 else 'soil' if d < 3 else 'fossil' if rng.random() < .03 else 'shale' if d < 5 else 'limestone'
+cells[(4, -4, -8)] = 'amber'
+cells[(-7, -4, 5)] = 'amber'
+for (x, z) in ((-5, 7), (-4, 7), (7, 3), (2, -9), (3, -9), (2, -8)):
+    if (x, -1, z) in cells:
+        cells[(x, 0, z)] = 'laterite'
 
 
 def tree(x, y, z, kind, h, crown):
@@ -67,19 +74,22 @@ def tree(x, y, z, kind, h, crown):
                     cells[(x + dx, y + i, z + dz)] = leaves
         cells[(x, y + h + 1, z)] = leaves
         cells[(x, y + h + 2, z)] = leaves
-    else:  # palm: a crown of fronds
-        for dx, dz in ((1, 0), (-1, 0), (0, 1), (0, -1), (2, 0), (-2, 0), (0, 2), (0, -2)):
-            cells[(x + dx, y + h - (1 if abs(dx + dz) > 1 else 0), z + dz)] = leaves
-        cells[(x, y + h, z)] = leaves
+    else:  # umbrella: the wide, flat crown of a ginkgo
+        for layer, r in ((0, 3), (1, 4), (2, 3)):
+            for dx in range(-r, r + 1):
+                for dz in range(-r, r + 1):
+                    if dx * dx + dz * dz > r * r + 1 or rng.random() < .08:
+                        continue
+                    cells[(x + dx, y + h - 1 + layer, z + dz)] = leaves
 
 
 tree(-8, 0, -6, 'metasequoia', 9, 'cone')
-tree(8, 0, -7, 'tree_fern', 5, 'palm')
+tree(8, 0, -6, 'ginkgo', 6, 'umbrella')
 plants = []
-names = ['cretaceous_grass', 'bracken', 'royal_fern', 'horsetail', 'clubmoss', 'bracken', 'cretaceous_grass']
-for _ in range(110):
+names = ['bracken', 'royal_fern', 'horsetail', 'bracken']
+for _ in range(40):
     x, z = round((rng.random() - .5) * R * 2), round((rng.random() - .5) * R * 1.7)
-    if (x, -1, z) not in cells or (x, 0, z) in cells or (math.hypot(x, z) < 4.5 and rng.random() < .85) or abs(x - crack(z)) < 1:
+    if (x, -1, z) not in cells or cells[(x, -1, z)] != 'soil' or (x, 0, z) in cells or (math.hypot(x, z) < 4.5 and rng.random() < .85) or abs(x - crack(z)) < 1:
         continue
     if any(p[0] == x and p[2] == z for p in plants):
         continue
@@ -94,7 +104,7 @@ def half(x, z):
 # Blocks on the lip of the crack, near the surface, break off and fly.
 debris = {}
 for (x, y, z), k in cells.items():
-    if y >= -3 and k not in ('metasequoia', 'metasequoia_leaves', 'tree_fern', 'tree_fern_leaves') and abs(x - crack(z) + .5) <= 1 and rng.random() < .3:
+    if y >= -3 and k not in ('metasequoia', 'metasequoia_leaves', 'ginkgo', 'ginkgo_leaves') and abs(x - crack(z) + .5) <= 1 and rng.random() < .3:
         debris[(x, y, z)] = f'debris_{len(debris) + 1}'
 bone_of = {c: debris.get(c) or half(c[0], c[2]) for c in cells}
 
@@ -118,6 +128,24 @@ for i, name in enumerate(order):
                 glow[oy + y][ox + x] = tiles[name][y][x]
     cell_uv[name] = [ox, oy, ox + 16, oy + 16]
 
+# Random turn per block (src/blockspin.json): tops turn, sides mirror, so the ground does not repeat in a grid.
+SPIN = json.loads((ROOT / 'src/blockspin.json').read_text())
+
+
+def spun(tex, uv, face, x, y, z):
+    h = int(hashlib.md5(f'{x},{y},{z},{face}'.encode()).hexdigest()[:8], 16)
+    u0, v0, u1, v1 = uv
+    if (tex in SPIN['full'] or tex in SPIN['half']) and face in ('up', 'down'):
+        rot = (h % 4) * 90 if tex in SPIN['full'] else (h % 2) * 180
+        if (h >> 3) & 1:
+            u0, u1 = u1, u0
+        return {'uv': [u0, v0, u1, v1], 'texture': 0, **({'rotation': rot} if rot else {})}
+    if tex in SPIN['full'] or tex in SPIN['half'] or tex in SPIN['mirror']:
+        if (h >> 3) & 1:
+            u0, u1 = u1, u0
+    return {'uv': [u0, v0, u1, v1], 'texture': 0}
+
+
 # ------------------------------------------------------------------ cubes
 FACES = {'east': (1, 0, 0), 'west': (-1, 0, 0), 'up': (0, 1, 0), 'down': (0, -1, 0), 'south': (0, 0, 1), 'north': (0, 0, -1)}
 elements = []
@@ -135,7 +163,7 @@ for (x, y, z), kind in sorted(cells.items()):
         # The face that looks across the crack is lava.
         if f in ('east', 'west') and n in cells and bone_of[n] != bone and bone in ('left', 'right') and bone_of[n] in ('left', 'right'):
             tex = 'lava'
-        faces[f] = {'uv': cell_uv[tex], 'texture': 0}
+        faces[f] = spun(tex, cell_uv[tex], f, x, y, z)
     elements.append(dict(name=f'{kind}_{x}_{y}_{z}', box_uv=False, rescale=False, locked=False, **{'from': [x * 16, y * 16, z * 16]},
                          to=[x * 16 + 16, y * 16 + 16, z * 16 + 16], autouv=0, color=0, inflate=0.0, origin=[x * 16 + 8, y * 16 + 8, z * 16 + 8],
                          rotation=[0, 0, 0], faces=faces, type='cube', uuid=uid('cube', x, y, z), _bone=bone))
@@ -242,7 +270,7 @@ def compact_bone(name):
 
 
 site = {'model': {'res': [W, H], 'bones': [compact_bone('root')],
-                  'cubes': [[e['name'], e['from'], e['to'], e['origin'], e['rotation'], 0, [e['faces'][f]['uv'] for f in ORDER]] for e in elements]},
+                  'cubes': [[e['name'], e['from'], e['to'], e['origin'], e['rotation'], 0, [e['faces'][f]['uv'] + ([e['faces'][f]['rotation']] if e['faces'][f].get('rotation') else []) for f in ORDER]] for e in elements]},
         'animations': {'break': {'len': LENGTH, 'loop': False, 'bones': anim}},
         'rex': [-4 * 16, 0, 1 * 16], 'impact': [crack(0) * 16, 0, 0]}
 outdir = ROOT / 'public/assets/island'
