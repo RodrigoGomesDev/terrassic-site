@@ -46,6 +46,10 @@ O script só lê o mod e gera os arquivos abaixo. Com `--soft-blocks`, ele troca
 
 Espécie nova no mod entra no site sozinha na próxima importação.
 
+## Letreiro e tipografia
+
+`python3 -B scripts/letreiro.py` desenha a letra de título do Terrassic ("Degraus", em `scripts/letreiro_glyphs.py`): maiúsculas pesadas de pedra gasta, cada uma numa altura e num degrau, com o alfabeto inteiro, números, pontuação e acentos. Sai em quatro acabamentos (basalto, âmbar, osso e pedra) em `art/marca/letreiro/`, mais o letreiro que o site usa em `public/assets/`. As letras partem das do letreiro do mod (`tools/capagen/titulo.py`) e da família Entalhe, no mesmo formato de grade do `tools/fontgen`.
+
 ## Miniaturas
 
 As miniaturas do bestiário, dos capítulos e do macho e fêmea são imagens prontas em `public/assets/thumbs/`, então o visitante não precisa renderizar 59 modelos no navegador. Depois de mudar um modelo ou um bloco:

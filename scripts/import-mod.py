@@ -248,7 +248,7 @@ def main():
           f'export const BLOCKS={json.dumps(blocks, separators=(",", ":"))};\n'
           f'export const LORE={json.dumps(story(), ensure_ascii=False, separators=(",", ":"))};\n')
     (SITE / 'src/generated/species.js').write_text(js)
-    for name in ['letreiro_950.png', 'letreiro_1900.png', 'monograma_64.png', 'monograma_256.png', 'selo_altar_512.png']:
+    for name in ['monograma_64.png', 'monograma_256.png', 'selo_altar_512.png']:
         if (MOD / 'art/marca' / name).exists():
             shutil.copy2(MOD / 'art/marca' / name, OUT / name)
     print(f'{len(species)} espécies, {len(atlas["index"])} sprites, {len(blocks)} blocos, textos em pt/en/es.')
