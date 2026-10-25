@@ -23,19 +23,21 @@ for(const b of document.querySelectorAll('[data-lang]'))b.addEventListener('clic
 
 let heroLoaded=0;const heroStatus=()=>{$('hero-status').textContent=heroLoaded>=1?t('hero.ready'):t('hero.loading')};
 const film=document.querySelector('.film');
+// Without 3D the opening shows the baked picture of the T. rex where the model would stand.
+const noGL=()=>{film.classList.add('no-webgl');$('hero-canvas').style.backgroundImage=`url(${new URL('assets/thumbs/tyrannosaurus.webp',document.baseURI).href})`};
 import('./hero.js').then(({Hero})=>{
  const hero=new Hero($('hero-canvas'),{
   onProgress:p=>{heroLoaded=p;$('hero-meter').style.width=`${p*100}%`;if(p>=1){heroStatus();film.classList.add('is-loaded')}},
   onReady:()=>film.classList.add('is-live'),
-  onFail:()=>film.classList.add('no-webgl')});
- if(!hero.renderer)return film.classList.add('no-webgl');
+  onFail:noGL});
+ if(!hero.renderer)return noGL();
  if(import.meta.env.DEV)window.__hero=hero;
  // The roar is heard only after the visitor turns the sound on (browsers block sound that starts by itself).
  const roar=new Audio(new URL('assets/audio/tyrannosaurus-roar-pixabay.mp3',document.baseURI).href);roar.preload='none';roar.volume=.9;let sound=false;
  $('hero-sound').addEventListener('click',e=>{sound=!sound;e.currentTarget.setAttribute('aria-pressed',String(sound));if(sound){roar.load();if(hero.rex?.animator.scrubbing){roar.currentTime=0;roar.play().catch(()=>{})}}else roar.pause()});
  hero.onRoar=()=>{if(sound&&hero.visible)setTimeout(()=>{roar.currentTime=0;roar.play().catch(()=>{})},350)};
  filmProgress(p=>hero.setProgress(p));
-}).catch(()=>film.classList.add('no-webgl'));
+}).catch(noGL);
 
 // The story's meteor is loaded only when the story comes near.
 const storyIO=new IntersectionObserver(([e])=>{if(!e.isIntersecting)return;storyIO.disconnect();import('./storyfx.js').then(({StoryMeteor})=>{const fx=new StoryMeteor($('story-meteor'));if(fx.renderer)renderStory.listen(p=>fx.setProgress(p))}).catch(()=>{})},{rootMargin:'600px'});storyIO.observe($('historia'));

@@ -85,6 +85,7 @@ button{cursor:pointer}
 .film-word img{width:100%;height:auto;image-rendering:pixelated}
 .hero-canvas{position:absolute;inset:0;z-index:-1;opacity:0;transition:opacity 1.2s ease}
 .film.is-live .hero-canvas{opacity:1}
+.film.no-webgl .hero-canvas{opacity:1;background:68% 62%/min(56vw,760px) auto no-repeat}
 .film-stage::after{content:"";position:absolute;inset:0;z-index:4;pointer-events:none;background:var(--basalt-950);opacity:var(--fade)}
 .hero-canvas canvas{width:100%!important;height:100%!important;display:block;image-rendering:pixelated}
 .film-copy{position:absolute;z-index:3}
@@ -217,6 +218,8 @@ button{cursor:pointer}
 .anim-chips .chip[aria-pressed=true]{background:var(--amber)}
 .stage-status{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font:12px var(--mono);color:var(--stone-300);pointer-events:none;text-align:center;max-width:80%}
 .stage.is-static .stage-top,.stage.is-static .stage-bottom{display:none}
+.stage.is-static .stage-canvas{background:center/contain no-repeat}
+.stage.is-static .stage-status{top:auto;bottom:16px}
 .dossier{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:22px;display:grid;gap:16px;align-content:start;position:relative;min-width:0}
 .dossier::before{content:"";position:absolute;left:22px;right:22px;top:0;height:2px;background:linear-gradient(90deg,transparent,var(--amber-700) 20%,var(--amber) 50%,var(--amber-700) 80%,transparent)}
 .dossier-head{display:flex;gap:14px;align-items:center}

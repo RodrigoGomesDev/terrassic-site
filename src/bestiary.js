@@ -76,14 +76,17 @@ export function initBestiary({viewerReady,thumbnailer}){
   if(s!==selected){selected=s;anim=s.anims.includes(anim)?anim:'idle'}
   for(const {button} of cards.values())button.setAttribute('aria-pressed',String(button.dataset.id===s.id));
   renderDossier();
+  // Without 3D the stage shows the animal's baked picture instead of staying empty.
+  if($('stage').classList.contains('is-static'))picture(s.id).then(url=>{$('stage-canvas').style.backgroundImage=`url(${url})`}).catch(()=>{});
   if(viewer){$('stage-status').textContent=t('best.loading');viewer.show(s,sex).then(()=>{$('stage-status').textContent='';if(viewer.current&&anim!=='idle')viewer.play(anim)})}
  }
  for(const v of ['male','female'])$(`sex-${v}`).addEventListener('click',()=>{sex=v;$('sex-male').setAttribute('aria-pressed',String(v==='male'));$('sex-female').setAttribute('aria-pressed',String(v==='female'));select(selected)});
  $('zoom-in').addEventListener('click',()=>viewer?.setZoom(viewer.zoom*.8));$('zoom-out').addEventListener('click',()=>viewer?.setZoom(viewer.zoom*1.25));
  $('stage-canvas').addEventListener('keydown',e=>{if(!viewer)return;if(e.key==='+'||e.key==='=')viewer.setZoom(viewer.zoom*.8);if(e.key==='-')viewer.setZoom(viewer.zoom*1.25);if(e.key==='ArrowLeft'||e.key==='ArrowRight'){e.preventDefault();viewer.controls.autoRotate=false;const off=viewer.camera.position.clone().sub(viewer.controls.target);off.applyAxisAngle({x:0,y:1,z:0},e.key==='ArrowLeft'?.2:-.2);viewer.camera.position.copy(viewer.controls.target).add(off)}});
 
- viewerReady.then(v=>{viewer=v;if(!v){$('stage').classList.add('is-static');$('stage-status').textContent=t('best.static');return}
-  v.onActionEnd=()=>{for(const b of $('anim-chips').children)b.classList.remove('is-playing')};select(selected)}).catch(()=>{$('stage').classList.add('is-static');$('stage-status').textContent=t('best.static')});
+ const still=()=>{$('stage').classList.add('is-static');$('stage-status').textContent=t('best.static');select(selected)};
+ viewerReady.then(v=>{viewer=v;if(!v)return still();
+  v.onActionEnd=()=>{for(const b of $('anim-chips').children)b.classList.remove('is-playing')};select(selected)}).catch(still);
  const refresh=()=>{renderRoster();renderDossier()};refresh();
  return {refresh};
 }
