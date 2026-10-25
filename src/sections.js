@@ -43,9 +43,9 @@ export function initMarquee(){
  return ()=>{fill($('marquee-a'),names.slice(0,half));fill($('marquee-b'),names.slice(half))};
 }
 
-// The intro screen of the mod, line by line, driven by scroll. The Rift tears open as you read.
+// The intro screen of the mod, line by line, driven by scroll, while a meteor falls behind the text.
 export function initStory(){
- const section=$('historia'),host=$('story-lines'),path=$('rift-path'),len=path.getTotalLength();path.style.strokeDasharray=len;
+ const section=$('historia'),host=$('story-lines'),listeners=[];
  const canvas=$('story-sky'),g=canvas.getContext('2d');let motes=[];
  const size=()=>{canvas.width=canvas.clientWidth*Math.min(devicePixelRatio,1.5);canvas.height=canvas.clientHeight*Math.min(devicePixelRatio,1.5);motes=Array.from({length:110},()=>({x:Math.random(),y:Math.random(),s:.4+Math.random()*1.6,v:.02+Math.random()*.05,p:Math.random()*6}))};
  size();addEventListener('resize',size);
@@ -57,13 +57,13 @@ export function initStory(){
  const update=()=>{
   p=reduced?1:pinProgress(section);const n=lines.length;
   const q=p*(n-.35)+.25;lines.forEach((l,i)=>{const a=smooth((q-i)*2.4),out=i<n-1?smooth((q-i-.72)*2.4):0;l.style.setProperty('--in',a.toFixed(3));l.style.setProperty('--out',out.toFixed(3))});
-  path.style.strokeDashoffset=len*(1-smooth(p*1.15));section.style.setProperty('--flash',smooth((p-.7)/.12)*(1-smooth((p-.86)/.1)));section.style.setProperty('--p',p);
+  section.style.setProperty('--flash',(smooth((p-.645)/.03)*(1-smooth((p-.69)/.14))).toFixed(3));section.style.setProperty('--p',p);for(const fn of listeners)fn(p);
  };
  new IntersectionObserver(([e])=>{visible=e.isIntersecting}).observe(section);
  const draw=now=>{requestAnimationFrame(draw);if(!visible||reduced&&motes.drawn)return;motes.drawn=true;
   const w=canvas.width,h=canvas.height;g.clearRect(0,0,w,h);
   for(const m of motes){const y=((m.y-now*.00001*m.v*60+1)%1)*h,x=(m.x+Math.sin(now*.0004+m.p)*.01)*w,a=(.25+.75*Math.abs(Math.sin(now*.001+m.p)))*(.35+p*.65);g.fillStyle=`rgba(242,181,68,${a*.7})`;g.fillRect(x,y,m.s*2,m.s*2)}};
- requestAnimationFrame(draw);onScroll(update);return render;
+ requestAnimationFrame(draw);onScroll(update);render.listen=fn=>{listeners.push(fn);fn(p)};return render;
 }
 
 // Katarina's notebook: the Incident Report and her diary pages, in the mod's own words.

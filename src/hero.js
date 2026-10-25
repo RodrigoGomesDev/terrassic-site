@@ -21,7 +21,7 @@ async function loadIsland(){
  return {model,data,animator:new Animator(model,{rest:compileClip({len:1,loop:true,bones:{}}),break:compileClip(data.animations.break)},{name:'rest'})};
 }
 
-async function loadMeteor(){
+export async function loadMeteor(){
  const [data,map,glow]=await Promise.all([fetch(assetUrl('meteor/meteor.json')).then(r=>r.json()),...['meteor','meteor_glow'].map(n=>new THREE.TextureLoader().loadAsync(assetUrl(`meteor/${n}.png`)))]);
  for(const t of [map,glow]){t.magFilter=t.minFilter=THREE.NearestFilter;t.generateMipmaps=false;t.colorSpace=THREE.SRGBColorSpace}
  const model=createModel(data,map);Object.assign(model.material,{emissive:new THREE.Color(0xffffff),emissiveMap:glow,emissiveIntensity:2.2});
@@ -30,7 +30,7 @@ async function loadMeteor(){
 }
 
 // Square embers and smoke puffs, like the game's particles.
-class Trail{
+export class Trail{
  constructor(scene,count=360){
   this.mesh=new THREE.InstancedMesh(new THREE.BoxGeometry(1,1,1),new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:.95,depthWrite:false}),count);
   this.mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);this.mesh.frustumCulled=false;this.parts=Array.from({length:count},()=>({life:0}));this.next=0;scene.add(this.mesh);

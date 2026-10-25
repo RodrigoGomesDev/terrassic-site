@@ -9,7 +9,8 @@ const $=id=>document.getElementById(id);
 setLang(detectLang());
 initHeader();initMotion();
 const {render:renderFilm,listen:filmProgress}=initFilm();
-const renders=[renderFilm,initMarquee(),initStory(),initNotebook(),initEras(),initRoadmap(),initInstall(links),initFaq()];
+const renderStory=initStory();
+const renders=[renderFilm,initMarquee(),renderStory,initNotebook(),initEras(),initRoadmap(),initInstall(links),initFaq()];
 
 // Three.js is loaded on demand so the copy is never blocked by WebGL.
 const three=import('./viewer.js').catch(()=>null);
@@ -35,6 +36,9 @@ import('./hero.js').then(({Hero})=>{
  hero.onRoar=()=>{if(sound&&hero.visible)setTimeout(()=>{roar.currentTime=0;roar.play().catch(()=>{})},350)};
  filmProgress(p=>hero.setProgress(p));
 }).catch(()=>film.classList.add('no-webgl'));
+
+// The story's meteor is loaded only when the story comes near.
+const storyIO=new IntersectionObserver(([e])=>{if(!e.isIntersecting)return;storyIO.disconnect();import('./storyfx.js').then(({StoryMeteor})=>{const fx=new StoryMeteor($('story-meteor'));if(fx.renderer)renderStory.listen(p=>fx.setProgress(p))}).catch(()=>{})},{rootMargin:'600px'});storyIO.observe($('historia'));
 
 // Used by scripts/bake-thumbs.mjs to save the thumbnails as static images.
 if(new URLSearchParams(location.search).has('bake'))window.__bake=async()=>{
