@@ -383,6 +383,8 @@ button{cursor:pointer}
  .sticky-head{position:static}
 }
 @media (max-width:760px){
+ .lang button{min-width:36px;min-height:36px;padding:6px 8px}
+ .footer-links a,.install-links a{display:inline-block;padding-block:9px}
  .topbar{gap:10px}.nav-cta{display:none}
  .topbar.is-solid{backdrop-filter:none;background:rgba(20,16,20,.96)}.topbar.on-light.is-solid{background:rgba(236,200,128,.96)}
   .film{height:440svh}
