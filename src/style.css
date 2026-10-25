@@ -179,7 +179,7 @@ button{cursor:pointer}
 .era:hover{border-color:var(--era-a)}
 .era-art{position:relative;min-height:100%;background:var(--basalt-950)}
 .era-art:has(.era-photo) canvas{display:none}
-.era-photo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;image-rendering:pixelated;animation:fadeUp .8s var(--ease)}
+.era-photo{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;image-rendering:pixelated;animation:fadeUp .8s var(--ease)}
 .era-art canvas{position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelated;object-fit:cover}
 .era-body{padding:22px 22px 20px;display:grid;gap:10px;align-content:start;min-width:0}
 .era-n{font:500 11px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--era-a)}
@@ -286,9 +286,9 @@ button{cursor:pointer}
 @keyframes wobble{25%{transform:rotate(-7deg)}75%{transform:rotate(7deg)}}
 @keyframes hatch{30%{transform:translateY(-6px) scale(1.06)}100%{transform:none}}
 @keyframes burst{30%{opacity:1}100%{opacity:0;transform:scale(1.6)}}
-.pair{display:grid;grid-template-columns:1fr 1fr;gap:8px;height:140px}
-.pair figure{margin:0;position:relative;background:var(--basalt-900);border-radius:8px;overflow:hidden;min-width:0}
-.pair img{width:100%;height:100%;object-fit:cover;transform:scale(1.35)}
+.pair{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.pair figure{margin:0;position:relative;aspect-ratio:3/2;max-width:100%;background:radial-gradient(80% 70% at 50% 60%,#2e2530,#18141a);border-radius:8px;overflow:hidden;min-width:0}
+.pair img{width:100%;height:100%;object-fit:contain;display:block}
 .pair img:not([src]){visibility:hidden}
 .pair figcaption{position:absolute;left:8px;bottom:6px;font:11px var(--mono);color:var(--stone-300)}
 .tame-steps{list-style:none;margin:0;padding:0;display:grid;gap:8px;min-height:140px;align-content:center}
@@ -397,7 +397,7 @@ button{cursor:pointer}
  .eras-pin{position:static;height:auto;padding-block:80px 40px}
  .eras-track{overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:14px}
  .era{flex-basis:86vw;grid-template-columns:1fr;scroll-snap-align:center;transform:none}
- .era-art{height:150px}
+ .era-art{height:auto;aspect-ratio:8/5;max-width:100%}
  .timeline{display:none}
  .stage{height:480px}
  .anim-chips{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;padding-bottom:2px;mask:linear-gradient(90deg,#000 85%,transparent)}
