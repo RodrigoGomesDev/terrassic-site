@@ -4,7 +4,7 @@ Site estático do [Terrassic](https://github.com/RodrigoGomesDev/terrassic), de 
 
 O que tem:
 
-- **Abertura:** fundo âmbar neutro e o T. rex sozinho. Rolando, ele ruge enquanto a câmera se afasta; depois abre a boca, a câmera mergulha nela e as mandíbulas fecham a tela, que escurece para a história. O som do rugido só toca se o visitante ligar.
+- **Abertura:** fundo âmbar neutro e o T. rex sozinho. Rolando, ele ruge enquanto a câmera se afasta; depois abre a boca, a câmera mergulha nela e a tela escurece para a história. O som do rugido só toca se o visitante ligar.
 - **O Salto:** a tela de abertura do mod, uma frase por vez conforme o scroll, com o meteoro descendo pela tela e explodindo depois de "Então veio a luz".
 - **Caderno da Katarina:** o Relatório do Incidente e as páginas do diário, com o texto do próprio mod.
 - **Eras:** os 5 capítulos numa faixa horizontal presa ao scroll, cada um com uma paisagem em pixel desenhada por código.

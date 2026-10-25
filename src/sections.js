@@ -3,7 +3,6 @@ import {ERAS,VERSIONS,GUIDE_LEVELS,TOOLS,WEAPONS,INSTALL,FAQ} from './content.js
 import {t,pick} from './i18n.js';
 import {sprite,paintSprite} from './sprites.js';
 import {picture} from './pictures.js';
-import {initBite} from './bite.js';
 const $=id=>document.getElementById(id),clamp=(v,a,b)=>Math.min(b,Math.max(a,v)),smooth=x=>{x=clamp(x,0,1);return x*x*(3-2*x)};
 const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
 const el=(tag,cls,text)=>{const e=document.createElement(tag);if(cls)e.className=cls;if(text!==undefined)e.textContent=text;return e};
@@ -17,12 +16,13 @@ addEventListener('scroll',()=>{if(!ticking){ticking=true;requestAnimationFrame(f
 const SKY=[[0,[219,177,91]],[.84,[219,177,91]],[1,[20,16,20]]];
 const sky=p=>{let i=0;while(i<SKY.length-2&&SKY[i+1][0]<p)i++;const [a,ca]=SKY[i],[b,cb]=SKY[i+1],k=smooth((p-a)/(b-a));return `rgb(${ca.map((v,j)=>Math.round(v+(cb[j]-v)*k)).join(',')})`};
 export function initFilm(){
- const film=$('inicio'),stage=$('film-stage'),listeners=[],bite=initBite($('film-jaws'));
+ const film=$('inicio'),stage=$('film-stage'),listeners=[];
  const update=()=>{
   const p=reduced?.62:pinProgress(film),win=(a,b,c,d)=>smooth((p-a)/(b-a))*(1-smooth((p-c)/(d-c)));
   stage.style.setProperty('--film-bg',sky(p));stage.style.setProperty('--intro',(1-smooth(p/.1)).toFixed(3));
   stage.style.setProperty('--quote',win(.1,.15,.26,.31).toFixed(3));stage.style.setProperty('--chapter',win(.34,.39,.5,.56).toFixed(3));
-  bite(clamp((p-.86)/.12,0,1));
+  // The dive into the mouth ends in a plain fade to the dark of the story.
+  stage.style.setProperty('--fade',smooth((p-.88)/.11).toFixed(3));
   $('film-fill').style.width=`${p*100}%`;$('scroll-label').textContent=t(p<.3?'film.scroll':p<.84?'film.scroll2':'film.scroll3');
   $('topbar').classList.toggle('on-light',film.getBoundingClientRect().bottom>innerHeight*.5&&p<.9);
   for(const fn of listeners)fn(p);
