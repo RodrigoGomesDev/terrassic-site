@@ -1,18 +1,20 @@
-// The hatching egg of the mechanics section as pixel art: a 16x20 egg with a dark outline, cream shell lit from the
+// The hatching egg of the mechanics section as pixel art: a plump 14x16 egg shaped like the game's own, with a dark outline, cream shell lit from the
 // top left and rust spots, in four stages (whole, a crack, cracked across, open with the cap knocked off).
-const W=16,H=20,TOP=6;
+const W=16,H=16,TOP=6;
 const C={line:'#2a2124',shell:['#fffaf0','#efe6d2','#d8ccb2','#b3a58a'],spot:['#b04a38','#8e342a'],inside:'#3a2a22'};
-const SPOTS=[[4,6,2,1],[9,3,1,1],[11,8,2,2],[3,12,1,1],[7,14,2,1],[11,15,1,1],[6,10,1,1],[8,6,1,1],[5,17,2,1],[12,12,1,1]];
-const crackY=x=>9+[0,1,0,-1,0,1,2,1,0,-1,0,1,0,-1,0,1][x];
+const SPOTS=[[4,4,2,1],[9,2,1,1],[11,6,2,2],[2,9,1,1],[7,12,2,1],[11,12,1,1],[5,8,1,1],[8,5,1,1],[4,13,2,1],[12,9,1,1]];
+const crackY=x=>7+[0,1,0,-1,0,1,2,1,0,-1,0,1,0,-1,0,1][x];
+const ROWS=[4,6,8,10,10,12,12,12,14,14,14,14,12,12,10,6];
 const inEgg=(x,y)=>{
  if(y<0||y>=H)return false;
- const v=(y+.5)/H,hw=Math.sqrt(Math.max(0,1-(2*v-1)**2))*(1+.2*(2*v-1))*6.6;
+ // Width of each row, drawn by hand like the game's egg: narrow round top, plump belly, a short round base.
+ const hw=ROWS[y]/2;
  return Math.abs(x+.5-W/2)<=hw;
 };
 
 // Shell colour of one pixel: lit from the top left, a little dither, and the spots.
 function shell(x,y){
- const nx=(x+.5-W/2)/8,ny=(y+.5-H*.55)/10,l=nx*.9+ny*.7+((x*7+y*13)%5-2)*.06;
+ const nx=(x+.5-W/2)/8,ny=(y+.5-H*.55)/8,l=nx*.9+ny*.7+((x*7+y*13)%5-2)*.06;
  if(SPOTS.some(([sx,sy,sw,sh])=>x>=sx&&x<sx+sw&&y>=sy&&y<sy+sh))return C.spot[l>.3?1:0];
  return C.shell[Math.max(0,Math.min(3,Math.floor((l+.95)*1.9)))];
 }
