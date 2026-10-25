@@ -31,7 +31,7 @@ import('./hero.js').then(({Hero})=>{
  if(!hero.renderer)return film.classList.add('no-webgl');
  if(import.meta.env.DEV)window.__hero=hero;
  // The roar is heard only after the visitor turns the sound on (browsers block sound that starts by itself).
- const roar=new Audio(new URL('assets/audio/tyrannosaurus.ogg',document.baseURI).href);roar.preload='none';roar.volume=.9;let sound=false;
+ const roar=new Audio(new URL('assets/audio/tyrannosaurus-roar-pixabay.mp3',document.baseURI).href);roar.preload='none';roar.volume=.9;let sound=false;
  $('hero-sound').addEventListener('click',e=>{sound=!sound;e.currentTarget.setAttribute('aria-pressed',String(sound));if(sound){roar.load();if(hero.rex?.animator.scrubbing){roar.currentTime=0;roar.play().catch(()=>{})}}else roar.pause()});
  hero.onRoar=()=>{if(sound&&hero.visible)setTimeout(()=>{roar.currentTime=0;roar.play().catch(()=>{})},350)};
  filmProgress(p=>hero.setProgress(p));

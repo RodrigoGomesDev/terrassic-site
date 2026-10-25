@@ -148,7 +148,11 @@ export function initMechanics(thumbnailer){
  // The egg in pixel art: whole, a crack, cracked across, then it hatches and starts again.
  const stage=$('egg-stage'),egg=eggCanvas(),eg=egg.getContext('2d');let step=0;
  $('egg-sprite').replaceWith(egg);eggStage(eg,0);
- if(!reduced)setInterval(()=>{step=(step+1)%4;stage.dataset.step=step;eggStage(eg,step)},1600);
+ // The hatched stage lasts longer, so the baby has time to peek out.
+ const next=()=>{step=(step+1)%4;stage.dataset.step=step;eggStage(eg,step,0);
+  if(step===3){const t0=performance.now(),run=now=>{const t=(now-t0)/2600;eggStage(eg,3,Math.min(1,t));if(t<1)requestAnimationFrame(run)};requestAnimationFrame(run)}
+  setTimeout(next,step===3?3000:1600)};
+ if(!reduced)setTimeout(next,1600);
  for(const s of document.querySelectorAll('[data-sprite]'))paintSprite(s,s.dataset.sprite,32);
  const para=SPECIES.find(s=>s.id==='parasaurolophus');
  const pair=new IntersectionObserver(([e])=>{if(!e.isIntersecting)return;pair.disconnect();for(const sex of ['male','female'])picture(`parasaurolophus-${sex}`,()=>thumbnailer().then(t=>t.request(para,sex))).then(url=>{$(`pair-${sex}`).src=url}).catch(()=>{})},{rootMargin:'400px'});pair.observe($('sex-pair'));

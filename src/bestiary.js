@@ -62,7 +62,7 @@ export function initBestiary({viewerReady,thumbnailer}){
  function renderAnims(){
   const host=$('anim-chips');host.replaceChildren(...selected.anims.map(a=>{const b=document.createElement('button');b.type='button';b.className='chip';b.dataset.anim=a;b.textContent=t(`anim.${a}`)!==`anim.${a}`?t(`anim.${a}`):a;b.setAttribute('aria-pressed',String(a===anim));b.addEventListener('click',()=>playAnim(a));return b}));
  }
- const roar=new Audio(assetUrl('audio/tyrannosaurus.ogg'));roar.preload='none';roar.volume=.5;let sound=false;
+ const roar=new Audio(assetUrl('audio/tyrannosaurus-roar-pixabay.mp3'));roar.preload='none';roar.volume=.5;let sound=false;
  $('sound-toggle').addEventListener('click',()=>{sound=!sound;$('sound-toggle').setAttribute('aria-pressed',String(sound));if(!sound)roar.pause()});
  function playAnim(a){
   const clip=viewer?.current?.animator.clips[a];if(!clip)return;

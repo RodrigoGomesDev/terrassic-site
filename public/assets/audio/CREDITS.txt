@@ -1,4 +1,4 @@
-Terrassic Tyrannosaurus threat sound, copied from the mod's own sound set.
-Original sources and licenses (PD-USGov / CC0):
-https://github.com/RodrigoGomesDev/terrassic/blob/main/docs/LICENSES-SOUNDS.md
-Credits: National Park Service, US Fish and Wildlife Service and the CC0 creators listed in the project's source manifest.
+Tyrannosaurus roar (tyrannosaurus-roar-pixabay.mp3): "Dinosaur roar or scream 2" by GSMsea via Pixabay,
+https://pixabay.com/sound-effects/film-special-effects-dinosaur-roar-or-scream-2-431297/
+Pixabay Content License. Used only as the page's own sound, played on click; not offered for download.
+Kept on the site even after the mod gets its own roar.

@@ -1,6 +1,6 @@
 // The hatching egg of the mechanics section as pixel art: a plump 14x16 egg shaped like the game's own, with a dark outline, cream shell lit from the
 // top left and rust spots, in four stages (whole, a crack, cracked across, open with the cap knocked off).
-const W=16,H=16,TOP=6;
+const W=16,H=16,TOP=8;
 const C={line:'#2a2124',shell:['#fffaf0','#efe6d2','#d8ccb2','#b3a58a'],spot:['#b04a38','#8e342a'],inside:'#3a2a22'};
 const SPOTS=[[4,4,2,1],[9,2,1,1],[11,6,2,2],[2,9,1,1],[7,12,2,1],[11,12,1,1],[5,8,1,1],[8,5,1,1],[4,13,2,1],[12,9,1,1]];
 const crackY=x=>7+[0,1,0,-1,0,1,2,1,0,-1,0,1,0,-1,0,1][x];
@@ -37,7 +37,7 @@ function crack(g,from,to){
  }
 }
 
-export function eggStage(g,stage){
+export function eggStage(g,stage,t=1){
  g.clearRect(0,0,W,H+TOP);
  if(stage<3){
   draw(g,()=>true);
@@ -45,11 +45,25 @@ export function eggStage(g,stage){
   if(stage===2){crack(g,0,15);g.fillStyle=C.line;g.fillRect(6,crackY(6)+1+TOP,1,2);g.fillRect(12,crackY(12)+1+TOP,1,1)}
   return;
  }
- // Open: the bottom shell with a jagged rim and the dark inside showing, the cap knocked up and to the left.
+ // Open: the cap knocked up and to the left, the bottom shell with a jagged rim and the dark inside showing, and
+ // the baby rising out of it (t goes 0 to 1 while the stage lasts): it peeks up, then looks around and blinks.
+ draw(g,(x,y)=>y<crackY(x),-4,-8);
+ g.fillStyle=C.shell[1];for(const [x,y] of [[14,3],[13,6],[15,9]]){g.fillRect(x,y,1,1)}
  draw(g,(x,y)=>y>crackY(x));
  for(let x=1;x<W-1;x++){const y=crackY(x)+1;if(inEgg(x-1,y)&&inEgg(x+1,y)){g.fillStyle=C.inside;g.fillRect(x,y+TOP,1,1)}}
- draw(g,(x,y)=>y<crackY(x),-2,-5);
- g.fillStyle=C.shell[1];for(const [x,y] of [[14,2],[1,4],[15,6]]){g.fillRect(x,y,1,1)}
+ const up=Math.min(1,t/.45),rise=Math.round(up*up*(3-2*up)*7),look=t>.6&&t<.8?1:0,blink=t>.86&&t<.93;
+ baby(g,4+look,crackY(8)+1-rise,blink);
+}
+
+// The hatchling: a small round head with a big eye, a beak-like snout and a nub of a frill, facing right.
+const BABY=['..oooo...','.oggggo..','offgggoo.','ogggeggo.','ogggwgggo','oggggglgo','.ogggggo.','.ogggo...'];
+const BC={o:C.line,g:'#7a9a52',f:'#5e7a3c',l:'#9bba6c',e:'#1e140c',w:'#1e140c'};
+function baby(g,x0,top,blink){
+ BABY.forEach((row,y)=>[...row].forEach((c,x)=>{
+  if(c==='.')return;const X=x0+x,Y=top+y;
+  if(Y>crackY(Math.max(0,Math.min(W-1,X))))return;   // still inside the shell
+  g.fillStyle=c==='e'&&!blink?'#fffaf0':c==='w'&&blink?BC.g:BC[c];g.fillRect(X,Y+TOP,1,1);
+ }));
 }
 
 export function eggCanvas(){
