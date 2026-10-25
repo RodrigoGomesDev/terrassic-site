@@ -86,11 +86,9 @@ button{cursor:pointer}
 .hero-canvas{position:absolute;inset:0;z-index:-1;opacity:0;transition:opacity 1.2s ease}
 .film.is-live .hero-canvas{opacity:1}
 .hero-canvas canvas{width:100%!important;height:100%!important;display:block}
-.film-jaws{position:absolute;inset:0;z-index:5;pointer-events:none}
-.film-jaws i{position:absolute;left:0;right:0;height:calc(var(--swallow) * 51%);background:var(--basalt-950)}
-.film-jaws i::after{content:"";position:absolute;left:0;right:0;height:36px;background:linear-gradient(135deg,var(--bone) 25%,transparent 25%) 0 0/36px 36px,linear-gradient(225deg,var(--bone) 25%,transparent 25%) 0 0/36px 36px;opacity:calc(min(var(--swallow) * 3, (1 - var(--swallow)) * 8))}
-.jaw-top{top:0}.jaw-top::after{top:100%}
-.jaw-bottom{bottom:0}.jaw-bottom::after{bottom:100%;transform:scaleY(-1)}
+.film-jaws{position:absolute;inset:0;z-index:5;pointer-events:none;overflow:hidden;opacity:0}
+.bite{position:absolute;left:0;width:100%;height:62%;image-rendering:pixelated;will-change:transform}
+.bite-top{top:0;transform:translateY(-100%)}.bite-bottom{bottom:0;transform:translateY(100%) scaleY(-1)}
 .film-copy{position:absolute;z-index:3}
 .film-intro{left:var(--gutter-l);bottom:clamp(70px,11vh,120px);max-width:470px;opacity:var(--intro);transform:translateY(calc((1 - var(--intro))*30px));pointer-events:auto}
 .film-eyebrow{font:500 12px/1.5 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--ink)}
