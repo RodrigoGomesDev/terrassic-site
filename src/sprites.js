@@ -1,5 +1,5 @@
 import {SPRITES} from './generated/species.js';
-import {assetUrl} from './rig.js';
+import {assetUrl} from './assets.js';
 // Sprites come from one atlas of 32 px cells (spawn eggs, items, egg blocks) built by scripts/import-mod.py.
 export function paintSprite(el,key,size=32){
  const i=SPRITES.index[key];if(i===undefined){el.hidden=true;return el}

@@ -29,6 +29,10 @@ button,input,select{font:inherit;color:inherit}
 button{cursor:pointer}
 :focus-visible{outline:2px solid var(--amber);outline-offset:3px;border-radius:3px}
 .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+/* The dark dip of a far in-page jump (initAnchors); sits under the header so the menu stays put. */
+.curtain{position:fixed;inset:0;z-index:45;background:var(--basalt-950);opacity:0;visibility:hidden;pointer-events:none;transition:opacity .22s ease,visibility 0s .22s}
+.curtain.is-on{opacity:1;visibility:visible;transition:opacity .2s ease}
+[tabindex="-1"]:focus{outline:none}
 .skip{position:fixed;left:16px;top:-80px;z-index:80;background:var(--amber);color:var(--basalt-900);padding:10px 14px;border-radius:var(--radius);font-weight:600}
 .skip:focus{top:calc(12px + env(safe-area-inset-top,0px))}
 .wrap{max-width:1280px;margin-inline:auto;padding-left:var(--gutter-l);padding-right:var(--gutter-r)}
@@ -384,7 +388,7 @@ button{cursor:pointer}
 @media (max-width:760px){
  .lang button{min-width:36px;min-height:36px;padding:6px 8px}
  .footer-links a,.install-links a{display:inline-block;padding-block:9px}
- .topbar{gap:10px}.nav-cta{display:none}
+ .topbar{gap:10px}.nav-cta{display:none}.brand .brand-word{width:clamp(96px,34vw,150px)}
  .topbar.is-solid{backdrop-filter:none;background:rgba(20,16,20,.96)}.topbar.on-light.is-solid{background:rgba(236,200,128,.96)}
   .film{height:440svh}
  .film-word{top:calc(112px + env(safe-area-inset-top,0px))}
@@ -412,6 +416,18 @@ button{cursor:pointer}
  .search input{width:100%}
  .roster-tools{width:100%}.search{flex:1}
 }
+/* A phone on its side: the opening fits the short screen, title on top, copy bottom left, the animal to the right. */
+@media (orientation:landscape) and (max-height:520px){
+ .film-stage{min-height:0}
+ .film-word{top:calc(58px + env(safe-area-inset-top,0px));width:min(52vw,560px)}
+ .film-top{top:calc(58px + env(safe-area-inset-top,0px))}.hero-status{display:none}
+ .film-intro{bottom:14px;max-width:min(46vw,440px)}
+ .film-eyebrow{font-size:11px}.film-lede{margin-top:6px;font-size:15px;line-height:1.45}
+ .film-intro .hero-actions{margin-top:12px}.film-intro .btn{padding:10px 16px;gap:10px;font-size:15px}
+ .film-quote{top:24%}.film-quote p{font-size:32px;line-height:44px}
+ .film-chapter{top:22%}.film-chapter h2{font-size:clamp(40px,7vw,64px)}.film-chapter p:last-child{font-size:16px}
+ .scroll-cue{display:none}
+}
 @media (prefers-reduced-motion:reduce){
  html{scroll-behavior:auto}
  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
@@ -424,15 +440,27 @@ button{cursor:pointer}
  .marquee-row{animation:none}
 }
 
-/* The loading screen: the amber of the opening, the logo, the title and a bar of 20 pixel cells */
+/* The loading screen: night basalt and a block of the mod's Temporal Amber that lights up one row of pixels per
+   sixteenth of the load (--rows, set by loader.js). When it is full it flares and its light floods the screen into
+   the amber sky of the opening. */
 html.is-loading,html.is-loading body{overflow:hidden}
-.loader-screen{position:fixed;inset:0;z-index:100;display:grid;place-content:center;justify-items:center;gap:22px;padding-inline:max(16px,env(safe-area-inset-left,0px)) max(16px,env(safe-area-inset-right,0px));background:rgb(219,177,91);color:var(--basalt-900);transition:opacity .6s ease,visibility .6s;animation:loaderGiveUp .6s 20s forwards}
+.loader-screen{--rows:0;--glow:calc(var(--rows)/16);position:fixed;inset:0;z-index:100;display:grid;place-content:center;justify-items:center;gap:28px;padding-inline:max(16px,env(safe-area-inset-left,0px)) max(16px,env(safe-area-inset-right,0px));overflow:hidden;color:var(--stone-300);
+ background:radial-gradient(circle at 50% 42%,rgba(240,122,26,calc(.05 + var(--glow)*.2)),transparent min(70vmin,560px)),var(--basalt-950);transition:opacity .45s ease,visibility .45s;animation:loaderGiveUp .6s 20s forwards}
 .loader-screen.is-done{opacity:0;visibility:hidden}
-.loader-logo{width:96px;height:96px;animation:loaderSpin 2.4s steps(12) infinite}
-.loader-word{width:min(78vw,520px);height:auto;image-rendering:pixelated}
-.loader-bar{--cells:0;position:relative;width:min(70vw,360px);height:24px;border:4px solid var(--basalt-900);background:rgba(20,16,20,.18);box-shadow:4px 4px 0 rgba(20,16,20,.35)}
-.loader-bar::before{content:"";position:absolute;inset:0 auto 0 0;width:calc(var(--cells)*5%);background:var(--basalt-900);box-shadow:inset 0 4px 0 #4a3a44;transition:width .2s steps(2)}
-.loader-line{margin:0;font:500 12px var(--mono);letter-spacing:.12em;text-transform:uppercase}
-@keyframes loaderSpin{to{transform:rotate(360deg)}}
+.loader-amber{position:relative;width:128px;height:128px;margin-bottom:8px;filter:drop-shadow(0 0 calc(var(--rows)*1.5px) rgba(255,210,122,.55)) drop-shadow(0 0 calc(var(--rows)*4px) rgba(240,122,26,calc(var(--glow)*.6)))}
+.loader-amber img{position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelated}
+.loader-amber-dim{filter:grayscale(.6) brightness(.26)}
+.loader-amber-lit{clip-path:inset(calc((16 - var(--rows))*100%/16) 0 0 0);animation:amberPulse 1.8s steps(3) infinite alternate}
+.loader-amber::after{content:"";position:absolute;left:-24px;right:-24px;bottom:-26px;height:12px;border-radius:50%;background:radial-gradient(closest-side,rgba(242,181,68,calc(var(--glow)*.45)),transparent)}
+.loader-word{width:min(72vw,440px);height:auto;image-rendering:pixelated}
+.loader-line{display:flex;gap:14px;align-items:baseline;margin:0;min-height:24px;font:400 16px/24px var(--typed);-webkit-font-smoothing:none;text-align:center}
+.loader-pct{color:var(--amber);font-variant-numeric:tabular-nums;min-width:4ch;text-align:left}
+.loader-motes{position:absolute;inset:0;pointer-events:none;opacity:calc(.2 + var(--glow)*.8)}
+.loader-motes i{position:absolute;bottom:-8px;width:4px;height:4px;background:var(--amber-300);box-shadow:0 0 8px rgba(242,181,68,.9);animation:mote var(--d,9s) linear var(--delay,0s) infinite}
+.loader-flood{position:absolute;inset:0;background:rgb(219,177,91);clip-path:circle(0 at var(--fx,50%) var(--fy,40%));pointer-events:none}
+.loader-screen.is-flooding .loader-flood{clip-path:circle(150vmax at var(--fx,50%) var(--fy,40%));transition:clip-path .8s cubic-bezier(.65,0,.35,1)}
+.loader-screen.is-flooding .loader-amber-lit{animation:none;filter:brightness(1.9) saturate(1.2);transition:filter .2s}
+@keyframes amberPulse{to{filter:brightness(1.14)}}
+@keyframes mote{0%{transform:translate(0,0);opacity:0}10%{opacity:1}100%{transform:translate(var(--drift,12px),-110vh);opacity:0}}
 @keyframes loaderGiveUp{to{opacity:0;visibility:hidden}}
-@media (prefers-reduced-motion:reduce){.loader-logo{animation:none}}
+@media (prefers-reduced-motion:reduce){.loader-amber-lit{animation:none}.loader-motes{display:none}}

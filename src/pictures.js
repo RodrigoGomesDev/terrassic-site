@@ -1,4 +1,4 @@
-import {assetUrl} from './rig.js';
+import {assetUrl} from './assets.js';
 // Thumbnails are baked into static images (scripts/bake-thumbs.mjs). If one is missing, it is rendered in the browser.
 export function picture(name,render){
  return new Promise(resolve=>{const img=new Image();img.onload=()=>resolve(img.src);img.onerror=()=>resolve(null);img.src=assetUrl(`thumbs/${name}.webp`)})

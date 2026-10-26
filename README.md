@@ -10,6 +10,9 @@ O que tem:
 - **Eras:** os 5 capítulos numa faixa horizontal presa ao scroll, cada um com uma paisagem em pixel desenhada por código.
 - **Bestiário 3D:** as 59 espécies com modelo, macho e fêmea, todas as animações do jogo com transição suave, uma pessoa de 1,8 m e um piso de blocos de 1 m para dar a escala, o Guia de Campo (ciência, comportamento, domesticação, utilidade e a nota da Katarina) e as miniaturas renderizadas dos próprios modelos.
 - **Como se joga, roteiro, instalação e dúvidas**, com os sprites do mod (ovos, itens, armas).
+- **Wiki (`/wiki/`):** página própria, sem 3D, com instalação (dependências, Fabric, Forge, multiplayer, atualizar), como se joga, o Guia de Campo de todas as espécies, eras, roteiro, dúvidas e como reportar um problema. Cada parte tem endereço fixo (`/wiki/#instalacao`, `/wiki/#tyrannosaurus`) para linkar no CurseForge e no Modrinth. Textos só da wiki em `src/wiki-content.js`.
+- **Reportar um problema (`/wiki/#reportar`):** formulário que manda cada relato para o seu e-mail pelo [Web3Forms](https://web3forms.com) (grátis, sem servidor, o jogador não precisa de conta; o log vai por link do mclo.gs), mais o Discord quando houver. Para ligar, cole a chave em `report.web3formsKey` e o convite em `links.discord`, os dois em `src/site-config.js`. Sem chave e sem Discord, a seção e os links para ela não aparecem no site publicado.
+- **Tela de carregamento:** um bloco de Âmbar Temporal do mod que acende uma fileira de pixels por 1/16 do carregamento, dizendo o que ainda falta; no fim, a luz dele inunda a tela e vira o céu da abertura (`src/loader.js`).
 
 ## Rodar
 

@@ -1,6 +1,7 @@
 import {SPECIES,LORE} from './generated/species.js';
 import {ERAS,VERSIONS,GUIDE_LEVELS,TOOLS,WEAPONS,INSTALL,FAQ} from './content.js';
 import {t,pick} from './i18n.js';
+import {report} from './site-config.js';
 import {sprite,paintSprite} from './sprites.js';
 import {picture} from './pictures.js';
 import {eggCanvas,eggStage} from './egg.js';
@@ -34,7 +35,7 @@ export function initFilm(){
 }
 
 export function initHeader(){
- const bar=$('topbar'),links=[...document.querySelectorAll('.nav a')],targets=links.map(a=>document.querySelector(a.getAttribute('href')));
+ const bar=$('topbar'),links=[...document.querySelectorAll('.nav a[href^="#"]')],targets=links.map(a=>document.querySelector(a.getAttribute('href')));
  onScroll(()=>{bar.classList.toggle('is-solid',scrollY>40);
   const mid=innerHeight*.4;let active=-1;targets.forEach((s,i)=>{if(s&&s.getBoundingClientRect().top<mid)active=i});links.forEach((a,i)=>a.classList.toggle('is-active',i===active))});
 }
@@ -180,7 +181,10 @@ export function initInstall(links){
  let loader='fabric';
  const render=()=>{for(const n of ['fabric','forge']){const tab=$(`tab-${n}`);tab.setAttribute('aria-selected',String(n===loader));tab.tabIndex=n===loader?0:-1}
   $('steps').replaceChildren(...INSTALL[loader].map(s=>el('li','',pick(s))));
-  if(links.download)$('download').href=links.download;$('modrinth').hidden=!links.modrinth;if(links.modrinth)$('modrinth').href=links.modrinth};
+  if(links.download)$('download').href=links.download;$('modrinth').hidden=!links.modrinth;if(links.modrinth)$('modrinth').href=links.modrinth;
+  for(const id of ['discord','foot-discord']){$(id).hidden=!links.discord;if(links.discord)$(id).href=links.discord}
+  // The wiki only has a report section once the form has its key or there is a Discord (same rule as wiki.js).
+  $('report-link').hidden=!(report.web3formsKey||links.discord||import.meta.env.DEV)};
  for(const n of ['fabric','forge']){$(`tab-${n}`).addEventListener('click',()=>{loader=n;render()});$(`tab-${n}`).addEventListener('keydown',e=>{if(e.key==='ArrowLeft'||e.key==='ArrowRight'){e.preventDefault();loader=n==='fabric'?'forge':'fabric';render();$(`tab-${loader}`).focus()}})}
  return render;
 }

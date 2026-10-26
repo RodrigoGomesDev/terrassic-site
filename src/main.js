@@ -1,5 +1,6 @@
 import {detectLang,setLang,t} from './i18n.js';
 import {links} from './site-config.js';
+import {initAnchors} from './anchors.js';
 import {initFilm,initHeader,initMarquee,initStory,initNotebook,initEras,initMechanics,initRoadmap,initInstall,initFaq,initMotion,onScroll,paintEras} from './sections.js';
 import {initBestiary} from './bestiary.js';
 import {lazyThumbnailer} from './pictures.js';
@@ -10,10 +11,10 @@ const $=id=>document.getElementById(id);
 
 // One loading screen until everything the visitor will see is ready (loader.js).
 document.documentElement.classList.add('is-loading');
-const loader=createLoader();
-// Text first: the page reads correctly before any 3D has loaded.
+// Text first: the page reads correctly before any 3D has loaded (and the loading screen speaks the right language).
 setLang(detectLang());
-initHeader();initMotion();
+const loader=createLoader();
+initHeader();initAnchors();initMotion();
 const {render:renderFilm,listen:filmProgress}=initFilm();
 const renderStory=initStory();
 const renders=[renderFilm,initMarquee(),renderStory,initNotebook(),initEras(),initRoadmap(),initInstall(links),initFaq()];
@@ -35,6 +36,15 @@ loader.wait('meteor',1,Promise.all([import('./storyfx.js'),fetch(asset('meteor/m
 const rexJob=loader.track('rex',6);
 let heroLoaded=0;const heroStatus=()=>{$('hero-status').textContent=heroLoaded>=1?t('hero.ready'):t('hero.loading')};
 const film=document.querySelector('.film');
+// What the T. rex must never cover: the header, the sound button, the scroll cue, the title and the captions on screen
+// right now (tight boxes of their words, buttons and images, so a short line leaves its side free).
+const stage=$('film-stage'),captions=[['.film-word','--intro'],['.film-intro','--intro'],['.film-quote','--quote'],['.film-chapter','--chapter']].map(([s,v])=>[document.querySelector(s),v]);
+const inked=el=>{const rects=[],range=document.createRange(),walk=document.createTreeWalker(el,NodeFilter.SHOW_TEXT);
+ for(let n=walk.nextNode();n;n=walk.nextNode())if(n.textContent.trim()){range.selectNodeContents(n);rects.push(...range.getClientRects())}
+ for(const b of el.querySelectorAll('a,button,img'))rects.push(b.getBoundingClientRect());
+ const u=rects.filter(r=>r.width&&r.height);return u.length?new DOMRect(Math.min(...u.map(r=>r.left)),Math.min(...u.map(r=>r.top)),Math.max(...u.map(r=>r.right))-Math.min(...u.map(r=>r.left)),Math.max(...u.map(r=>r.bottom))-Math.min(...u.map(r=>r.top))):null};
+const heroAvoid=()=>[$('topbar'),document.querySelector('.film-top'),document.querySelector('.scroll-cue'),
+ ...captions.filter(([,v])=>+(stage.style.getPropertyValue(v)||0)>.02).map(([el])=>el)].map(inked).filter(Boolean);
 // Without 3D the opening shows the baked picture of the T. rex where the model would stand.
 const noGL=()=>{rexJob.done();film.classList.add('no-webgl');$('hero-canvas').style.backgroundImage=`url(${new URL('assets/thumbs/tyrannosaurus.webp',document.baseURI).href})`};
 import('./hero.js').then(({Hero})=>{
@@ -42,7 +52,7 @@ import('./hero.js').then(({Hero})=>{
   onProgress:p=>{heroLoaded=p;rexJob.set(p*.9);$('hero-meter').style.width=`${p*100}%`;if(p>=1){heroStatus();film.classList.add('is-loaded')}},
   // The screen lifts only once the animal has been drawn (two frames after it is in the scene).
   onReady:()=>{film.classList.add('is-live');requestAnimationFrame(()=>requestAnimationFrame(rexJob.done))},
-  onFail:noGL});
+  onFail:noGL,avoid:heroAvoid});
  if(!hero.renderer)return noGL();
  if(import.meta.env.DEV)window.__hero=hero;
  // The roar is heard only after the visitor turns the sound on (browsers block sound that starts by itself).

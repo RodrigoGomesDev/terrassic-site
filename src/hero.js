@@ -32,8 +32,8 @@ export class Trail{
 }
 
 export class Hero{
- constructor(host,{onProgress=()=>{},onReady=()=>{},onFail=()=>{}}={}){
-  this.host=host;this.onProgress=onProgress;this.onRoar=()=>{};this.reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;this.mobile=innerWidth<760;
+ constructor(host,{onProgress=()=>{},onReady=()=>{},onFail=()=>{},avoid=()=>[]}={}){
+  this.host=host;this.onProgress=onProgress;this.avoid=avoid;this.fit={s:1,x:0,y:0,o:1};this.snap=true;this.onRoar=()=>{};this.reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;this.mobile=innerWidth<760;
   try{this.renderer=new THREE.WebGLRenderer({antialias:true,alpha:true,powerPreference:'high-performance'})}catch(e){onFail(e);return}
   const r=this.renderer;r.setPixelRatio(Math.min(devicePixelRatio,this.mobile?1.5:1.75));r.outputColorSpace=THREE.SRGBColorSpace;r.toneMapping=THREE.ACESFilmicToneMapping;r.toneMappingExposure=1.05;r.setClearColor(0,0);
   r.shadowMap.enabled=true;r.shadowMap.type=THREE.PCFSoftShadowMap;host.append(r.domElement);
@@ -52,9 +52,50 @@ export class Hero{
   spawn(rex,{shadows:true}).then(c=>{this.rex=c;c.holder.rotation.y=-2.55;this.scene.add(c.holder);onProgress(1);onReady()}).catch(e=>{console.warn(e);onFail(e)});
   requestAnimationFrame(this.tick);
  }
- resize(){const w=this.host.clientWidth,h=this.host.clientHeight;this.portrait=w<h;this.renderer.setSize(w,h,false);this.camera.aspect=w/Math.max(1,h);this.camera.fov=this.portrait?48:30;
-  // On a phone the animal is drawn higher, between the title and the copy, so it never covers the text.
-  if(this.portrait)this.camera.setViewOffset(w,h,0,h*.14,w,h);else this.camera.clearViewOffset();this.camera.updateProjectionMatrix()}
+ resize(){const w=this.host.clientWidth,h=this.host.clientHeight;this.w=w;this.h=h;this.portrait=w<h;this.renderer.setSize(w,h,false);this.camera.aspect=w/Math.max(1,h);this.camera.fov=this.portrait?48:30;
+  // On a phone the animal is drawn higher, between the title and the copy; frame() then keeps it clear of the text.
+  this.lift=this.portrait?h*.14:0;this.lens(1,0,this.lift)}
+ lens(zoom,x,y){this.camera.zoom=zoom;this.camera.setViewOffset(this.w,this.h,x,y,this.w,this.h);this.camera.updateProjectionMatrix()}
+ // The animal's outline on screen (px from the stage's corner), from the boxes of its blocks, with the plain lens.
+ outline(){
+  this.lens(1,0,this.lift);this.camera.updateMatrixWorld();const v=this.tmp,b={l:1e9,t:1e9,r:-1e9,btm:-1e9};
+  for(const m of this.rex.model.meshes){if(!m.visible)continue;if(!m.geometry.boundingBox)m.geometry.computeBoundingBox();const {min,max}=m.geometry.boundingBox;
+   for(let i=0;i<8;i++){v.set(i&1?max.x:min.x,i&2?max.y:min.y,i&4?max.z:min.z).applyMatrix4(m.matrixWorld).project(this.camera);if(v.z>1)continue;
+    const x=(v.x+1)/2*this.w,y=(1-v.y)/2*this.h;b.l=Math.min(b.l,x);b.r=Math.max(b.r,x);b.t=Math.min(b.t,y);b.btm=Math.max(b.btm,y)}}
+  return b;
+ }
+ // Keeps the animal off the copy: finds the free part of the visible stage beside the captions shown right now and
+ // pans the lens (shrinking it only when it has to) so the animal's outline fits there. Fades out before the dive.
+ frame(dt,weight){
+  const host=this.host.getBoundingClientRect(),H=Math.min(this.h,innerHeight-host.top),pad=12;
+  const box=this.outline(),cx=this.w/2,cy=this.h/2;
+  // A part of the animal already past an edge of the screen may stay there, so each edge reaches as far as it does
+  // (but nothing hidden may come into view by the move).
+  const B={l:box.l,t:box.t,r:box.r,b:box.btm},E={l:Math.min(0,B.l),t:Math.min(0,B.t),r:Math.max(this.w,B.r),b:Math.max(H,B.b)};
+  let want={s:1,x:0,y:0};
+  const blocks=weight>0&&B.r>0&&B.l<this.w&&B.b>0&&B.t<H?this.avoid().map(r=>({l:r.left-host.left-pad,t:r.top-host.top-pad,r:r.right-host.left+pad,b:r.bottom-host.top+pad})).filter(o=>o.r>0&&o.l<this.w&&o.b>0&&o.t<H):[];
+  if(blocks.length&&blocks.some(o=>o.l<B.r&&o.r>B.l&&o.t<B.b&&o.b>B.t)){
+   // Candidate free rectangles: every mix of edges taken from the screen and the blocks that crosses no block.
+   const xs0=[E.l,...blocks.map(o=>o.r)],xs1=[E.r,...blocks.map(o=>o.l)],ys0=[E.t,...blocks.map(o=>o.b)],ys1=[E.b,...blocks.map(o=>o.t)];
+   const bw=B.r-B.l,bh=B.b-B.t,bx=(B.l+B.r)/2,by=(B.t+B.b)/2;let best=null;
+   for(const l of xs0)for(const r of xs1)for(const t of ys0)for(const b of ys1){
+    if(r-l<40||b-t<40||blocks.some(o=>o.l<r&&o.r>l&&o.t<b&&o.b>t))continue;
+    const s=Math.min(1,(r-l)/bw,(b-t)/bh),w2=bw*s/2,h2=bh*s/2;
+    // Where the outline lands after zooming about the centre of the lens, then the least move that puts it inside.
+    const zx=cx+(bx-cx)*s,zy=cy+(by+this.lift-cy)*s-this.lift,tx=clamp(zx,l+w2,r-w2),ty=clamp(zy,t+h2,b-h2);
+    const score=Math.round(s*50)*1e6-Math.hypot(tx-bx,ty-by);
+    if(!best||score>best.score)best={score,s,x:zx-tx,y:zy-ty};
+   }
+   // On a short screen there may be no room at all: rather than a tiny animal in a corner, it waits out of sight
+   // until the captions scroll away.
+   want=best&&best.s>=.5?{s:best.s,x:best.x,y:best.y,o:1}:{s:1,x:0,y:0,o:0};
+  }
+  const f=this.fit,k=this.reduced?1:1-Math.exp(-5*dt),to={s:lerp(1,want.s,weight),x:want.x*weight,y:want.y*weight,o:lerp(1,want.o??1,weight)};
+  for(const key of ['s','x','y','o'])f[key]+=(to[key]-f[key])*(this.snap?1:k);this.snap=false;
+  this.renderer.domElement.style.opacity=f.o>.99?'':f.o.toFixed(3);
+  // zoom scales about the centre of the lens; the view offset then slides the picture by (x, y) px.
+  this.lens(f.s,f.x,f.y+this.lift);
+ }
  setProgress(p){this.target=this.reduced?.3:clamp(p,0,1)}
  tick(now){
   requestAnimationFrame(this.tick);const ms=now-this.last,dt=Math.min(.05,ms/1000);this.last=now;if(!this.visible||document.hidden)return;if(!this.pixLevel)this.guard?.frame(ms);this.step(dt);
@@ -92,6 +133,8 @@ export class Hero{
   const shake=this.reduced?0:w*.06*(Math.sin(this.time*39)+Math.sin(this.time*27))*(1-dive);
   this.camera.position.copy(eye.lerp(mouth.clone().addScaledVector(front,-.6),smooth(p,.9,1))).add(new THREE.Vector3(this.look.x*(1-dive)+shake,-this.look.y*.5*(1-dive)+shake,0));
   this.camera.lookAt(look);
+  // The captions are gone by .56; the fit lets go before the dive so the camera still flies into the mouth.
+  this.frame(dt,1-smooth(p,.56,.64));
   this.renderer.render(this.scene,this.camera);
  }
 }

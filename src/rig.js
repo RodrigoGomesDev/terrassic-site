@@ -2,8 +2,8 @@ import * as THREE from 'three';
 import {mergeGeometries} from 'three/addons/utils/BufferGeometryUtils.js';
 import {compileClip,sampleBone,actionWeight,fadeWeight} from './animation.js';
 const radians=n=>(Number(n)||0)*Math.PI/180;
-const BASE=import.meta.env?.BASE_URL??'/';
-export const assetUrl=path=>`${BASE}assets/${path}`;
+import {assetUrl} from './assets.js';
+export {assetUrl};
 
 // Clips made for the site on the mod's rig (scripts/web-roar.py); they replace the game clip of the same name.
 const WEB_CLIPS={tyrannosaurus:{roar:'species/tyrannosaurus.roar.json'}};
