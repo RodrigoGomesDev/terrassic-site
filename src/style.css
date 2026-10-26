@@ -440,27 +440,35 @@ button{cursor:pointer}
  .marquee-row{animation:none}
 }
 
-/* The loading screen: night basalt and a block of the mod's Temporal Amber that lights up one row of pixels per
-   sixteenth of the load (--rows, set by loader.js). When it is full it flares and its light floods the screen into
-   the amber sky of the opening. */
+/* The loading screen: a Cretaceous night with the Rift glowing on the horizon, and the title carved in dark stone,
+   sitting exactly where the opening shows it (loader.js measures it). As the site loads (--p, 0 to 1) the letters
+   light up from left to right behind a hot seam of amber; at the end the amber sky floods in around the title, the
+   screen fades and the opening is underneath, with the same title in the same place. */
 html.is-loading,html.is-loading body{overflow:hidden}
-.loader-screen{--rows:0;--glow:calc(var(--rows)/16);position:fixed;inset:0;z-index:100;display:grid;place-content:center;justify-items:center;gap:28px;padding-inline:max(16px,env(safe-area-inset-left,0px)) max(16px,env(safe-area-inset-right,0px));overflow:hidden;color:var(--stone-300);
- background:radial-gradient(circle at 50% 42%,rgba(240,122,26,calc(.05 + var(--glow)*.2)),transparent min(70vmin,560px)),var(--basalt-950);transition:opacity .45s ease,visibility .45s;animation:loaderGiveUp .6s 20s forwards}
+.loader-screen{--p:0;position:fixed;inset:0;z-index:100;overflow:hidden;color:var(--stone-300);
+ background:radial-gradient(70% 45% at 50% var(--ty,30%),rgba(242,181,68,calc(var(--p)*.13)),transparent 70%),radial-gradient(120% 50% at 50% 115%,rgba(240,122,26,.42),transparent 64%),radial-gradient(90% 70% at 50% 125%,rgba(94,56,102,.5),transparent),var(--basalt-950);
+ transition:opacity .5s ease,visibility .5s;animation:loaderGiveUp .6s 20s forwards}
 .loader-screen.is-done{opacity:0;visibility:hidden}
-.loader-amber{position:relative;width:128px;height:128px;margin-bottom:8px;filter:drop-shadow(0 0 calc(var(--rows)*1.5px) rgba(255,210,122,.55)) drop-shadow(0 0 calc(var(--rows)*4px) rgba(240,122,26,calc(var(--glow)*.6)))}
-.loader-amber img{position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelated}
-.loader-amber-dim{filter:grayscale(.6) brightness(.26)}
-.loader-amber-lit{clip-path:inset(calc((16 - var(--rows))*100%/16) 0 0 0);animation:amberPulse 1.8s steps(3) infinite alternate}
-.loader-amber::after{content:"";position:absolute;left:-24px;right:-24px;bottom:-26px;height:12px;border-radius:50%;background:radial-gradient(closest-side,rgba(242,181,68,calc(var(--glow)*.45)),transparent)}
-.loader-word{width:min(72vw,440px);height:auto;image-rendering:pixelated}
-.loader-line{display:flex;gap:14px;align-items:baseline;margin:0;min-height:24px;font:400 16px/24px var(--typed);-webkit-font-smoothing:none;text-align:center}
-.loader-pct{color:var(--amber);font-variant-numeric:tabular-nums;min-width:4ch;text-align:left}
-.loader-motes{position:absolute;inset:0;pointer-events:none;opacity:calc(.2 + var(--glow)*.8)}
-.loader-motes i{position:absolute;bottom:-8px;width:4px;height:4px;background:var(--amber-300);box-shadow:0 0 8px rgba(242,181,68,.9);animation:mote var(--d,9s) linear var(--delay,0s) infinite}
-.loader-flood{position:absolute;inset:0;background:rgb(219,177,91);clip-path:circle(0 at var(--fx,50%) var(--fy,40%));pointer-events:none}
-.loader-screen.is-flooding .loader-flood{clip-path:circle(150vmax at var(--fx,50%) var(--fy,40%));transition:clip-path .8s cubic-bezier(.65,0,.35,1)}
-.loader-screen.is-flooding .loader-amber-lit{animation:none;filter:brightness(1.9) saturate(1.2);transition:filter .2s}
-@keyframes amberPulse{to{filter:brightness(1.14)}}
-@keyframes mote{0%{transform:translate(0,0);opacity:0}10%{opacity:1}100%{transform:translate(var(--drift,12px),-110vh);opacity:0}}
+.loader-title{position:absolute;left:50%;top:30%;width:min(94vw,1500px);aspect-ratio:970/210;transform:translate(-50%,-50%)}
+.loader-title.is-placed{transform:none}
+.loader-title img{position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelated}
+.loader-title-dim{filter:brightness(.2) saturate(.3) contrast(1.1)}
+/* The lit layers are masked on a box with room around the letters, so their glow is never cut into a rectangle. --cut
+   is where the light has reached; the seam is a band of the mod's amber-finish title glowing just behind it. */
+.loader-reveal{--pad:48px;--cut:calc(var(--pad) + var(--p)*(100% - 2*var(--pad)));position:absolute;inset:calc(-1*var(--pad));pointer-events:none}
+.loader-reveal img{inset:var(--pad);width:calc(100% - 2*var(--pad));height:calc(100% - 2*var(--pad))}
+.loader-lit{--band:max(12px,4%);-webkit-mask:linear-gradient(90deg,#000 calc(var(--cut) - var(--band)),transparent var(--cut));mask:linear-gradient(90deg,#000 calc(var(--cut) - var(--band)),transparent var(--cut))}
+.loader-lit img{filter:drop-shadow(0 0 calc(6px + var(--p)*12px) rgba(242,181,68,.4))}
+.loader-seam{--band:max(12px,4%);-webkit-mask:linear-gradient(90deg,transparent calc(var(--cut) - var(--band)*2),#000 calc(var(--cut) - var(--band)*.6),#000 var(--cut),transparent var(--cut));mask:linear-gradient(90deg,transparent calc(var(--cut) - var(--band)*2),#000 calc(var(--cut) - var(--band)*.6),#000 var(--cut),transparent var(--cut));opacity:min(1,var(--p)*40,(1 - var(--p))*40);transition:opacity .3s}
+.loader-seam img{filter:brightness(1.35) drop-shadow(0 0 5px rgba(255,190,80,.9)) drop-shadow(0 0 10px rgba(240,122,26,.55))}
+.loader-line{position:absolute;left:50%;top:var(--line-top,calc(30% + 14vw));transform:translateX(-50%);display:flex;gap:14px;margin:0;white-space:nowrap;font:500 12px/1.4 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--amber);transition:opacity .3s}
+.loader-pct{color:var(--bone);font-variant-numeric:tabular-nums;min-width:4ch}
+.loader-motes{position:absolute;inset:0;pointer-events:none;transition:opacity .4s}
+.loader-motes i{position:absolute;bottom:-8px;width:var(--s,3px);height:var(--s,3px);background:var(--amber-300);box-shadow:0 0 calc(var(--s,3px)*3) rgba(242,181,68,.85);animation:mote var(--d,9s) linear var(--delay,0s) infinite}
+.loader-flood{position:absolute;inset:0;background:rgb(219,177,91);clip-path:circle(0 at var(--fx,50%) var(--fy,30%));pointer-events:none}
+.loader-screen.is-flooding .loader-flood{clip-path:circle(150vmax at var(--fx,50%) var(--fy,30%));transition:clip-path .9s cubic-bezier(.65,0,.35,1)}
+.loader-screen.is-flooding .loader-line,.loader-screen.is-flooding .loader-motes,.loader-screen.is-flooding .loader-seam{opacity:0}
+.loader-screen.is-flooding .loader-lit{-webkit-mask:none;mask:none}.loader-screen.is-flooding .loader-lit img{filter:none;transition:filter .9s}
+@keyframes mote{0%{transform:translate(0,0);opacity:0}12%{opacity:var(--o,1)}100%{transform:translate(var(--drift,12px),-105vh);opacity:0}}
 @keyframes loaderGiveUp{to{opacity:0;visibility:hidden}}
-@media (prefers-reduced-motion:reduce){.loader-amber-lit{animation:none}.loader-motes{display:none}}
+@media (prefers-reduced-motion:reduce){.loader-motes{display:none}}

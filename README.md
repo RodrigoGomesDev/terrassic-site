@@ -12,7 +12,7 @@ O que tem:
 - **Como se joga, roteiro, instalação e dúvidas**, com os sprites do mod (ovos, itens, armas).
 - **Wiki (`/wiki/`):** página própria, sem 3D, com instalação (dependências, Fabric, Forge, multiplayer, atualizar), como se joga, o Guia de Campo de todas as espécies, eras, roteiro, dúvidas e como reportar um problema. Cada parte tem endereço fixo (`/wiki/#instalacao`, `/wiki/#tyrannosaurus`) para linkar no CurseForge e no Modrinth. Textos só da wiki em `src/wiki-content.js`.
 - **Reportar um problema (`/wiki/#reportar`):** formulário que manda cada relato para o seu e-mail pelo [Web3Forms](https://web3forms.com) (grátis, sem servidor, o jogador não precisa de conta; o log vai por link do mclo.gs), mais o Discord quando houver. Para ligar, cole a chave em `report.web3formsKey` e o convite em `links.discord`, os dois em `src/site-config.js`. Sem chave e sem Discord, a seção e os links para ela não aparecem no site publicado.
-- **Tela de carregamento:** um bloco de Âmbar Temporal do mod que acende uma fileira de pixels por 1/16 do carregamento, dizendo o que ainda falta; no fim, a luz dele inunda a tela e vira o céu da abertura (`src/loader.js`).
+- **Tela de carregamento:** uma noite do Cretáceo com a Fenda brilhando no horizonte e o letreiro em pedra escura, no lugar exato em que a abertura o mostra. Ele acende da esquerda para a direita conforme o site carrega, com uma faixa do letreiro âmbar do mod na frente, dizendo o que ainda falta; no fim, o céu âmbar inunda a tela em volta dele e a abertura aparece por baixo com o mesmo letreiro (`src/loader.js`).
 
 ## Rodar
 
