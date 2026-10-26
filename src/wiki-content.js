@@ -10,9 +10,9 @@ export const DEPS=[
 
 export const W={
  title:T('Wiki do Terrassic','Terrassic Wiki','Wiki de Terrassic'),
- lede:T('Tudo para instalar, jogar e conhecer cada criatura do Terrassic, o mod de criaturas pré-históricas de Rodrigo Gomes para Minecraft Java 1.20.1, em Fabric e Forge.',
-  'Everything you need to install, play and get to know every creature in Terrassic, the prehistoric creature mod by Rodrigo Gomes for Minecraft Java 1.20.1, on Fabric and Forge.',
-  'Todo para instalar, jugar y conocer cada criatura de Terrassic, el mod de criaturas prehistóricas de Rodrigo Gomes para Minecraft Java 1.20.1, en Fabric y Forge.'),
+ lede:T('Instalação, criaturas e guias para a sua próxima expedição.',
+  'Installation, creatures, and guides for your next expedition.',
+  'Instalación, criaturas y guías para tu próxima expedición.'),
  alpha:T('O Terrassic está em desenvolvimento ativo. As versões alfa podem ter bugs e o conteúdo muda entre versões. Faça backup dos seus mundos antes de instalar ou atualizar.',
   'Terrassic is under active development. Alpha versions may contain bugs and content changes between builds. Back up your worlds before installing or updating.',
   'Terrassic está en desarrollo activo. Las versiones alfa pueden tener errores y el contenido cambia entre versiones. Haz una copia de tus mundos antes de instalar o actualizar.'),
@@ -62,9 +62,9 @@ export const W={
  'tools.t':T('Ferramentas do cientista','The scientist’s tools','Herramientas del científico'),
  'arms.dmg':T('Dano','Damage','Daño'),'arms.weapon':T('Arma','Weapon','Arma'),
  'crea.t':T('Criaturas','Creatures','Criaturas'),
- 'crea.lede':T('{n} espécies já modeladas, no tamanho do maior fóssil conhecido (1 bloco = 1 metro). Abra uma para ver o Guia de Campo completo. As marcadas com uma versão futura ainda não estão no arquivo que você baixa.',
-  '{n} species modelled so far, at the size of the largest known fossil (1 block = 1 metre). Open one to read its full Field Guide. Those marked with a future version are not in the file you download yet.',
-  '{n} especies ya modeladas, al tamaño del mayor fósil conocido (1 bloque = 1 metro). Abre una para ver su Guía de Campo completa. Las marcadas con una versión futura aún no están en el archivo que descargas.'),
+ 'crea.lede':T('Conheça as {n} espécies e consulte seus hábitos, alimentação e domesticação. A ficha indica em qual versão cada criatura aparece.',
+  'Explore {n} species and learn about their habits, diet, and taming. Each profile lists the version the creature appears in.',
+  'Conoce las {n} especies y consulta sus hábitos, alimentación y domesticación. Cada ficha indica en qué versión aparece la criatura.'),
  'crea.search':T('Buscar espécie','Search species','Buscar especie'),
  'crea.none':T('Nenhuma espécie com esse nome.','No species with that name.','Ninguna especie con ese nombre.'),
  'crea.in':T('No jogo','In the game','En el juego'),
@@ -72,11 +72,11 @@ export const W={
  'crea.model':T('Ver o modelo 3D no site','See the 3D model on the website','Ver el modelo 3D en el sitio'),
 
  'eras.t':T('Eras e capítulos','Eras and chapters','Eras y capítulos'),
- 'eras.lede':T('Você avança indo cada vez mais fundo no passado, atrás da Katarina. Toda era visitada fica aberta para sempre.','You move forward by going ever deeper into the past, after Katarina. Every era you visit stays open for good.','Avanzas yendo cada vez más atrás en el pasado, tras Katarina. Cada era visitada queda abierta para siempre.'),
+ 'eras.lede':T('Você avança indo cada vez mais fundo no passado, atrás da Katyusha. Toda era visitada fica aberta para sempre.','You move forward by going ever deeper into the past, after Katyusha. Every era you visit stays open for good.','Avanzas yendo cada vez más atrás en el pasado, tras Katyusha. Cada era visitada queda abierta para siempre.'),
  'eras.where':T('Onde','Where','Dónde'),'eras.event':T('Evento','Event','Evento'),'eras.boss':T('Chefe','Boss','Jefe'),'eras.plants':T('Plantas','Plants','Plantas'),'eras.fauna':T('Quem vive lá','Who lives there','Quién vive allí'),
 
  'road.t':T('Roteiro','Roadmap','Hoja de ruta'),
- 'road.lede':T('Cada era vira um capítulo jogável do começo ao fim antes de começar a próxima. O roteiro mostra a intenção, não uma promessa de data.','Each era becomes a chapter you can play from start to finish before the next one begins. The roadmap shows intent, not a promised date.','Cada era se convierte en un capítulo jugable de principio a fin antes de empezar la siguiente. La hoja de ruta muestra la intención, no una fecha prometida.'),
+ 'road.lede':T('Acompanhe os próximos capítulos e as novidades em desenvolvimento.','Follow the upcoming chapters and features in development.','Sigue los próximos capítulos y las novedades en desarrollo.'),
 
  'faq.t':T('Dúvidas frequentes','Frequently asked questions','Preguntas frecuentes'),
  faq:[
@@ -86,9 +86,9 @@ export const W={
   {q:T('O mod usa inteligência artificial enquanto eu jogo?','Does the mod use generative AI while I play?','¿El mod usa inteligencia artificial mientras juego?'),a:T('Não. Ferramentas de IA ajudaram no código e nos textos do projeto, mas o jogo não se conecta a nenhum serviço de IA. Os detalhes estão nas declarações de conteúdo do Modrinth.','No. AI tools helped with the project’s code and text, but the game does not connect to any AI service. Details are in the Modrinth content disclosures.','No. Herramientas de IA ayudaron con el código y los textos del proyecto, pero el juego no se conecta a ningún servicio de IA. Los detalles están en las declaraciones de contenido de Modrinth.')},
  ],
  'bug.t':T('Reportar um problema','Report a problem','Reportar un problema'),
- 'bug.lede':T('Achou um bug? Conte aqui: o relato chega direto para o Rodrigo, e não precisa de conta. Quanto mais detalhe, mais rápido sai a correção.',
-  'Found a bug? Tell us here: the report goes straight to Rodrigo, no account needed. The more detail, the sooner it gets fixed.',
-  '¿Encontraste un error? Cuéntalo aquí: el reporte llega directo a Rodrigo y no hace falta cuenta. Cuanto más detalle, antes sale la corrección.'),
+ 'bug.lede':T('Encontrou um problema? Conte o que aconteceu e como repetir. Não precisa criar uma conta.',
+  'Found a problem? Tell us what happened and how to reproduce it. No account needed.',
+  '¿Encontraste un problema? Cuéntanos qué pasó y cómo repetirlo. No necesitas crear una cuenta.'),
  'bug.version':T('Versão do Terrassic','Terrassic version','Versión de Terrassic'),
  'bug.loader':T('Loader','Loader','Loader'),
  'bug.where':T('Onde acontece','Where it happens','Dónde ocurre'),

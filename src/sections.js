@@ -30,7 +30,7 @@ export function initFilm(){
   for(const fn of listeners)fn(p);
  };
  onScroll(update);
- const render=()=>{const page=LORE.pages.find(x=>x.day===1203)||LORE.pages.at(-1),text=pick(page.text);$('film-quote').textContent=text.slice(0,text.indexOf('.')+1);$('film-cite').textContent=`Katarina · ${t('book.day')} ${page.day}`;update()};
+ const render=()=>{const page=LORE.pages.find(x=>x.day===1203)||LORE.pages.at(-1),text=pick(page.text);$('film-quote').textContent=text.slice(0,text.indexOf('.')+1);$('film-cite').textContent=`${t('best.noteBy')} · ${t('book.day')} ${page.day}`;update()};
  return {render,listen:fn=>{listeners.push(fn);fn(reduced?.62:pinProgress(film))}};
 }
 

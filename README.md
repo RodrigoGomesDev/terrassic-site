@@ -100,3 +100,20 @@ O idioma vem de `?lang=pt|en|es`, da última escolha do visitante ou do navegado
 ## Autoria
 
 Rodrigo Gomes. Modelos, texturas, sprites e textos são do mod e autorais. Os cenários são montados por código com os blocos do mod; nenhuma textura do Minecraft é usada. Projeto independente, sem afiliação à Mojang ou à Microsoft.
+
+## Revisão editorial — 26/10/2026
+
+Pedido do Rodrigo: textos diretos, sem repetir escala, equivalência entre blocos e metros ou explicar
+como o projeto é produzido. A abertura convida a explorar; instalação e wiki guardam as instruções.
+Português, inglês e espanhol revisados juntos. Requisitos, avisos de atualização e estados do roteiro
+preservados. O nome público passa a ser Dra. Katyusha (Dr. Katyusha em inglês).
+
+`src/editorial.js` aplica o nome ao exibir os textos importados, sem reescrever `src/generated/species.js`.
+A mudança do nome no repositório do mod é uma tarefa futura, separada desta revisão do site.
+Não executar uma importação em massa para alterar apenas a apresentação dos textos.
+
+Validação desta revisão: `npm run check` (10 testes) e `npm run build` passaram. Home e wiki
+conferidas no Chrome em pt/en/es, sem erros de execução ou chaves cruas. Abertura inspecionada
+em 1440×1000 e 390×844, sem rolagem horizontal no celular. Navegação executada com WebGL
+desativado para conferir textos e fallback; não constitui nova validação do renderizador 3D.
+Paridade dos três idiomas, placeholders e aplicação do nome sobre dados importados conferidas.
