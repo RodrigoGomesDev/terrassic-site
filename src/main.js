@@ -15,6 +15,8 @@ if(!story){$('historia').hidden=true;$('cronica').hidden=true;$('historia-em-bre
 for(const b of document.querySelectorAll('[data-story-soon]'))b.hidden=story;
 // Without story mode the journal card would only say "coming soon" again, so it goes.
 $('tile-journal').hidden=!story;
+// The eras are part of story mode: while it is off they show as "coming soon", pictures dimmed.
+$('eras').classList.toggle('is-soon',!story);
 initHeader();initAnchors();
 const renders=[initEras(),initInstall(links),initFaq()];
 const storyRender=story?initStory():null;if(story)renders.push(storyRender,initNotebook());

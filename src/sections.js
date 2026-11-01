@@ -110,8 +110,8 @@ export function initEras(){
    body.append(el('p','era-n',pick(e.n)),el('h3','',pick(e.name)),el('p','era-when',`${pick(e.era)}${e.ma?` · ${e.ma[0]}–${e.ma[1]} Ma`:''}`),el('p','era-land',pick(e.land)));
    const dl=el('dl','era-facts');for(const [k,v] of story?[['eras.where',e.where],['eras.event',e.event],['eras.boss',e.boss],['eras.plants',e.plants]]:[['eras.where',e.where],['eras.plants',e.plants]]){const d=el('div');d.append(el('dt','',t(k)),el('dd','',pick(v)));dl.append(d)}
    const fauna=el('p','era-fauna');fauna.append(el('span','',t('eras.fauna')),document.createTextNode(e.fauna.map(f=>typeof f==='string'?f:pick(f)).join(' · ')));
-   const status=story?el('span',`status status-${e.status}`,`${e.version} · ${t(e.status==='wip'?'road.wip':'road.plan')}`):el('span','status status-plan',t('soon'));
-   body.append(dl,fauna,status);card.append(art,body);return card;
+   const status=story?el('span',`status status-${e.status}`,`${e.version} · ${t(e.status==='wip'?'road.wip':'road.plan')}`):null;
+   body.append(dl,fauna);if(status)body.append(status);card.append(art,body);return card;
   }));
 }
 

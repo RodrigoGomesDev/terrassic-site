@@ -212,7 +212,7 @@ button{cursor:pointer}
 .mechanics{background:var(--basalt-950)}
 .bento{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:14px}
 .tile{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:24px;display:grid;gap:12px;align-content:start;min-width:0;position:relative;overflow:hidden}
-.tile h3{font:400 28px/1 var(--display);color:var(--bone)}
+.tile h3{font:400 20px/1.2 var(--display);color:var(--bone)}
 .tile p{color:var(--stone-300);font-size:15px}
 .tile-egg,.tile-sex,.tile-tame{grid-column:span 2}
 .tile-ride{grid-column:span 2}.tile-science{grid-column:span 4}
@@ -410,3 +410,7 @@ section[id]{scroll-margin-top:56px}
 .soon-story{padding-block:clamp(48px,7vw,80px)}
 .tile-journal[hidden]{display:none}
 .tile-arms:has(+ .tile-journal[hidden]){grid-column:1/-1}
+/* Eras while story mode is off: the section is "coming soon", the landscapes dimmed. */
+.eras.is-soon .era-art{filter:saturate(.35) brightness(.7)}
+.eras.is-soon .era h3{color:var(--stone-300)}
+.display .soon-badge{vertical-align:middle;margin-left:10px}
