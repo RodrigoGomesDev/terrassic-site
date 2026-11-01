@@ -141,7 +141,7 @@
 /* Animals whose new model is not ready: silhouette only (site-config.js, models.ready). */
 .sp-art.is-soon{filter:brightness(0) opacity(.85)}
 /* Cretaceous animals still on the plan: an empty dashed frame where the picture would be. */
-.sp-none-art{display:block;border:1px dashed var(--line);border-radius:6px}
+.sp-none-art{display:block}
 .sp.is-planned{border-style:dashed;background:transparent}
 .sp-later{margin-top:28px}
 .sp-later[hidden]{display:none}
