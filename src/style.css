@@ -101,7 +101,10 @@ button{cursor:pointer}
 .story-lines{position:static;width:min(900px,100%);padding-left:var(--gutter-l);padding-right:var(--gutter-r);display:grid;justify-items:center;text-align:center;grid-template-columns:minmax(0,1fr)}
 .story-kicker{position:absolute;left:0;right:0;margin:0;text-align:center;top:calc(84px + env(safe-area-inset-top,0px));font:400 12px var(--mono);letter-spacing:.04em;text-transform:uppercase;color:var(--amber)}
 .story-line,.story-era{grid-area:1/1;--in:0;--out:0;opacity:calc(var(--in) - var(--out));transform:translateY(calc((1 - var(--in))*40px - var(--out)*30px));filter:blur(calc((1 - var(--in))*8px + var(--out)*4px));will-change:transform,opacity,filter;align-self:center;max-width:100%}
-.story-line{font:500 clamp(24px,3.6vw,46px)/1.25 var(--body);color:var(--bone);text-shadow:0 0 40px rgba(14,11,14,.9);max-width:24ch}
+.story-line{position:relative;font:500 clamp(24px,3.6vw,46px)/1.25 var(--body);color:var(--bone);text-shadow:0 0 2px #0e0b0e,0 0 10px rgba(14,11,14,.95),0 0 40px rgba(14,11,14,.9);max-width:24ch}
+/* The meteor and its trail cross the middle of the screen: a dark haze sits under each line, above the fire, so the
+   words stay readable and the light shows around them. */
+.story-line::before{content:"";position:absolute;inset:-45% -18%;z-index:-1;background:radial-gradient(closest-side,rgba(14,11,14,.96),rgba(14,11,14,.88) 60%,transparent);pointer-events:none}
 .story-era{font:400 clamp(40px,7.5vw,112px)/.95 var(--display);color:var(--amber);text-shadow:0 0 30px rgba(240,122,26,.7),0 0 80px rgba(240,122,26,.4);max-width:14ch}
 
 /* Chronicle and Katarina's notebook */

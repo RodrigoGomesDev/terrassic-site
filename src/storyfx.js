@@ -33,9 +33,10 @@ export class StoryMeteor{
  tick(now){
   requestAnimationFrame(this.tick);const ms=now-this.last,dt=Math.min(.05,ms/1000);this.last=now;if(!this.visible||document.hidden||!this.meteor)return;this.guard.frame(ms);this.time+=dt;
   this.progress=this.reduced?this.target:damp(this.progress,this.target,8,dt);const p=this.progress,h=this.span,w=h*this.camera.aspect;
-  // A gentle curve from above the top edge to low on the screen; it speeds up and grows as it comes closer.
+  // A gentle curve from above the top edge to low on the screen; it speeds up and grows as it comes closer. On a wide
+  // screen it keeps to the right of the lines of text, so the trail never runs through the words.
   const u=Math.pow(smooth(p,.02,this.impact),1.5),landed=p>=this.impact,m=this.meteor;
-  const a=new THREE.Vector3(w*.7,h*1.35,-14),c=new THREE.Vector3(w*.55,h*.2,-8),b=new THREE.Vector3(w*.1,-h*.7,2);
+  const a=new THREE.Vector3(w*.7,h*1.35,-14),c=new THREE.Vector3(w*.55,h*.2,-8),b=new THREE.Vector3(w*(this.camera.aspect>1?.42:.1),-h*.7,2);
   const curve=t=>a.clone().multiplyScalar((1-t)*(1-t)).add(c.clone().multiplyScalar(2*t*(1-t))).add(b.clone().multiplyScalar(t*t));
   const pos=curve(u),dir=curve(Math.min(1,u+.01)).sub(curve(Math.max(0,u-.01))).normalize(),size=lerp(.45,2,u*u)*this.fit;
   m.holder.visible=!landed&&p>.01;m.holder.position.copy(pos);m.holder.lookAt(pos.clone().sub(dir));m.holder.scale.setScalar(size);m.animator.update(this.reduced?0:dt);
