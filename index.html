@@ -12,9 +12,6 @@
 <link rel="icon" href="./assets/monograma_64.png" sizes="64x64">
 <link rel="icon" href="./assets/monograma_32.png" sizes="32x32">
 <link rel="apple-touch-icon" href="./assets/monograma_256.png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;800;900&family=Hanken+Grotesk:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap">
 <link rel="stylesheet" href="./src/style.css">
 </head>
 <body>
@@ -55,7 +52,6 @@
  <section class="bestiary band" id="bestiario">
   <div class="wrap">
    <div class="section-head">
-    <p class="eyebrow" data-i18n="best.eyebrow">Bestiary</p>
     <h2 class="display" data-i18n="best.title">See each one up close.</h2>
     <p class="lede" data-i18n="best.lede">Choose a creature, watch it move, and learn its habits. Drag to turn.</p>
    </div>
@@ -102,7 +98,6 @@
  <section class="mechanics band" id="mecanicas">
   <div class="wrap">
    <div class="section-head">
-    <p class="eyebrow" data-i18n="mech.eyebrow">How it plays</p>
     <h2 class="display" data-i18n="mech.title">Survive with what the age provides.</h2>
     <p class="lede" data-i18n="mech.lede">Find food, build a shelter, and prepare for what lives beyond camp.</p>
    </div>
@@ -142,7 +137,7 @@
      <ul class="slots" id="weapons"></ul>
      <p class="small" data-i18n="mech.arms.p">Knives, clubs, and spears crafted from stone, bone, and flint.</p>
     </article>
-    <article class="tile tile-journal">
+    <article class="tile tile-journal" id="tile-journal">
      <h3><span data-i18n="mech.journal.t">Field Journal</span> <span class="soon-badge" data-story-soon data-i18n="soon">Coming soon</span></h3>
      <p data-i18n="mech.journal.p">Follow the expedition’s clues, gather amber fragments, and rebuild the Leap Altar. There is more waiting on the other side.</p>
      <div class="journal" id="journal"></div>
@@ -178,8 +173,7 @@
 
  <section class="soon-story band" id="historia-em-breve" hidden>
   <div class="wrap soon-story-grid">
-   <p class="eyebrow"><span data-i18n="soonstory.eyebrow">Story</span> <span class="soon-badge" data-i18n="soon">Coming soon</span></p>
-   <h2 class="display" data-i18n="soonstory.title">Story mode comes later.</h2>
+   <h2 class="display"><span data-i18n="soonstory.title">Story mode</span> <span class="soon-badge" data-i18n="soon">Coming soon</span></h2>
    <p class="lede" data-i18n="soonstory.p">Dr. Katyusha’s expedition, the Rift and the chapters arrive in a future version.</p>
   </div>
  </section>
@@ -187,7 +181,6 @@
  <section class="eras band" id="eras">
   <div class="wrap">
    <div class="section-head">
-    <p class="eyebrow" data-i18n="eras.eyebrow">Chapters</p>
     <h2 class="display" data-i18n="eras.title">One era at a time.</h2>
     <p class="lede" data-i18n="eras.lede">The story chapters arrive in a future version. For now, Terrassic takes place in the Late Cretaceous.</p>
    </div>
@@ -198,7 +191,6 @@
  <section class="install band" id="jogar">
   <div class="wrap install-grid">
    <div>
-    <p class="eyebrow" data-i18n="inst.eyebrow">Play</p>
     <h2 class="display" data-i18n="inst.title">How to install.</h2>
     <p class="lede" data-i18n="inst.lede">The files are on CurseForge. Download the one for your loader, Fabric or Forge, and follow the steps.</p>
     <div class="install-actions">

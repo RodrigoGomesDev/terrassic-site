@@ -16,7 +16,7 @@ addEventListener('scroll',()=>{if(!ticking){ticking=true;requestAnimationFrame(f
 
 export function initHeader(){
  const bar=$('topbar'),hero=$('inicio');
- new IntersectionObserver(([e])=>bar.classList.toggle('on-light',e.isIntersecting),{rootMargin:`-${Math.round(bar.offsetHeight/2)}px 0px -100% 0px`}).observe(hero);
+ new IntersectionObserver(([e])=>bar.classList.toggle('on-light',e.isIntersecting),{rootMargin:`-${bar.offsetHeight}px 0px -100% 0px`}).observe(hero);
  // On small screens the sections sit behind a Menu button; choosing one, or Esc, closes it again.
  const toggle=$('nav-toggle'),setOpen=o=>{bar.classList.toggle('is-open',o);toggle.setAttribute('aria-expanded',String(o))};
  toggle.addEventListener('click',()=>setOpen(!bar.classList.contains('is-open')));
@@ -105,7 +105,7 @@ export function initEras(){
  const track=$('eras-track');
  return ()=>track.replaceChildren(...ERAS.map((e,i)=>{
    const card=el('article',`era era-${e.id}`);card.style.setProperty('--era-a',e.colors[1]);
-   const art=el('div','era-art');art.append(landscape(document.createElement('canvas'),e,(i+3)*7919));if(eraArt.has(e.id))art.append(eraImage(eraArt.get(e.id)));art.dataset.era=e.id;art.style.background=`linear-gradient(180deg,${e.colors[0]},${e.colors[1]})`;
+   const art=el('div','era-art');art.append(landscape(document.createElement('canvas'),e,(i+3)*7919));if(eraArt.has(e.id))art.append(eraImage(eraArt.get(e.id)));art.dataset.era=e.id;art.style.background=e.colors[0];
    const body=el('div','era-body');
    body.append(el('p','era-n',pick(e.n)),el('h3','',pick(e.name)),el('p','era-when',`${pick(e.era)}${e.ma?` · ${e.ma[0]}–${e.ma[1]} Ma`:''}`),el('p','era-land',pick(e.land)));
    const dl=el('dl','era-facts');for(const [k,v] of story?[['eras.where',e.where],['eras.event',e.event],['eras.boss',e.boss],['eras.plants',e.plants]]:[['eras.where',e.where],['eras.plants',e.plants]]){const d=el('div');d.append(el('dt','',t(k)),el('dd','',pick(v)));dl.append(d)}

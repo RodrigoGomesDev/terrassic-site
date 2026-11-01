@@ -13,6 +13,8 @@ setLang(detectLang());
 if(!story){$('historia').hidden=true;$('cronica').hidden=true;$('historia-em-breve').hidden=false;
  for(const a of document.querySelectorAll('a[href="#historia"]'))a.setAttribute('href','#historia-em-breve');}
 for(const b of document.querySelectorAll('[data-story-soon]'))b.hidden=story;
+// Without story mode the journal card would only say "coming soon" again, so it goes.
+$('tile-journal').hidden=!story;
 initHeader();initAnchors();
 const renders=[initEras(),initInstall(links),initFaq()];
 const storyRender=story?initStory():null;if(story)renders.push(storyRender,initNotebook());

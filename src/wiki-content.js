@@ -10,9 +10,7 @@ export const DEPS=[
 
 export const W={
  title:T('Wiki do Terrassic','Terrassic Wiki','Wiki de Terrassic'),
- lede:T('Instalação, criaturas e guias para a sua próxima expedição.',
-  'Installation, creatures, and guides for your next expedition.',
-  'Instalación, criaturas y guías para tu próxima expedición.'),
+ lede:T('Como instalar, os animais, as mecânicas e as dúvidas mais comuns.','How to install, the animals, the mechanics and the most common questions.','Cómo instalar, los animales, las mecánicas y las dudas más comunes.'),
  alpha:T('O Terrassic está em desenvolvimento ativo. As versões alfa podem ter bugs e o conteúdo muda entre versões. Faça backup dos seus mundos antes de instalar ou atualizar.',
   'Terrassic is under active development. Alpha versions may contain bugs and content changes between builds. Back up your worlds before installing or updating.',
   'Terrassic está en desarrollo activo. Las versiones alfa pueden tener errores y el contenido cambia entre versiones. Haz una copia de tus mundos antes de instalar o actualizar.'),
