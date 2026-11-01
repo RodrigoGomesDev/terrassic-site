@@ -5,6 +5,8 @@ import {assetUrl} from './rig.js';
 import {picture} from './pictures.js';
 import {isReady,story} from './site-config.js';
 import {PLANNED} from './planned.js';
+// Long names break before the root a reader knows (Acrocantho-saurus), not wherever the card runs out of room.
+const breakable=n=>n.length>12?n.replace(/(?<=\w{4})(saur|sauro|saurio|raptor|nychus|venator|suchus|tyrannus|titan|mimus|ceratops|cephal|coeli|caudia|glyph|odon)/gi,'\u00AD$1'):n;
 const $=id=>document.getElementById(id);
 const GROUPS=['all','predator','herbivore','flyer','water'];
 const GUIDE_KEYS=['sci','behavior','taming','utility'];
@@ -71,7 +73,7 @@ export function initBestiary({viewerReady,thumbnailer}){
    if(shown.length<inPart.length){const btn=mores[i].firstChild;btn.textContent=t('best.showAll',{n:inPart.length});btn.dataset.next=inPart[PREVIEW].id;items.push(mores[i])}}
   roster.replaceChildren(...items);
   list.forEach(s=>{const c=cards.get(s.id);
-   c.button.querySelector('.card-name').textContent=pick(s.name);c.button.querySelector('.soon-tag')?.replaceChildren(t('soon'));c.button.querySelector('.card-sub').textContent=s.planned?`${fmt(s.length)} m\n${pick(LORE.eras[s.era])}`:`${fmt(s.length)} m · ${t(`one.${s.group}`)}`;
+   c.button.querySelector('.card-name').textContent=breakable(pick(s.name));c.button.querySelector('.soon-tag')?.replaceChildren(t('soon'));c.button.querySelector('.card-sub').textContent=s.planned?`${fmt(s.length)} m\n${pick(LORE.eras[s.era])}`:`${fmt(s.length)} m · ${t(`one.${s.group}`)}`;
    c.button.setAttribute('aria-label',s.planned?`${pick(s.name)}, ${t('soon')}`:t('best.view',{name:pick(s.name)}));c.button.setAttribute('aria-pressed',String(s===selected))});
   $('roster-count').textContent=list.length?t('best.count',{n:list.length,total:ALL.length}):t('best.none');
  }

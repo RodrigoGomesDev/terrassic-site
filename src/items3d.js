@@ -41,12 +41,23 @@ async function flatModel(name){
  const root=new THREE.Group();root.add(mesh);return root;
 }
 
+const STABS=new Set(['flint_knife','rex_tooth_dagger']);
 // What each weapon does on the stage, as a loop of `len` seconds. hold: the item in its idle place; play(t) moves it.
 const KINDS={
- melee:{len:2.4,async build(w){const item=await flatModel(w.id);item.scale.setScalar(1.6);return {item}},
-  // A swing from over the shoulder through the target and back, pivoting on the grip (lower left of the picture).
-  play({item},t){const s=smooth(.55,.8,t)-smooth(1.1,1.7,t),wind=smooth(.2,.55,t)*(1-smooth(.55,.8,t));
-   item.rotation.z=.6*wind-1.35*s;item.position.set(-2+8*s,-2+3*wind,0)}},
+ // Blades and clubs, held by the grip (the lower corner of the picture), so they turn around the hand.
+ // The hatchet and the clubs are turned to face the other way, so the swing lands with the flint edge and the heavy end,
+ // not with the back of the head; the knife and the dagger stab instead of swinging.
+ melee:{len:2.4,async build(w){const art=await flatModel(w.id),item=new THREE.Group(),stab=STABS.has(w.id);
+   if(stab)art.position.set(5.5,6.5,0);else{art.scale.x=-1;art.position.set(-5.5,6.5,0)}
+   item.add(art);item.scale.setScalar(1.6);return {item,stab,heavy:w.id==='tail_club'}},
+  play({item,stab,heavy},t){
+   if(stab){// Drawn back, a quick thrust with the point forward, held a moment, pulled out.
+    const back=smooth(.3,.7,t)*(1-smooth(.85,.95,t)),out=smooth(.85,.98,t)*(1-smooth(1.45,1.9,t));
+    item.rotation.z=-Math.PI/4+.08*back;item.position.set(-14-3*back+13*out,-2,0);return}
+   // Raised over the shoulder, brought down hard across the front, a small bounce on the hit, back to rest.
+   const k=heavy?1.15:1,wind=smooth(.2,.7*k,t)*(1-smooth(.75*k,.9*k,t)),hit=smooth(.75*k,.92*k,t)*(1-smooth(1.5,2.05,t));
+   const bounce=Math.sin(clamp((t-.92*k)/.2,0,1)*Math.PI)*.12*(t<1.5?1:0);
+   item.rotation.z=.45*wind-2.1*hit+bounce;item.position.set(-2+3*hit,-10+2*wind,0)}},
  spear:{len:3.6,async build(w){const item=await boxModel(`${w.id}_held`);return {item}},
   // Raised, aimed back like the trident, thrown in an arc and stuck in the ground, shaking.
   play({item},t){
