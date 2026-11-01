@@ -16,7 +16,7 @@ addEventListener('scroll',()=>{if(!ticking){ticking=true;requestAnimationFrame(f
 
 export function initHeader(){
  const bar=$('topbar'),hero=$('inicio');
- new IntersectionObserver(([e])=>bar.classList.toggle('on-light',e.isIntersecting),{rootMargin:`-${bar.offsetHeight}px 0px -100% 0px`}).observe(hero);
+ new IntersectionObserver(([e])=>bar.classList.toggle('on-light',e.isIntersecting),{rootMargin:`-${bar.offsetHeight+16}px 0px -100% 0px`}).observe(hero);
  // On small screens the sections sit behind a Menu button; choosing one, or Esc, closes it again.
  const toggle=$('nav-toggle'),setOpen=o=>{bar.classList.toggle('is-open',o);toggle.setAttribute('aria-expanded',String(o))};
  toggle.addEventListener('click',()=>setOpen(!bar.classList.contains('is-open')));
