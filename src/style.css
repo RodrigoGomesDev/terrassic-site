@@ -217,7 +217,8 @@ button{cursor:pointer}
 .stage-top{top:14px;justify-content:space-between}
 .stage-tools{display:flex;gap:6px;flex-wrap:wrap}
 .stage-bottom{bottom:14px}
-.anim-chips{display:flex;gap:6px;flex-wrap:wrap}
+.anim-chips{display:flex;gap:6px;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:thin;padding-bottom:4px;min-width:0;max-width:100%}
+.anim-chips .chip{flex:none}
 .anim-chips .chip{background:rgba(28,24,30,.78);backdrop-filter:blur(6px)}
 .anim-chips .chip[aria-pressed=true]{background:var(--amber)}
 .stage-status{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font:12px var(--mono);color:var(--stone-300);pointer-events:none;text-align:center;max-width:80%}

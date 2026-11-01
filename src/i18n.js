@@ -86,6 +86,21 @@ export const UI={
  'soonstory.eyebrow':["História", "Story", "Historia"],
  'soonstory.title':["O modo história vem depois.", "Story mode comes later.", "El modo historia llega después."],
  'soonstory.p':["A expedição da Dra. Katyusha, a Fenda e os capítulos chegam numa versão futura.", "Dr. Katyusha’s expedition, the Rift and the chapters arrive in a future version.", "La expedición de la Dra. Katyusha, la Grieta y los capítulos llegan en una versión futura."],
+ 'anim.look_back':['Olhar para trás','Look back','Mirar atrás'],
+ 'anim.shake':['Sacudir','Shake','Sacudirse'],
+ 'anim.yawn':['Bocejar','Yawn','Bostezar'],
+ 'anim.stretch':['Espreguiçar','Stretch','Estirarse'],
+ 'anim.stalk':['Espreitar','Stalk','Acechar'],
+ 'anim.swim':['Nadar','Swim','Nadar'],
+ 'anim.roar_loud':['Rugido forte','Loud roar','Rugido fuerte'],
+ 'anim.threat':['Ameaçar','Threaten','Amenazar'],
+ 'anim.attack_quick':['Mordida rápida','Quick bite','Mordisco rápido'],
+ 'anim.stomp':['Pisotear','Stomp','Pisotear'],
+ 'anim.hurt':['Ferido','Hurt','Herido'],
+ 'anim.death':['Morrer','Death','Morir'],
+ 'anim.drink':['Beber','Drink','Beber'],
+ 'anim.sleep':['Dormir','Sleep','Dormir'],
+ 'anim.wake_sleep':['Acordar do sono','Wake from sleep','Despertar del sueño'],
 };
 let lang='pt';
 export const getLang=()=>lang;

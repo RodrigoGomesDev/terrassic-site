@@ -40,7 +40,7 @@ O script só lê o mod e gera os arquivos abaixo. Com `--soft-blocks`, ele troca
 
 | Saída | Origem no mod |
 |---|---|
-| `public/assets/species/<id>.json` | cubos do `art/<id>/<id>.bbmodel` + `animations/entity/<id>.animation.json`, compactados |
+| `public/assets/species/<id>.json` | cubos do `art/<id>/<id>.bbmodel` (ou do `geo/entity/<id>.geo.json` nos modelos feitos à mão com UV por face, como o T. rex) + `animations/entity/<id>.animation.json`, compactados |
 | `public/assets/species/<id>_male.png` / `_female.png` | `textures/entity/` |
 | `public/assets/sprites.png` | ovos geradores, itens e ovos-bloco num atlas de 32 px |
 | `src/generated/species.js` | `gen_resources.SPECIES` (nomes), `gen_species.SIZES`/`GUIDE`/`SPECIES`, `lore.py` (Guia, abertura, relatório, diário, objetivos) e a versão de cada espécie no `docs/ROSTER.md` |

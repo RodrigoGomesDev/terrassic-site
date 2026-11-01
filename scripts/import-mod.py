@@ -25,6 +25,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import gen_resources  # noqa: E402
 import gen_species  # noqa: E402
 import lore  # noqa: E402
+from geo_model import compact_from_geo, per_face  # noqa: E402
 
 
 def r4(v):
@@ -218,9 +219,12 @@ def main():
     species = []
     for spec in gen_species.SPECIES:
         sid = spec['id']
-        bb = json.loads((MOD / 'art' / sid / f'{sid}.bbmodel').read_text())
         anims = json.loads((RES / 'animations/entity' / f'{sid}.animation.json').read_text())
-        data = {'model': r4(compact_model(bb)), 'animations': compact_animations(anims)}
+        # Hand-made models (per-face UV, e.g. the T. rex) come from the geo.json the game draws; the rest from the .bbmodel.
+        geo_path = RES / 'geo/entity' / f'{sid}.geo.json'
+        geo = json.loads(geo_path.read_text()) if geo_path.exists() else None
+        model = compact_from_geo(geo) if geo and per_face(geo) else compact_model(json.loads((MOD / 'art' / sid / f'{sid}.bbmodel').read_text()))
+        data = {'model': r4(model), 'animations': compact_animations(anims)}
         (OUT / 'species' / f'{sid}.json').write_text(json.dumps(data, separators=(',', ':'), ensure_ascii=False))
         for sex in ('male', 'female'):
             shutil.copy2(RES / 'textures/entity' / f'{sid}_{sex}.png', OUT / 'species' / f'{sid}_{sex}.png')

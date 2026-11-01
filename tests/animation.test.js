@@ -31,12 +31,12 @@ test('cross-fades and one-shot actions start and end at rest',()=>{
  close(fadeWeight(0),0);close(fadeWeight(.35),1);close(actionWeight(0,2),0);close(actionWeight(2,2),0);close(actionWeight(1,2),1);
  for(let t=0;t<.35;t+=.01)assert.ok(fadeWeight(t+.01)>=fadeWeight(t));
 });
-test('a ray through the real cheek does not see two faces at the same depth',()=>{
+test('a ray through the skull does not see two faces at the same depth',()=>{
  const texture=new THREE.Texture(),model=createModel(species('tyrannosaurus'),texture,'male');model.root.updateMatrixWorld(true);
- const meshes=[];model.root.traverse(o=>{if(o.isMesh&&/jugal|temporal/.test(o.name))meshes.push(o)});assert.ok(meshes.length>=2);
+ const meshes=[];model.root.traverse(o=>{if(o.isMesh&&/^skull_/.test(o.name))meshes.push(o)});assert.ok(meshes.length>=2);
  const box=new THREE.Box3().setFromObject(meshes[0]),center=box.getCenter(new THREE.Vector3());
  const hits=new THREE.Raycaster(center.clone().add(new THREE.Vector3(40,0,0)),new THREE.Vector3(-1,0,0)).intersectObjects(meshes);
- for(let i=1;i<hits.length;i++)assert.ok(Math.abs(hits[i].distance-hits[i-1].distance)>1e-5||hits[i].object===hits[i-1].object,'coplanar cheek faces compete for depth');
+ for(let i=1;i<hits.length;i++)assert.ok(Math.abs(hits[i].distance-hits[i-1].distance)>1e-5||hits[i].object===hits[i-1].object,'coplanar skull faces compete for depth');
  model.dispose();texture.dispose();
 });
 test('merged rigs keep one mesh per bone and every bone',()=>{
