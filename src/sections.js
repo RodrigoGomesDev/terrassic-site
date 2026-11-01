@@ -1,7 +1,7 @@
 import {SPECIES,LORE} from './generated/species.js';
 import {ERAS,VERSIONS,GUIDE_LEVELS,TOOLS,WEAPONS,INSTALL,FAQ} from './content.js';
 import {t,pick} from './i18n.js';
-import {report} from './site-config.js';
+import {report,story,isReady} from './site-config.js';
 import {sprite,paintSprite} from './sprites.js';
 import {picture} from './pictures.js';
 import {eggCanvas,eggStage} from './egg.js';
@@ -22,10 +22,10 @@ export function initFilm(){
  const update=()=>{
   const p=reduced?.62:pinProgress(film),win=(a,b,c,d)=>smooth((p-a)/(b-a))*(1-smooth((p-c)/(d-c)));
   stage.style.setProperty('--film-bg',sky(p));stage.style.setProperty('--intro',(1-smooth(p/.1)).toFixed(3));
-  stage.style.setProperty('--quote',win(.1,.15,.26,.31).toFixed(3));stage.style.setProperty('--chapter',win(.34,.39,.5,.56).toFixed(3));
+  stage.style.setProperty('--quote',story?win(.1,.15,.26,.31).toFixed(3):'0');stage.style.setProperty('--chapter',story?win(.34,.39,.5,.56).toFixed(3):'0');
   // The dive into the mouth breaks into big blocks (hero.js), then fades to the dark of the story in steps.
   stage.style.setProperty('--fade',(Math.round(smooth((p-.86)/.1)*6)/6).toFixed(3));
-  $('film-fill').style.width=`${p*100}%`;$('scroll-label').textContent=t(p<.3?'film.scroll':p<.84?'film.scroll2':'film.scroll3');
+  $('film-fill').style.width=`${p*100}%`;$('scroll-label').textContent=t(p<.3?'film.scroll':p<.84?'film.scroll2':story?'film.scroll3':'film.scroll3b');
   $('topbar').classList.toggle('on-light',film.getBoundingClientRect().bottom>innerHeight*.5&&p<.9);
   for(const fn of listeners)fn(p);
  };
@@ -111,7 +111,8 @@ function landscape(canvas,era,seed){
 // Each chapter card gets a slab of that era's blocks from the mod, rendered once by the shared thumbnail renderer.
 const eraArt=new Map();
 const eraImage=url=>{const img=el('img','era-photo');img.alt='';img.src=url;return img};
-export const ERA_ANIMALS={late:[['tyrannosaurus',2,1,-2.2],['triceratops',-5,2,-1.1]],jurassic:[['stegosaurus',0,1,-1.9],['dilophosaurus',-6,2,-.9]]};
+// Only animals whose new model is ready stand on the dioramas (the baked pictures follow this list: npm run thumbs).
+export const ERA_ANIMALS=Object.fromEntries(Object.entries({late:[['tyrannosaurus',2,1,-2.2],['triceratops',-5,2,-1.1]],jurassic:[['stegosaurus',0,1,-1.9],['dilophosaurus',-6,2,-.9]]}).map(([k,v])=>[k,v.filter(([id])=>isReady(id))]));
 export function paintEras(thumbnailer){
  const section=$('eras');
  const io=new IntersectionObserver(([e])=>{if(!e.isIntersecting)return;io.disconnect();
@@ -127,9 +128,9 @@ export function initEras(){
    const art=el('div','era-art');art.append(landscape(document.createElement('canvas'),e,(i+3)*7919));if(eraArt.has(e.id))art.append(eraImage(eraArt.get(e.id)));art.dataset.era=e.id;art.style.background=`linear-gradient(180deg,${e.colors[0]},${e.colors[1]})`;
    const body=el('div','era-body');
    body.append(el('p','era-n',pick(e.n)),el('h3','',pick(e.name)),el('p','era-when',`${pick(e.era)}${e.ma?` · ${e.ma[0]}–${e.ma[1]} Ma`:''}`),el('p','era-land',pick(e.land)));
-   const dl=el('dl','era-facts');for(const [k,v] of [['eras.where',e.where],['eras.event',e.event],['eras.boss',e.boss],['eras.plants',e.plants]]){const d=el('div');d.append(el('dt','',t(k)),el('dd','',pick(v)));dl.append(d)}
+   const dl=el('dl','era-facts');for(const [k,v] of story?[['eras.where',e.where],['eras.event',e.event],['eras.boss',e.boss],['eras.plants',e.plants]]:[['eras.where',e.where],['eras.plants',e.plants]]){const d=el('div');d.append(el('dt','',t(k)),el('dd','',pick(v)));dl.append(d)}
    const fauna=el('p','era-fauna');fauna.append(el('span','',t('eras.fauna')),document.createTextNode(e.fauna.map(f=>typeof f==='string'?f:pick(f)).join(' · ')));
-   const status=el('span',`status status-${e.status}`,`${e.version} · ${t(e.status==='wip'?'road.wip':'road.plan')}`);
+   const status=story?el('span',`status status-${e.status}`,`${e.version} · ${t(e.status==='wip'?'road.wip':'road.plan')}`):el('span','status status-plan',t('soon'));
    body.append(dl,fauna,status);card.append(art,body);return card;
   }));
   const labels=['66 Ma','100 Ma','145 Ma','201 Ma','252 Ma',pick({pt:'Era do Gelo',en:'Ice Age',es:'Edad de Hielo'})];
@@ -155,12 +156,13 @@ export function initMechanics(thumbnailer){
   setTimeout(next,step===3?3000:1600)};
  if(!reduced)setTimeout(next,1600);
  for(const s of document.querySelectorAll('[data-sprite]'))paintSprite(s,s.dataset.sprite,32);
- const para=SPECIES.find(s=>s.id==='parasaurolophus');
+ const para=SPECIES.find(s=>s.id==='parasaurolophus');$('sex-pair').classList.toggle('is-soon',!isReady(para.id));
  const pair=new IntersectionObserver(([e])=>{if(!e.isIntersecting)return;pair.disconnect();for(const sex of ['male','female'])picture(`parasaurolophus-${sex}`,()=>thumbnailer().then(t=>t.request(para,sex))).then(url=>{$(`pair-${sex}`).src=url}).catch(()=>{})},{rootMargin:'400px'});pair.observe($('sex-pair'));
  return ()=>{
   $('levels').replaceChildren(...GUIDE_LEVELS.map((l,i)=>{const li=el('li');li.style.setProperty('--i',i);li.append(el('strong','',pick(l.name)),el('span','',pick(l.how)));return li}));
   $('tools').replaceChildren(...TOOLS.map(x=>{const li=el('li');li.append(sprite(x.sprite,32),el('span','',pick(x.name)));return li}));
   $('weapons').replaceChildren(...WEAPONS.map(w=>{const li=el('li','slot');li.append(sprite(w.sprite,32));const d=el('div');d.append(el('span','slot-name',pick(w.name)),el('span','slot-dmg',w.thrown?`${w.dmg} · ${w.thrown} ${t('mech.thrown')}`:w.dmg));li.append(d);return li}));
+  $('journal').hidden=!story;
   const themes=Object.keys(LORE.themes);
   $('journal').replaceChildren(...themes.map(th=>{const col=el('div','journal-col');col.append(el('h4','',pick(LORE.themes[th])));const ul=el('ul');for(const o of LORE.objectives.filter(o=>o.theme===th)){const li=el('li');li.title=pick(o.text);li.append(el('span','check'),el('span','',pick(o.title)));ul.append(li)}col.append(ul);return col}));
  };
@@ -181,7 +183,7 @@ export function initInstall(links){
  let loader='fabric';
  const render=()=>{for(const n of ['fabric','forge']){const tab=$(`tab-${n}`);tab.setAttribute('aria-selected',String(n===loader));tab.tabIndex=n===loader?0:-1}
   $('steps').replaceChildren(...INSTALL[loader].map(s=>el('li','',pick(s))));
-  if(links.download)$('download').href=links.download;$('modrinth').hidden=!links.modrinth;if(links.modrinth)$('modrinth').href=links.modrinth;
+  if(links.download)for(const id of ['download','hero-download'])$(id).href=links.download;
   for(const id of ['discord','foot-discord']){$(id).hidden=!links.discord;if(links.discord)$(id).href=links.discord}
   // The wiki only has a report section once the form has its key or there is a Discord (same rule as wiki.js).
   $('report-link').hidden=!(report.web3formsKey||links.discord||import.meta.env.DEV)};
@@ -190,7 +192,7 @@ export function initInstall(links){
 }
 
 export function initFaq(){
- return ()=>$('faq').replaceChildren(...FAQ.map(f=>{const d=el('details');const s=el('summary');s.append(el('span','',pick(f.q)),el('i','','+'));d.append(s,el('p','',pick(f.a)));return d}));
+ return ()=>$('faq').replaceChildren(...FAQ.map(f=>story||!f.aSoon?f:{...f,a:f.aSoon}).map(f=>{const d=el('details');const s=el('summary');s.append(el('span','',pick(f.q)),el('i','','+'));d.append(s,el('p','',pick(f.a)));return d}));
 }
 
 // Motion that is purely decorative: reveals, magnetic buttons and the hero copy parallax.

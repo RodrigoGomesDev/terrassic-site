@@ -6,9 +6,9 @@
 <title>Terrassic</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <meta name="theme-color" content="#1c181e">
-<meta name="description" content="Cross the Rift and survive among dinosaurs. Raise companions, take to the skies, and follow a lost expedition in Terrassic.">
+<meta name="description" content="Survive among dinosaurs in Minecraft. Raise companions from the egg, ride and fly in Terrassic.">
 <meta property="og:title" content="Terrassic">
-<meta property="og:description" content="Cross the Rift and survive among dinosaurs. Raise companions, take to the skies, and follow a lost expedition in Terrassic.">
+<meta property="og:description" content="Survive among dinosaurs in Minecraft. Raise companions from the egg, ride and fly in Terrassic.">
 <link rel="icon" href="./assets/monograma_64.png" sizes="64x64">
 <link rel="icon" href="./assets/monograma_32.png" sizes="32x32">
 <link rel="apple-touch-icon" href="./assets/monograma_256.png">
@@ -49,11 +49,12 @@
    <div class="hero-canvas" id="hero-canvas" aria-hidden="true"></div>
    <div class="film-copy film-intro">
     <p class="film-eyebrow" data-i18n="hero.eyebrow">A Minecraft Java 1.20.1 mod · Fabric and Forge</p>
-    <p class="film-lede" data-i18n="hero.lede">Cross the Rift and survive among dinosaurs. Raise companions from the egg, take to the skies, and follow the traces of a lost expedition.</p>
+    <p class="film-lede" data-i18n="hero.lede">Survive among dinosaurs in Minecraft. Raise companions from the egg, ride the big ones and take to the skies.</p>
     <div class="hero-actions">
      <a class="btn btn-dark magnetic" href="#bestiario"><span data-i18n="hero.cta">Meet the creatures</span><span aria-hidden="true">→</span></a>
-     <a class="btn btn-line magnetic" href="https://www.curseforge.com/minecraft/mc-mods/terrassic" target="_blank" rel="noopener noreferrer"><span data-i18n="hero.download">Download v0.2.0</span><span aria-hidden="true">↗</span></a>
+     <a class="btn btn-line magnetic" id="hero-download" href="https://www.curseforge.com/minecraft/mc-mods/terrassic" target="_blank" rel="noopener noreferrer"><span data-i18n="hero.download">Download on CurseForge</span><span aria-hidden="true">↗</span></a>
     </div>
+    <p class="hero-dlnote" data-i18n="hero.dlnote">Opens the Terrassic page on CurseForge, with the files for Fabric and Forge.</p>
    </div>
    <div class="film-copy film-quote" aria-hidden="true"><p id="film-quote"></p><span id="film-cite"></span></div>
    <div class="film-copy film-chapter" aria-hidden="true"><p class="film-eyebrow" data-i18n="film.chapter">Chapter 1 · Late Cretaceous</p><h2 data-i18n="film.title">Echoes of the End.</h2><p data-i18n="film.line">You are not alone here.</p></div>
@@ -87,6 +88,14 @@
     <article class="page" id="notebook-page" aria-live="polite"></article>
     <div class="notebook-nav"><button type="button" class="icon-btn" id="page-prev" aria-label="Previous page">←</button><span id="page-count"></span><button type="button" class="icon-btn" id="page-next" aria-label="Next page">→</button></div>
    </div>
+  </div>
+ </section>
+
+ <section class="soon-story band" id="historia-em-breve" hidden>
+  <div class="wrap soon-story-grid">
+   <p class="eyebrow"><span data-i18n="soonstory.eyebrow">Story</span> <span class="soon-badge" data-i18n="soon">Coming soon</span></p>
+   <h2 class="display" data-i18n="soonstory.title">Story mode comes later.</h2>
+   <p class="lede" data-i18n="soonstory.p">Dr. Katyusha’s expedition, the Rift and the chapters arrive in a future version.</p>
   </div>
  </section>
 
@@ -128,6 +137,7 @@
       <span class="sprite" id="dossier-egg" aria-hidden="true"></span>
       <div><p class="dossier-group" id="dossier-group"></p><h3 id="dossier-name">Tyrannosaurus</h3><p class="dossier-latin" id="dossier-latin"></p></div>
      </div>
+     <p class="dossier-soon" id="dossier-soon" hidden><span class="soon-badge" id="dossier-soon-tag">Coming soon</span><span id="dossier-soon-text"></span></p>
      <dl class="facts" id="dossier-facts"></dl>
      <div class="ruler" id="dossier-ruler" aria-hidden="true"><div class="ruler-bar"><span id="ruler-fill"></span></div><div class="ruler-scale"><span>0</span><span>10 m</span><span>20 m</span><span>30 m</span></div></div>
      <div class="guide-tabs" role="tablist" id="guide-tabs"></div>
@@ -191,7 +201,7 @@
      <p class="small" data-i18n="mech.arms.p">Knives, clubs, and spears crafted from stone, bone, and flint.</p>
     </article>
     <article class="tile tile-journal reveal">
-     <h3 data-i18n="mech.journal.t">Field Journal</h3>
+     <h3><span data-i18n="mech.journal.t">Field Journal</span> <span class="soon-badge" data-story-soon data-i18n="soon">Coming soon</span></h3>
      <p data-i18n="mech.journal.p">Follow the expedition’s clues, gather amber fragments, and rebuild the Leap Altar. There is more waiting on the other side.</p>
      <div class="journal" id="journal"></div>
     </article>
@@ -216,10 +226,9 @@
    <div class="reveal">
     <p class="eyebrow" data-i18n="inst.eyebrow">Play</p>
     <h2 class="display" data-i18n="inst.title">How to install.</h2>
-    <p class="lede" data-i18n="inst.lede">Choose Fabric or Forge and download the matching file. Terrassic is in development.</p>
+    <p class="lede" data-i18n="inst.lede">The files are on CurseForge. Download the one for your loader, Fabric or Forge, and follow the steps.</p>
     <div class="install-actions">
      <a class="btn btn-primary magnetic" id="download" href="https://www.curseforge.com/minecraft/mc-mods/terrassic" target="_blank" rel="noopener noreferrer"><span data-i18n="inst.curseforge">Download on CurseForge</span><span aria-hidden="true">↗</span></a>
-     <a class="btn btn-ghost magnetic" id="modrinth" href="https://modrinth.com/mod/terrassic" target="_blank" rel="noopener noreferrer"><span>Modrinth</span><span aria-hidden="true">↗</span></a>
     </div>
     <p class="install-links"><a href="./wiki/" data-i18n="inst.wiki">Mod wiki</a><a id="report-link" href="./wiki/#reportar" data-i18n="inst.report">Report a problem</a><a id="discord" href="#" target="_blank" rel="noopener noreferrer" hidden>Discord</a><a href="https://ko-fi.com/terrassic" target="_blank" rel="noopener noreferrer" data-i18n="inst.donate">Support on Ko-fi</a></p>
    </div>
@@ -242,7 +251,7 @@
  <div class="wrap footer-grid">
   <img src="./assets/monograma_256.png" alt="" width="96" height="96" class="seal">
   <div><p class="footer-name"><img src="./assets/letreiro_ambar.png" alt="Terrassic"></p><p data-i18n="foot.by">A mod by Rodrigo Gomes.</p></div>
-  <div class="footer-links"><a href="./wiki/">Wiki</a><a href="https://www.curseforge.com/minecraft/mc-mods/terrassic" target="_blank" rel="noopener noreferrer">CurseForge ↗</a><a href="https://modrinth.com/mod/terrassic" target="_blank" rel="noopener noreferrer">Modrinth ↗</a><a id="foot-discord" href="#" target="_blank" rel="noopener noreferrer" hidden>Discord ↗</a><a href="https://ko-fi.com/terrassic" target="_blank" rel="noopener noreferrer">Ko-fi ↗</a><a href="#inicio" data-i18n="foot.top">Back to top</a></div>
+  <div class="footer-links"><a href="./wiki/">Wiki</a><a href="https://www.curseforge.com/minecraft/mc-mods/terrassic" target="_blank" rel="noopener noreferrer">CurseForge ↗</a><a id="foot-discord" href="#" target="_blank" rel="noopener noreferrer" hidden>Discord ↗</a><a href="https://ko-fi.com/terrassic" target="_blank" rel="noopener noreferrer">Ko-fi ↗</a><a href="#inicio" data-i18n="foot.top">Back to top</a></div>
   <p class="footer-legal" data-i18n="foot.legal">Independent project, not affiliated with Mojang or Microsoft. Minecraft is a trademark of Mojang Synergies AB.</p>
  </div>
 </footer>

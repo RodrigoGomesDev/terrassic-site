@@ -3,6 +3,7 @@ import {t,pick,getLang} from './i18n.js';
 import {sprite,paintSprite} from './sprites.js';
 import {assetUrl} from './rig.js';
 import {picture} from './pictures.js';
+import {isReady,story} from './site-config.js';
 const $=id=>document.getElementById(id);
 const GROUPS=['all','predator','herbivore','flyer','water'];
 const GUIDE_KEYS=['sci','behavior','taming','utility'];
@@ -19,6 +20,8 @@ export function initBestiary({viewerReady,thumbnailer}){
  for(const s of SPECIES){
   const li=document.createElement('li'),b=document.createElement('button');b.type='button';b.className='card';b.dataset.id=s.id;
   b.innerHTML=`<span class="card-art"><img alt="" decoding="async"><span class="card-glow"></span></span><span class="card-meta"><span class="card-name"></span><span class="card-sub"></span></span>`;
+  // Not ready under the new model standard: the card shows only the silhouette and a "Coming soon" tag.
+  if(!isReady(s.id)){b.classList.add('is-soon');b.querySelector('.card-art').append(Object.assign(document.createElement('span'),{className:'soon-tag'}))}
   b.querySelector('.card-art').prepend(sprite(`egg:${s.id}`,24));
   b.addEventListener('click',()=>{select(s);document.getElementById('stage').scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'center'})});
   b.addEventListener('pointermove',e=>{const r=b.getBoundingClientRect();b.style.setProperty('--mx',`${(e.clientX-r.left)/r.width*100}%`);b.style.setProperty('--my',`${(e.clientY-r.top)/r.height*100}%`)});
@@ -43,7 +46,7 @@ export function initBestiary({viewerReady,thumbnailer}){
   for(const b of filters.children){b.textContent=t(`group.${b.dataset.group}`);b.setAttribute('aria-pressed',String(b.dataset.group===group))}
   const list=visible();roster.replaceChildren(...list.map(s=>cards.get(s.id).li));
   list.forEach((s,i)=>{const c=cards.get(s.id);c.li.style.setProperty('--i',Math.min(i,16));c.li.classList.remove('enter');void c.li.offsetWidth;c.li.classList.add('enter');
-   c.button.querySelector('.card-name').textContent=pick(s.name);c.button.querySelector('.card-sub').textContent=`${fmt(s.length)} m · ${t(`one.${s.group}`)}`;
+   c.button.querySelector('.card-name').textContent=pick(s.name);c.button.querySelector('.soon-tag')?.replaceChildren(t('soon'));c.button.querySelector('.card-sub').textContent=`${fmt(s.length)} m · ${t(`one.${s.group}`)}`;
    c.button.setAttribute('aria-label',t('best.view',{name:pick(s.name)}));c.button.setAttribute('aria-pressed',String(s===selected))});
   $('roster-count').textContent=list.length?t('best.count',{n:list.length,total:SPECIES.length}):t('best.none');
  }
@@ -56,7 +59,9 @@ export function initBestiary({viewerReady,thumbnailer}){
   $('ruler-fill').style.width=`${s.length/MAX_LENGTH*100}%`;
   const tabs=$('guide-tabs');tabs.replaceChildren(...GUIDE_KEYS.map(k=>{const b=document.createElement('button');b.type='button';b.role='tab';b.textContent=t(`guide.${k}`);b.setAttribute('aria-selected',String(k===guideKey));b.tabIndex=k===guideKey?0:-1;b.addEventListener('click',()=>{guideKey=k;renderDossier()});return b}));
   const text=$('guide-text');text.textContent=pick(s.guide[guideKey]);text.classList.remove('swap');void text.offsetWidth;text.classList.add('swap');
-  $('note-text').textContent=pick(s.guide.note);
+  $('note-text').textContent=pick(s.guide.note);$('dossier-note').hidden=!story||!pick(s.guide.note);
+  const soon=!isReady(s.id);$('dossier-soon').hidden=!soon;$('dossier-soon-tag').textContent=t('soon');$('dossier-soon-text').textContent=t('best.soon');
+  $('stage').classList.toggle('is-soon',soon);
   $('stage-canvas').setAttribute('aria-label',t('best.canvas',{name:pick(s.name)}));
   $('sound-toggle').hidden=s.id!=='tyrannosaurus'||!viewer;
   renderAnims();

@@ -2,7 +2,7 @@
 // mod's three languages. Same data as the home page, no 3D, and a stable address for each part (#instalacao,
 // #tyrannosaurus...) to link from CurseForge and Modrinth.
 import {detectLang,setLang,t,pick,getLang} from './i18n.js';
-import {links,report} from './site-config.js';
+import {links,report,story} from './site-config.js';
 import {SPECIES,LORE} from './generated/species.js';
 import {ERAS,VERSIONS,GUIDE_LEVELS,TOOLS,WEAPONS,FAQ} from './content.js';
 import {W,DEPS} from './wiki-content.js';
@@ -72,7 +72,7 @@ function creature(s){
    el('span','sp-sub',`${fmt(s.length)} m · ${t(`one.${s.group}`)} · ${pick(LORE.eras[s.era])}`)),el('span',`status ${s.version==='v0.2'?'status-done':'status-plan'}`,s.version==='v0.2'?w('crea.in'):s.version),el('i','sp-plus','+')),
   h('div','sp-body',h('dl','facts',...facts.map(([k,v])=>h('div','',el('dt','',t(k)),el('dd','',v)))),
    ...GUIDE_KEYS.filter(k=>pick(s.guide[k])).map(k=>h('div','sp-guide',el('h4','wiki-h4',t(`guide.${k}`)),el('p','',pick(s.guide[k])))),
-   pick(s.guide.note)&&h('blockquote','note',el('p','',pick(s.guide.note)),el('cite','',t('best.noteBy'))),h('p','sp-actions',copy)));
+   story&&pick(s.guide.note)&&h('blockquote','note',el('p','',pick(s.guide.note)),el('cite','',t('best.noteBy'))),h('p','sp-actions',copy)));
  return d;
 }
 function creatures(){
@@ -87,11 +87,11 @@ function creatures(){
 }
 
 function eras(){
- return Object.assign(h('section','wiki-section',h('h2','wiki-h2',w('eras.t')),el('p','lede',w('eras.lede')),...ERAS.map(e=>Object.assign(h('article','wiki-era',
+ return Object.assign(h('section','wiki-section',h('h2','wiki-h2',w('eras.t')),el('p','lede',story?w('eras.lede'):t('eras.lede')),...ERAS.map(e=>Object.assign(h('article','wiki-era',
   el('p','eyebrow',`${pick(e.n)} · ${pick(e.era)}${e.ma?` · ${e.ma[0]}–${e.ma[1]} Ma`:''}`),el('h3','wiki-h3',pick(e.name)),el('p','',pick(e.land)),
-  h('dl','facts',...[['eras.where',e.where],['eras.event',e.event],['eras.boss',e.boss],['eras.plants',e.plants]].map(([k,v])=>h('div','',el('dt','',w(k)),el('dd','',pick(v))))),
+  h('dl','facts',...(story?[['eras.where',e.where],['eras.event',e.event],['eras.boss',e.boss],['eras.plants',e.plants]]:[['eras.where',e.where],['eras.plants',e.plants]]).map(([k,v])=>h('div','',el('dt','',w(k)),el('dd','',pick(v))))),
   h('p','wiki-fauna',el('strong','',`${w('eras.fauna')}: `),e.fauna.map(f=>typeof f==='string'?f:pick(f)).join(' · ')),
-  el('span',`status status-${e.status}`,`${e.version} · ${t(`road.${e.status}`)}`)),{id:`era-${e.id}`}))),{id:'eras'});
+  story?el('span',`status status-${e.status}`,`${e.version} · ${t(`road.${e.status}`)}`):el('span','status status-plan',t('soon'))),{id:`era-${e.id}`}))),{id:'eras'});
 }
 
 function roadmap(){
@@ -102,7 +102,7 @@ function roadmap(){
 
 function faq(){
  const item=f=>h('details','',h('summary','',el('span','',pick(f.q)),el('i','','+')),el('p','',pick(f.a)));
- return Object.assign(h('section','wiki-section',h('h2','wiki-h2',w('faq.t')),h('div','faq-list',...[...FAQ,...W.faq].map(item))),{id:'faq'});
+ return Object.assign(h('section','wiki-section',h('h2','wiki-h2',w('faq.t')),h('div','faq-list',...[...FAQ.map(f=>story||!f.aSoon?f:{...f,a:f.aSoon}),...W.faq].map(item))),{id:'faq'});
 }
 
 // Bug reports without GitHub: a form that mails each report to the author through Web3Forms (free, no server), and

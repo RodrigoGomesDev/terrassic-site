@@ -117,3 +117,16 @@ conferidas no Chrome em pt/en/es, sem erros de execução ou chaves cruas. Abert
 em 1440×1000 e 390×844, sem rolagem horizontal no celular. Navegação executada com WebGL
 desativado para conferir textos e fallback; não constitui nova validação do renderizador 3D.
 Paridade dos três idiomas, placeholders e aplicação do nome sobre dados importados conferidas.
+
+## Em breve — 01/11/2026
+
+Pedido do Rodrigo: nenhum modelo antigo aparece em detalhe enquanto não for refeito com estudo próprio, a história
+fica para depois e o download leva só ao CurseForge.
+
+- `src/site-config.js` → `models.ready`: espécies com o modelo novo aprovado. As outras aparecem como silhueta com
+  "Em breve" no bestiário, nas miniaturas, no macho e fêmea e na abertura (o T. rex). Ao aprovar um modelo, ponha o id
+  da espécie na lista (e rode `npm run thumbs` se ela também deve voltar às paisagens das eras).
+- `story=false`: a sequência "O Salto", o caderno da Katyusha, as notas no Guia, o Diário de Campo, eventos e chefes
+  das eras dão lugar a um aviso "Em breve". Com `true`, tudo volta como era.
+- `links.modrinth=null`: sem Modrinth no site e na wiki até o mod ser aprovado lá. O botão da abertura diz
+  "Baixar no CurseForge" e explica que abre a página com os arquivos para Fabric e Forge.

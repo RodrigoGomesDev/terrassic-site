@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import {isReady} from './site-config.js';
 import {mergeGeometries} from 'three/addons/utils/BufferGeometryUtils.js';
 import {compileClip,sampleBone,actionWeight,fadeWeight} from './animation.js';
 const radians=n=>(Number(n)||0)*Math.PI/180;
@@ -95,9 +96,13 @@ const lerp=(a,b,t)=>a.map((v,i)=>v+(b[i]-v)*t);
 function mix(a,b,t){return {rotation:lerp(a.rotation,b.rotation,t),position:lerp(a.position,b.position,t),scale:lerp(a.scale,b.scale,t)}}
 
 // A creature placed in a scene in metres: the rig is scaled from model pixels with the mod's own MODEL_SCALE.
-export async function spawn(species,{sex='male',shadows=false,animation='idle',merge=false}={}){
+// Animals whose new model is not ready yet (site-config.js) are drawn as a flat silhouette: the texture only keeps
+// the cut-outs (alphaTest), the colour comes from the emissive tint, so no old detail shows.
+export const SILHOUETTE=0x1f1610;
+export async function spawn(species,{sex='male',shadows=false,animation='idle',merge=false,silhouette=isReady(species.id)?null:SILHOUETTE}={}){
  const [data,texture]=await Promise.all([loadSpecies(species.id),loadTexture(species.id,sex)]);
  const model=createModel(data,texture,sex,{shadows,merge});
+ if(silhouette!==null){model.material.color.setRGB(0,0,0);model.material.emissive.set(silhouette);model.silhouette=true}
  const holder=new THREE.Group();holder.add(model.root);model.root.scale.setScalar(species.scale/16);
  const animator=new Animator(model,data.clips,{name:animation in data.clips?animation:'idle'});
  return {species,holder,model,animator,data,dispose(){model.dispose()}};

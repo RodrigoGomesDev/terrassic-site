@@ -1,5 +1,5 @@
 import {detectLang,setLang,t} from './i18n.js';
-import {links} from './site-config.js';
+import {links,story,isReady} from './site-config.js';
 import {initAnchors} from './anchors.js';
 import {initFilm,initHeader,initMarquee,initStory,initNotebook,initEras,initMechanics,initRoadmap,initInstall,initFaq,initMotion,onScroll,paintEras} from './sections.js';
 import {initBestiary} from './bestiary.js';
@@ -13,6 +13,10 @@ const $=id=>document.getElementById(id);
 document.documentElement.classList.add('is-loading');
 // Text first: the page reads correctly before any 3D has loaded (and the loading screen speaks the right language).
 setLang(detectLang());
+// Story mode is off in the mod: the story sequence and the notebook give way to one "coming soon" block.
+if(!story){$('historia').hidden=true;$('cronica').hidden=true;$('historia-em-breve').hidden=false;
+ for(const a of document.querySelectorAll('a[href="#historia"]'))a.setAttribute('href','#historia-em-breve');}
+for(const b of document.querySelectorAll('[data-story-soon]'))b.hidden=story;
 const loader=createLoader();
 initHeader();initAnchors();initMotion();
 const {render:renderFilm,listen:filmProgress}=initFilm();
@@ -30,7 +34,7 @@ for(const b of document.querySelectorAll('[data-lang]'))b.addEventListener('clic
 
 const asset=p=>new URL(`assets/${p}`,document.baseURI).href;
 loader.wait('fonts',1,document.fonts?.ready);loader.wait('3d',1,three);
-loader.wait('meteor',1,Promise.all([import('./storyfx.js'),fetch(asset('meteor/meteor.json')),preloadImage(asset('meteor/meteor.png')),preloadImage(asset('meteor/meteor_glow.png'))]));
+if(story)loader.wait('meteor',1,Promise.all([import('./storyfx.js'),fetch(asset('meteor/meteor.json')),preloadImage(asset('meteor/meteor.png')),preloadImage(asset('meteor/meteor_glow.png'))]));
 {const names=[...SPECIES.map(s=>s.id),'parasaurolophus-male','parasaurolophus-female',...ERAS.map(e=>`era-${e.id}`)],job=loader.track('pictures',3);let n=0;
  for(const name of names)preloadImage(asset(`thumbs/${name}.webp`)).then(()=>job.set(++n/names.length))}
 const rexJob=loader.track('rex',6);
@@ -46,7 +50,7 @@ const inked=el=>{const rects=[],range=document.createRange(),walk=document.creat
 const heroAvoid=()=>[$('topbar'),document.querySelector('.film-top'),document.querySelector('.scroll-cue'),
  ...captions.filter(([,v])=>+(stage.style.getPropertyValue(v)||0)>.02).map(([el])=>el)].map(inked).filter(Boolean);
 // Without 3D the opening shows the baked picture of the T. rex where the model would stand.
-const noGL=()=>{rexJob.done();film.classList.add('no-webgl');$('hero-canvas').style.backgroundImage=`url(${new URL('assets/thumbs/tyrannosaurus.webp',document.baseURI).href})`};
+const noGL=()=>{rexJob.done();film.classList.add('no-webgl');film.classList.toggle('is-soon',!isReady('tyrannosaurus'));$('hero-canvas').style.backgroundImage=`url(${new URL('assets/thumbs/tyrannosaurus.webp',document.baseURI).href})`};
 import('./hero.js').then(({Hero})=>{
  const hero=new Hero($('hero-canvas'),{
   onProgress:p=>{heroLoaded=p;rexJob.set(p*.9);$('hero-meter').style.width=`${p*100}%`;if(p>=1){heroStatus();film.classList.add('is-loaded')}},
@@ -63,7 +67,7 @@ import('./hero.js').then(({Hero})=>{
 }).catch(noGL);
 
 // The story's meteor is loaded only when the story comes near.
-const storyIO=new IntersectionObserver(([e])=>{if(!e.isIntersecting)return;storyIO.disconnect();import('./storyfx.js').then(({StoryMeteor})=>{const fx=new StoryMeteor($('story-meteor'));if(fx.renderer)renderStory.listen(p=>fx.setProgress(p))}).catch(()=>{})},{rootMargin:'600px'});storyIO.observe($('historia'));
+const storyIO=new IntersectionObserver(([e])=>{if(!e.isIntersecting)return;storyIO.disconnect();import('./storyfx.js').then(({StoryMeteor})=>{const fx=new StoryMeteor($('story-meteor'));if(fx.renderer)renderStory.listen(p=>fx.setProgress(p))}).catch(()=>{})},{rootMargin:'600px'});if(story)storyIO.observe($('historia'));
 
 // Used by scripts/bake-thumbs.mjs to save the thumbnails as static images.
 if(new URLSearchParams(location.search).has('bake'))window.__bake=async()=>{
