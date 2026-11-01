@@ -4,18 +4,29 @@ import {sprite,paintSprite} from './sprites.js';
 import {assetUrl} from './rig.js';
 import {picture} from './pictures.js';
 import {isReady,story} from './site-config.js';
+import {PLANNED} from './planned.js';
 const $=id=>document.getElementById(id);
 const GROUPS=['all','predator','herbivore','flyer','water'];
 const GUIDE_KEYS=['sci','behavior','taming','utility'];
-const MAX_LENGTH=Math.max(...SPECIES.map(s=>s.length));
+// The animals in the game, then the Cretaceous ones still on the plan (no model yet, only name and size).
+const ALL=[...SPECIES,...PLANNED];
+const MAX_LENGTH=Math.max(...ALL.map(s=>s.length));
+const dietLabel=d=>LORE.diets[d]?pick(LORE.diets[d]):t(`diet.${d}`);
 const fmt=n=>new Intl.NumberFormat(getLang()==='en'?'en':getLang()==='es'?'es':'pt-BR',{maximumFractionDigits:2}).format(n);
 // The mod lists pterosaurs by wingspan.
-const lengthLabel=s=>s.group==='flyer'&&['pteranodon','quetzalcoatlus','hatzegopteryx','ichthyornis'].includes(s.id)?'fact.wing':'fact.length';
+const lengthLabel=s=>s.wing||s.group==='flyer'&&['pteranodon','quetzalcoatlus','hatzegopteryx','ichthyornis'].includes(s.id)?'fact.wing':'fact.length';
 
 export function initBestiary({viewerReady,thumbnailer}){
  let selected=SPECIES.find(s=>s.id==='tyrannosaurus'),sex='male',group='all',query='',sort='size',guideKey='sci',viewer=null,anim='idle';
  const roster=$('roster'),cards=new Map();
  // Cards: thumbnails are rendered from the real models the first time a card comes near the screen.
+ for(const s of PLANNED){
+  const li=document.createElement('li'),b=document.createElement('button');b.type='button';b.className='card is-planned';b.dataset.id=s.id;
+  b.innerHTML=`<span class="card-meta"><span class="card-name"></span><span class="card-sub"></span><span class="soon-tag"></span></span>`;
+  b.addEventListener('click',()=>{select(s);document.getElementById('stage').scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'center'})});
+  li.append(b);cards.set(s.id,{li,button:b});
+ }
+ const plannedHead=Object.assign(document.createElement('li'),{className:'roster-head'});
  for(const s of SPECIES){
   const li=document.createElement('li'),b=document.createElement('button');b.type='button';b.className='card';b.dataset.id=s.id;
   b.innerHTML=`<span class="card-art"><img alt="" decoding="async"></span><span class="card-meta"><span class="card-name"></span><span class="card-sub"></span></span>`;
@@ -26,7 +37,7 @@ export function initBestiary({viewerReady,thumbnailer}){
   li.append(b);cards.set(s.id,{li,button:b,img:b.querySelector('img')});
  }
  const thumbs=new IntersectionObserver(entries=>{for(const e of entries){if(!e.isIntersecting)continue;thumbs.unobserve(e.target);const s=SPECIES.find(x=>x.id===e.target.dataset.id),card=cards.get(s.id);picture(s.id,()=>thumbnailer().then(t=>t.request(s))).then(url=>{card.img.src=url;card.button.classList.add('has-art')}).catch(()=>card.button.classList.add('no-art'))}},{rootMargin:'300px'});
- for(const {button} of cards.values())thumbs.observe(button);
+ for(const s of SPECIES)thumbs.observe(cards.get(s.id).button);
 
  const filters=$('filters');
  for(const g of GROUPS){const b=document.createElement('button');b.type='button';b.className='chip';b.dataset.group=g;b.addEventListener('click',()=>{group=g;renderRoster()});filters.append(b)}
@@ -36,27 +47,34 @@ export function initBestiary({viewerReady,thumbnailer}){
  $('sort').addEventListener('change',e=>{sort=e.target.value;renderRoster()});
 
  function visible(){
-  const list=SPECIES.filter(s=>(group==='all'||s.group===group)&&(!query||[...Object.values(s.name),s.id,ALIAS[s.id]||''].some(n=>norm(n).includes(query))));
+  const list=ALL.filter(s=>(group==='all'||s.group===group)&&(!query||[...Object.values(s.name),s.id,ALIAS[s.id]||''].some(n=>norm(n).includes(query))));
   const name=s=>pick(s.name);
-  const done=s=>isReady(s.id)?0:1;
-  // Finished animals first, then by the chosen order.
+  const done=s=>s.planned?2:isReady(s.id)?0:1;
+  // Finished animals first, then the ones in the game being remade, then the ones still on the plan.
   return list.sort((a,b)=>done(a)-done(b)||(sort==='name'?name(a).localeCompare(name(b)):b.length-a.length));
  }
  function renderRoster(){
   for(const b of filters.children){b.textContent=t(`group.${b.dataset.group}`);b.setAttribute('aria-pressed',String(b.dataset.group===group))}
-  const list=visible();roster.replaceChildren(...list.map(s=>cards.get(s.id).li));
+  const list=visible(),items=list.map(s=>cards.get(s.id).li),first=list.findIndex(s=>s.planned);
+  // A heading row marks where the animals that are not in the game yet begin.
+  if(first>=0){plannedHead.textContent=t('best.plannedHead',{n:list.length-first});items.splice(first,0,plannedHead)}
+  roster.replaceChildren(...items);
   list.forEach(s=>{const c=cards.get(s.id);
-   c.button.querySelector('.card-name').textContent=pick(s.name);c.button.querySelector('.soon-tag')?.replaceChildren(t('soon'));c.button.querySelector('.card-sub').textContent=`${fmt(s.length)} m · ${t(`one.${s.group}`)}`;
-   c.button.setAttribute('aria-label',t('best.view',{name:pick(s.name)}));c.button.setAttribute('aria-pressed',String(s===selected))});
-  $('roster-count').textContent=list.length?t('best.count',{n:list.length,total:SPECIES.length}):t('best.none');
+   c.button.querySelector('.card-name').textContent=pick(s.name);c.button.querySelector('.soon-tag')?.replaceChildren(t('soon'));c.button.querySelector('.card-sub').textContent=s.planned?`${fmt(s.length)} m · ${pick(LORE.eras[s.era])}`:`${fmt(s.length)} m · ${t(`one.${s.group}`)}`;
+   c.button.setAttribute('aria-label',s.planned?`${pick(s.name)}, ${t('soon')}`:t('best.view',{name:pick(s.name)}));c.button.setAttribute('aria-pressed',String(s===selected))});
+  $('roster-count').textContent=list.length?t('best.count',{n:list.length,total:ALL.length}):t('best.none');
  }
 
  function renderDossier(){
   const s=selected;$('dossier-name').textContent=pick(s.name);$('dossier-latin').textContent=s.name.en;$('dossier-group').textContent=t(`one.${s.group}`);
   paintSprite($('dossier-egg'),`egg:${s.id}`,40);
-  const facts=[[lengthLabel(s),`${fmt(s.length)} m`],['fact.diet',pick(LORE.diets[s.diet])],['fact.era',pick(LORE.eras[s.era])],['fact.mount',t(`mount.${s.mount}`)],['fact.tame',t(`tame.${s.tame}`)]];
+  const facts=[[lengthLabel(s),`${fmt(s.length)} m`],['fact.diet',dietLabel(s.diet)],['fact.era',pick(LORE.eras[s.era])],...s.planned?[['fact.version',t('best.notYet')]]:[['fact.mount',t(`mount.${s.mount}`)],['fact.tame',t(`tame.${s.tame}`)]]];
   $('dossier-facts').replaceChildren(...facts.map(([k,v])=>{const d=document.createElement('div');d.innerHTML='<dt></dt><dd></dd>';d.firstChild.textContent=t(k);d.lastChild.textContent=v;return d}));
   $('ruler-fill').style.width=`${s.length/MAX_LENGTH*100}%`;
+  // Animals still on the plan have no guide yet: only the facts above and the "coming soon" line.
+  $('guide-tabs').hidden=$('guide-text').hidden=!!s.planned;$('stage').classList.toggle('is-planned',!!s.planned);
+  $('stage-planned').hidden=!s.planned;$('stage-planned').textContent=t('best.plannedStage',{name:pick(s.name)});
+  if(s.planned){$('dossier-egg').hidden=true;$('dossier-note').hidden=true;$('dossier-soon').hidden=false;$('dossier-soon-tag').textContent=t('soon');$('dossier-soon-text').textContent=t('best.planned');$('stage').classList.remove('is-soon');$('sound-toggle').hidden=true;$('anim-chips').replaceChildren();return}
   const tabs=$('guide-tabs');tabs.replaceChildren(...GUIDE_KEYS.map(k=>{const b=document.createElement('button');b.type='button';b.role='tab';b.textContent=t(`guide.${k}`);b.setAttribute('aria-selected',String(k===guideKey));b.tabIndex=k===guideKey?0:-1;b.addEventListener('click',()=>{guideKey=k;renderDossier()});return b}));
   const text=$('guide-text');text.textContent=pick(s.guide[guideKey]);text.classList.remove('swap');void text.offsetWidth;text.classList.add('swap');
   $('note-text').textContent=pick(s.guide.note);$('dossier-note').hidden=!story||!pick(s.guide.note);
@@ -78,10 +96,11 @@ export function initBestiary({viewerReady,thumbnailer}){
   for(const b of $('anim-chips').children){b.setAttribute('aria-pressed',String(b.dataset.anim===anim));b.classList.toggle('is-playing',!clip.loop&&b.dataset.anim===a)}
  }
  function select(s){
-  if(s!==selected){selected=s;anim=s.anims.includes(anim)?anim:'idle'}
+  if(s!==selected){selected=s;anim=s.anims?.includes(anim)?anim:'idle'}
   for(const {button} of cards.values())button.setAttribute('aria-pressed',String(button.dataset.id===s.id));
   renderDossier();
   // Without 3D the stage shows the animal's baked picture instead of staying empty.
+  if(s.planned){$('stage-status').textContent='';return}
   if($('stage').classList.contains('is-static'))picture(s.id).then(url=>{$('stage-canvas').style.backgroundImage=`url(${url})`}).catch(()=>{});
   if(viewer){$('stage-status').textContent=t('best.loading');viewer.show(s,sex).then(()=>{$('stage-status').textContent='';if(viewer.current&&anim!=='idle')viewer.play(anim)})}
  }

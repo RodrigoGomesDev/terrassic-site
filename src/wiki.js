@@ -4,6 +4,7 @@
 import {detectLang,setLang,t,pick,getLang} from './i18n.js';
 import {links,report,story,isReady} from './site-config.js';
 import {SPECIES,LORE} from './generated/species.js';
+import {PLANNED} from './planned.js';
 import {ERAS,GUIDE_LEVELS,TOOLS,WEAPONS,FAQ} from './content.js';
 import {W,DEPS} from './wiki-content.js';
 import {sprite} from './sprites.js';
@@ -17,7 +18,8 @@ const ext=(href,text,cls)=>{const a=el('a',cls,text);a.href=href;a.target='_blan
 const fmt=n=>new Intl.NumberFormat(getLang()==='pt'?'pt-BR':getLang(),{maximumFractionDigits:2}).format(n);
 const norm=x=>x.normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase(),ALIAS={tyrannosaurus:'t. rex trex',velociraptor:'raptor',triceratops:'trike'};
 const GROUPS=['all','predator','herbivore','flyer','water'],GUIDE_KEYS=['sci','behavior','taming','utility'];
-const lengthLabel=s=>s.group==='flyer'&&['pteranodon','quetzalcoatlus','hatzegopteryx','ichthyornis'].includes(s.id)?'fact.wing':'fact.length';
+const ALL=[...SPECIES,...PLANNED],dietLabel=d=>LORE.diets[d]?pick(LORE.diets[d]):t(`diet.${d}`);
+const lengthLabel=s=>s.wing||s.group==='flyer'&&['pteranodon','quetzalcoatlus','hatzegopteryx','ichthyornis'].includes(s.id)?'fact.wing':'fact.length';
 
 // The table of contents; the sub-entries of a section are indented.
 const SECTIONS=()=>[['comecar',w('start.t')],['instalacao',w('inst.t')],['fabric',w('fabric.t'),1],['forge',w('forge.t'),1],['multiplayer',w('mp.t'),1],['atualizar',w('up.t'),1],
@@ -62,9 +64,16 @@ function play(){
 function creature(s){
  const d=el('details','sp');d.id=s.id;d.open=open.has(s.id);d.dataset.group=s.group;
  d.addEventListener('toggle',()=>{d.open?open.add(s.id):open.delete(s.id)});
+ // Animals still on the plan have no picture, no egg and no guide: only the facts and a "coming soon" line.
+ if(s.planned){const names=[...new Set(Object.values(s.name))].filter(n=>n!==pick(s.name)).join(' · ');
+  d.classList.add('is-planned');
+  d.append(h('summary','',el('span','sp-art sp-none-art',''),h('span','sp-head',h('span','sp-name',el('strong','',pick(s.name))),names&&el('span','sp-alt',names),
+    el('span','sp-sub',`${fmt(s.length)} m · ${t(`one.${s.group}`)} · ${pick(LORE.eras[s.era])}`)),el('span','status status-plan',t('soon')),el('i','sp-plus','+')),
+   h('div','sp-body',h('dl','facts',...[[lengthLabel(s),`${fmt(s.length)} m`],['fact.diet',dietLabel(s.diet)],['fact.era',pick(LORE.eras[s.era])],['fact.version',t('best.notYet')]].map(([k,v])=>h('div','',el('dt','',t(k)),el('dd','',v)))),el('p','',t('best.planned'))));
+  return d}
  const img=el('img','sp-art');img.alt='';img.loading='lazy';img.decoding='async';img.src=assetUrl(`thumbs/${s.id}.webp`);img.onerror=()=>img.remove();if(!isReady(s.id))img.classList.add('is-soon');
  const names=[...new Set(Object.values(s.name))].filter(n=>n!==pick(s.name)).join(' · ');
- const facts=[[lengthLabel(s),`${fmt(s.length)} m`],['fact.diet',pick(LORE.diets[s.diet])],['fact.era',pick(LORE.eras[s.era])],['fact.mount',t(`mount.${s.mount}`)],['fact.tame',t(`tame.${s.tame}`)]];
+ const facts=[[lengthLabel(s),`${fmt(s.length)} m`],['fact.diet',dietLabel(s.diet)],['fact.era',pick(LORE.eras[s.era])],['fact.mount',t(`mount.${s.mount}`)],['fact.tame',t(`tame.${s.tame}`)]];
  const copy=el('button','chip',w('crea.link'));copy.type='button';
  copy.addEventListener('click',()=>{const url=`${location.origin}${location.pathname}#${s.id}`;navigator.clipboard?.writeText(url).then(()=>{copy.textContent=w('crea.copied');setTimeout(()=>{copy.textContent=w('crea.link')},1600)},()=>{})});
  d.append(h('summary','',img,h('span','sp-head',h('span','sp-name',sprite(`egg:${s.id}`,24),el('strong','',pick(s.name))),names&&el('span','sp-alt',names),
@@ -75,13 +84,16 @@ function creature(s){
  return d;
 }
 function creatures(){
- const grid=h('div','sp-list',...[...SPECIES].sort((a,b)=>pick(a.name).localeCompare(pick(b.name))).map(creature)),none=el('p','small sp-none',w('crea.none'));
- const filter=()=>{let n=0;for(const d of grid.children){const s=SPECIES.find(x=>x.id===d.id),show=(group==='all'||s.group===group)&&(!query||[...Object.values(s.name),s.id,ALIAS[s.id]||''].some(x=>norm(x).includes(query)));d.hidden=!show;n+=show}none.hidden=n>0;
+ const byName=(a,b)=>pick(a.name).localeCompare(pick(b.name));
+ const grid=h('div','sp-list',...[...SPECIES].sort(byName).map(creature)),none=el('p','small sp-none',w('crea.none'));
+ // The Cretaceous animals still on the plan come after the ones in the game, under their own heading.
+ const later=h('div','sp-list',...[...PLANNED].sort(byName).map(creature)),laterHead=el('h3','wiki-h3 sp-later',t('best.plannedHead',{n:PLANNED.length}));
+ const filter=()=>{let n=0,m=0;for(const d of [...grid.children,...later.children]){const s=ALL.find(x=>x.id===d.id),show=(group==='all'||s.group===group)&&(!query||[...Object.values(s.name),s.id,ALIAS[s.id]||''].some(x=>norm(x).includes(query)));d.hidden=!show;n+=show;if(s.planned)m+=show}none.hidden=n>0;laterHead.hidden=!m;laterHead.textContent=t('best.plannedHead',{n:m});
   for(const b of chips.children)b.setAttribute('aria-pressed',String(b.dataset.group===group))};
  const chips=h('div','filters',...GROUPS.map(g=>{const b=el('button','chip',t(`group.${g}`));b.type='button';b.dataset.group=g;b.addEventListener('click',()=>{group=g;filter()});return b}));
  const search=el('input');search.type='search';search.autocomplete='off';search.placeholder=w('crea.search');search.value=query;search.setAttribute('aria-label',w('crea.search'));
  search.addEventListener('input',()=>{query=norm(search.value.trim());filter()});
- const node=Object.assign(h('section','wiki-section',h('h2','wiki-h2',w('crea.t')),el('p','lede',w('crea.lede',{n:SPECIES.length})),h('div','sp-tools',chips,h('label','search',search)),grid,none),{id:'criaturas'});
+ const node=Object.assign(h('section','wiki-section',h('h2','wiki-h2',w('crea.t')),el('p','lede',w('crea.lede',{n:SPECIES.length,m:PLANNED.length})),h('div','sp-tools',chips,h('label','search',search)),grid,laterHead,later,none),{id:'criaturas'});
  filter();return node;
 }
 

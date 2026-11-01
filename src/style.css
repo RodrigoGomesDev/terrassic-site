@@ -372,3 +372,16 @@ section[id]{scroll-margin-top:64px}
 .soon-story .eyebrow{display:flex;gap:10px;align-items:center}
 .tile-journal .journal[hidden]{display:none}
 @media (max-width:759px){.hero-dlnote{font-size:12px;margin-top:8px}}
+
+/* Cretaceous animals still on the plan: no model, so no picture and no 3D, only name, size and era. */
+.roster-head{grid-column:1/-1;margin:22px 0 2px;padding-top:16px;border-top:1px solid var(--line);font:12px var(--mono);letter-spacing:.04em;color:var(--stone-300)}
+.card.is-planned{background:transparent;border-style:dashed}
+.card.is-planned:hover{transform:none;box-shadow:none}
+.card.is-planned .card-meta{padding:10px 12px;gap:4px}
+.card.is-planned .card-name{font-size:16px;font-style:italic}
+.card.is-planned .soon-tag{position:static;justify-self:start;margin-top:4px}
+.stage.is-planned .stage-canvas,.stage.is-planned .stage-top,.stage.is-planned .stage-bottom,.stage.is-planned .stage-status{visibility:hidden}
+.stage-planned{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);margin:0;font:14px var(--mono);color:var(--stone-300);text-align:center;max-width:80%}
+.stage-planned[hidden]{display:none}
+.guide-tabs[hidden],.guide-text[hidden]{display:none}
+.sprite[hidden]{display:none}
