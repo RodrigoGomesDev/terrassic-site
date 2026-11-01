@@ -14,36 +14,12 @@ const scrollers=[];export const onScroll=fn=>scrollers.push(fn);
 let ticking=false;const frame=()=>{ticking=false;for(const fn of scrollers)fn()};
 addEventListener('scroll',()=>{if(!ticking){ticking=true;requestAnimationFrame(frame)}},{passive:true});addEventListener('resize',()=>requestAnimationFrame(frame));
 
-// The opening film: scroll progress drives the sky colour, the captions, the flash and the 3D scene.
-const SKY=[[0,[219,177,91]],[.84,[219,177,91]],[1,[20,16,20]]];
-const sky=p=>{let i=0;while(i<SKY.length-2&&SKY[i+1][0]<p)i++;const [a,ca]=SKY[i],[b,cb]=SKY[i+1],k=smooth((p-a)/(b-a));return `rgb(${ca.map((v,j)=>Math.round(v+(cb[j]-v)*k)).join(',')})`};
-export function initFilm(){
- const film=$('inicio'),stage=$('film-stage'),listeners=[];
- const update=()=>{
-  const p=reduced?.62:pinProgress(film),win=(a,b,c,d)=>smooth((p-a)/(b-a))*(1-smooth((p-c)/(d-c)));
-  stage.style.setProperty('--film-bg',sky(p));stage.style.setProperty('--intro',(1-smooth(p/.1)).toFixed(3));
-  stage.style.setProperty('--quote',story?win(.1,.15,.26,.31).toFixed(3):'0');stage.style.setProperty('--chapter',story?win(.34,.39,.5,.56).toFixed(3):'0');
-  // The dive into the mouth breaks into big blocks (hero.js), then fades to the dark of the story in steps.
-  stage.style.setProperty('--fade',(Math.round(smooth((p-.86)/.1)*6)/6).toFixed(3));
-  $('film-fill').style.width=`${p*100}%`;$('scroll-label').textContent=t(p<.3?'film.scroll':p<.84?'film.scroll2':story?'film.scroll3':'film.scroll3b');
-  $('topbar').classList.toggle('on-light',film.getBoundingClientRect().bottom>innerHeight*.5&&p<.9);
-  for(const fn of listeners)fn(p);
- };
- onScroll(update);
- const render=()=>{const page=LORE.pages.find(x=>x.day===1203)||LORE.pages.at(-1),text=pick(page.text);$('film-quote').textContent=text.slice(0,text.indexOf('.')+1);$('film-cite').textContent=`${t('best.noteBy')} · ${t('book.day')} ${page.day}`;update()};
- return {render,listen:fn=>{listeners.push(fn);fn(reduced?.62:pinProgress(film))}};
-}
-
 export function initHeader(){
- const bar=$('topbar'),links=[...document.querySelectorAll('.nav a[href^="#"]')],targets=links.map(a=>document.querySelector(a.getAttribute('href')));
+ const bar=$('topbar'),hero=$('inicio');
+ new IntersectionObserver(([e])=>bar.classList.toggle('on-light',e.isIntersecting),{rootMargin:'-60px 0px -100% 0px'}).observe(hero);
+ const links=[...document.querySelectorAll('.nav a[href^="#"]')],targets=links.map(a=>document.querySelector(a.getAttribute('href')));
  onScroll(()=>{bar.classList.toggle('is-solid',scrollY>40);
   const mid=innerHeight*.4;let active=-1;targets.forEach((s,i)=>{if(s&&s.getBoundingClientRect().top<mid)active=i});links.forEach((a,i)=>a.classList.toggle('is-active',i===active))});
-}
-
-export function initMarquee(){
- const names=SPECIES.map(s=>s.id);const half=Math.ceil(names.length/2);
- const fill=(host,ids)=>{const row=()=>{const frag=document.createDocumentFragment();for(const id of ids){const s=SPECIES.find(x=>x.id===id),item=el('span','marquee-item');item.append(sprite(`egg:${id}`,28),el('span','',pick(s.name)));frag.append(item)}return frag};host.replaceChildren(row(),row())};
- return ()=>{fill($('marquee-a'),names.slice(0,half));fill($('marquee-b'),names.slice(half))};
 }
 
 // The intro screen of the mod, line by line, driven by scroll, while a meteor falls behind the text.
@@ -121,9 +97,8 @@ export function paintEras(thumbnailer){
  },{rootMargin:'800px'});io.observe(section);
 }
 export function initEras(){
- const section=$('eras'),track=$('eras-track'),fill=$('timeline-fill'),ticks=$('timeline-ticks');
- const render=()=>{
-  track.replaceChildren(...ERAS.map((e,i)=>{
+ const track=$('eras-track');
+ return ()=>track.replaceChildren(...ERAS.map((e,i)=>{
    const card=el('article',`era era-${e.id}`);card.style.setProperty('--era-a',e.colors[1]);
    const art=el('div','era-art');art.append(landscape(document.createElement('canvas'),e,(i+3)*7919));if(eraArt.has(e.id))art.append(eraImage(eraArt.get(e.id)));art.dataset.era=e.id;art.style.background=`linear-gradient(180deg,${e.colors[0]},${e.colors[1]})`;
    const body=el('div','era-body');
@@ -133,17 +108,6 @@ export function initEras(){
    const status=story?el('span',`status status-${e.status}`,`${e.version} · ${t(e.status==='wip'?'road.wip':'road.plan')}`):el('span','status status-plan',t('soon'));
    body.append(dl,fauna,status);card.append(art,body);return card;
   }));
-  const labels=['66 Ma','100 Ma','145 Ma','201 Ma','252 Ma',pick({pt:'Era do Gelo',en:'Ice Age',es:'Edad de Hielo'})];
-  ticks.replaceChildren(...labels.map((x,i)=>{const s=el('span','',x);s.style.left=`${i/(labels.length-1)*100}%`;return s}));update();
- };
- const update=()=>{
-  if(innerWidth<760||reduced){track.style.transform='';fill.style.width='100%';return}
-  const p=pinProgress(section),max=track.scrollWidth-track.clientWidth;track.style.transform=`translate3d(${-p*max}px,0,0)`;fill.style.width=`${p*100}%`;
-  [...track.children].forEach((c,i)=>{const r=c.getBoundingClientRect(),center=(r.left+r.width/2)/innerWidth-.5;c.style.setProperty('--tilt',center.toFixed(3))});
- };
- const fit=()=>{section.style.height=innerWidth<760||reduced?'auto':`${track.scrollWidth-track.clientWidth+innerHeight*1.15}px`;update()};
- addEventListener('resize',fit);onScroll(update);
- return ()=>{render();requestAnimationFrame(fit)};
 }
 
 export function initMechanics(thumbnailer){
@@ -168,17 +132,6 @@ export function initMechanics(thumbnailer){
  };
 }
 
-export function initRoadmap(){
- const host=$('versions');
- const render=()=>host.replaceChildren(...VERSIONS.map(v=>{const li=el('li',`version is-${v.status}`);const head=el('div','version-head');head.append(el('span','version-tag',v.v),el('span',`status status-${v.status}`,t(v.status==='done'?'road.done':v.status==='wip'?'road.wip':'road.plan')));
-  li.append(head,el('h3','',pick(v.name)));if(v.detail)li.append(el('p','',pick(v.detail)));if(v.add)li.append(el('p','version-add',t('road.new',{n:v.add})));return li}));
- const made=$('road-made'),bar=$('road-progress');let counted=false;
- new IntersectionObserver(([e])=>{if(!e.isIntersecting||counted)return;counted=true;const start=performance.now(),total=SPECIES.length;
-  const step=now=>{const k=reduced?1:smooth((now-start)/1400);made.textContent=Math.round(total*k);bar.style.width=`${total/152*100*k}%`;if(k<1)requestAnimationFrame(step)};requestAnimationFrame(step)},{threshold:.4}).observe(made);
- onScroll(()=>{const items=host.children;for(const li of items){const r=li.getBoundingClientRect();li.classList.toggle('is-lit',r.top<innerHeight*.7)}});
- return render;
-}
-
 export function initInstall(links){
  let loader='fabric';
  const render=()=>{for(const n of ['fabric','forge']){const tab=$(`tab-${n}`);tab.setAttribute('aria-selected',String(n===loader));tab.tabIndex=n===loader?0:-1}
@@ -193,15 +146,4 @@ export function initInstall(links){
 
 export function initFaq(){
  return ()=>$('faq').replaceChildren(...FAQ.map(f=>story||!f.aSoon?f:{...f,a:f.aSoon}).map(f=>{const d=el('details');const s=el('summary');s.append(el('span','',pick(f.q)),el('i','','+'));d.append(s,el('p','',pick(f.a)));return d}));
-}
-
-// Motion that is purely decorative: reveals, magnetic buttons and the hero copy parallax.
-export function initMotion(){
- if(!reduced&&'IntersectionObserver' in window){document.documentElement.classList.add('motion');
-  const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('is-in');io.unobserve(e.target)}}),{threshold:.12,rootMargin:'0px 0px -6% 0px'});
-  document.querySelectorAll('.reveal').forEach(x=>io.observe(x));}
- if(!reduced&&matchMedia('(pointer: fine)').matches)for(const b of document.querySelectorAll('.magnetic')){
-  b.addEventListener('pointermove',e=>{const r=b.getBoundingClientRect();b.style.transform=`translate(${(e.clientX-r.left-r.width/2)*.18}px,${(e.clientY-r.top-r.height/2)*.28}px)`});
-  b.addEventListener('pointerleave',()=>{b.style.transform=''});
- }
 }

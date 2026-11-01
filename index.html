@@ -18,22 +18,15 @@
 <link rel="stylesheet" href="./src/style.css">
 </head>
 <body>
-<div class="loader-screen" id="loader" role="status" aria-live="polite">
- <div class="loader-motes" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
- <div class="loader-flood" aria-hidden="true"></div>
- <div class="loader-title" id="loader-title"><img class="loader-title-dim" src="./assets/letreiro_osso.png" alt="Terrassic"><span class="loader-reveal loader-lit" aria-hidden="true"><img src="./assets/letreiro_osso.png" alt=""></span><span class="loader-reveal loader-seam" aria-hidden="true"><img src="./assets/letreiro_ambar.png" alt=""></span></div>
- <p class="loader-line" id="loader-line"><span id="loader-text" data-i18n="loader.text">Waking the dinosaurs</span><span class="loader-pct" id="loader-pct">0%</span></p>
-</div>
 <a class="skip" href="#bestiario" data-i18n="skip">Skip to the bestiary</a>
 
 <header class="topbar" id="topbar">
  <a class="brand" href="#inicio" aria-label="Terrassic"><img src="./assets/monograma_64.png" alt="" width="32" height="32"><img class="brand-word" src="./assets/letreiro_osso_menor.png" alt="Terrassic"></a>
  <nav class="nav" id="nav" aria-label="Sections">
-  <a href="#historia" data-i18n="nav.story">Story</a>
-  <a href="#eras" data-i18n="nav.eras">Eras</a>
   <a href="#bestiario" data-i18n="nav.bestiary">Bestiary</a>
   <a href="#mecanicas" data-i18n="nav.play">How it plays</a>
-  <a href="#roteiro" data-i18n="nav.roadmap">Roadmap</a>
+  <a href="#historia" data-i18n="nav.story">Story</a>
+  <a href="#eras" data-i18n="nav.eras">Eras</a>
   <a href="./wiki/" data-i18n="nav.wiki">Wiki</a>
  </nav>
  <div class="lang" role="group" aria-label="Idioma / Language">
@@ -43,77 +36,23 @@
 </header>
 
 <main>
- <section class="film" id="inicio">
-  <div class="film-stage" id="film-stage">
-   <h1 class="film-word"><img src="./assets/letreiro_osso.png" alt="Terrassic"></h1>
-   <div class="hero-canvas" id="hero-canvas" aria-hidden="true"></div>
-   <div class="film-copy film-intro">
-    <p class="film-eyebrow" data-i18n="hero.eyebrow">A Minecraft Java 1.20.1 mod · Fabric and Forge</p>
-    <p class="film-lede" data-i18n="hero.lede">Survive among dinosaurs in Minecraft. Raise companions from the egg, ride the big ones and take to the skies.</p>
-    <div class="hero-actions">
-     <a class="btn btn-dark magnetic" href="#bestiario"><span data-i18n="hero.cta">Meet the creatures</span><span aria-hidden="true">→</span></a>
-     <a class="btn btn-line magnetic" id="hero-download" href="https://www.curseforge.com/minecraft/mc-mods/terrassic" target="_blank" rel="noopener noreferrer"><span data-i18n="hero.download">Download on CurseForge</span><span aria-hidden="true">↗</span></a>
-    </div>
-    <p class="hero-dlnote" data-i18n="hero.dlnote">Opens the Terrassic page on CurseForge, with the files for Fabric and Forge.</p>
+ <section class="hero" id="inicio">
+  <div class="hero-copy">
+   <h1 class="hero-word"><img src="./assets/letreiro_osso.png" alt="Terrassic"></h1>
+   <p class="film-eyebrow" data-i18n="hero.eyebrow">A Minecraft Java 1.20.1 mod · Fabric and Forge</p>
+   <p class="film-lede" data-i18n="hero.lede">Survive among dinosaurs in Minecraft. Raise companions from the egg, ride the big ones and take to the skies.</p>
+   <div class="hero-actions">
+    <a class="btn btn-dark" id="hero-download" href="https://www.curseforge.com/minecraft/mc-mods/terrassic" target="_blank" rel="noopener noreferrer"><span data-i18n="hero.download">Download on CurseForge</span><span aria-hidden="true">↗</span></a>
+    <a class="btn btn-line" href="#bestiario"><span data-i18n="hero.cta">Meet the creatures</span><span aria-hidden="true">→</span></a>
    </div>
-   <div class="film-copy film-quote" aria-hidden="true"><p id="film-quote"></p><span id="film-cite"></span></div>
-   <div class="film-copy film-chapter" aria-hidden="true"><p class="film-eyebrow" data-i18n="film.chapter">Chapter 1 · Late Cretaceous</p><h2 data-i18n="film.title">Echoes of the End.</h2><p data-i18n="film.line">You are not alone here.</p></div>
-   <div class="film-top"><span class="hero-status" aria-live="polite"><span class="hero-meter"><span id="hero-meter"></span></span><span id="hero-status" data-i18n="hero.loading">Loading the T. rex</span></span><button type="button" class="hero-sound" id="hero-sound" aria-pressed="false"><span class="hero-sound-icon" aria-hidden="true"></span><span data-i18n="hero.sound">Hear the roar</span></button></div>
-   <a class="scroll-cue" href="#historia"><span class="scroll-arrow" aria-hidden="true">↓</span><span id="scroll-label" data-i18n="film.scroll">Scroll and it roars</span></a>
-   <div class="film-track" aria-hidden="true"><span id="film-fill"></span></div>
+   <p class="hero-dlnote" data-i18n="hero.dlnote">Opens the Terrassic page on CurseForge, with the files for Fabric and Forge.</p>
   </div>
- </section>
-
- <div class="marquee" aria-hidden="true"><div class="marquee-row" id="marquee-a"></div><div class="marquee-row reverse" id="marquee-b"></div></div>
-
- <section class="story" id="historia">
-  <div class="story-pin">
-   <canvas class="story-sky" id="story-sky" aria-hidden="true"></canvas>
-   <div class="story-meteor" id="story-meteor" aria-hidden="true"></div>
-   <div class="story-lines" id="story-lines"><p class="story-kicker" data-i18n="story.kicker">The story · The Leap</p></div>
-  </div>
- </section>
-
- <section class="chronicle band" id="cronica">
-  <div class="wrap chronicle-grid">
-   <div class="chronicle-copy reveal">
-    <p class="eyebrow" data-i18n="chron.eyebrow">The Terrassic Project</p>
-    <h2 class="display" data-i18n="chron.title">She crossed first.</h2>
-    <p data-i18n="chron.p1">The Terrassic Project began with a discovery at a fossil site: amber that could open a window into the past. Dr. Katyusha stepped through and disappeared.</p>
-    <p data-i18n="chron.p2">While trying to find her, you end up in the Cretaceous empty-handed. The notes she left behind are your first clues to what happened and how to find a way home.</p>
-    <p class="rule" data-i18n="chron.rule">Follow the clues or find a place to stay.</p>
-   </div>
-   <div class="notebook reveal" id="notebook">
-    <div class="notebook-tabs" role="tablist" aria-label="Field Notebook" id="notebook-tabs"></div>
-    <article class="page" id="notebook-page" aria-live="polite"></article>
-    <div class="notebook-nav"><button type="button" class="icon-btn" id="page-prev" aria-label="Previous page">←</button><span id="page-count"></span><button type="button" class="icon-btn" id="page-next" aria-label="Next page">→</button></div>
-   </div>
-  </div>
- </section>
-
- <section class="soon-story band" id="historia-em-breve" hidden>
-  <div class="wrap soon-story-grid">
-   <p class="eyebrow"><span data-i18n="soonstory.eyebrow">Story</span> <span class="soon-badge" data-i18n="soon">Coming soon</span></p>
-   <h2 class="display" data-i18n="soonstory.title">Story mode comes later.</h2>
-   <p class="lede" data-i18n="soonstory.p">Dr. Katyusha’s expedition, the Rift and the chapters arrive in a future version.</p>
-  </div>
- </section>
-
- <section class="eras" id="eras">
-  <div class="eras-pin">
-   <div class="eras-head wrap">
-    <p class="eyebrow" data-i18n="eras.eyebrow">Chapters</p>
-    <h2 class="display" data-i18n="eras.title">One era at a time.</h2>
-    <p class="lede" data-i18n="eras.lede">Katyusha’s trail leads through forests, seas, and continents of another time.</p>
-   </div>
-   <div class="eras-track" id="eras-track"></div>
-   <div class="timeline wrap" aria-hidden="true"><div class="timeline-bar"><span id="timeline-fill"></span></div><div class="timeline-ticks" id="timeline-ticks"></div></div>
-  </div>
+  <div class="hero-canvas" id="hero-canvas" aria-hidden="true"></div>
  </section>
 
  <section class="bestiary band" id="bestiario">
   <div class="wrap">
-   <div class="section-head reveal">
+   <div class="section-head">
     <p class="eyebrow" data-i18n="best.eyebrow">Bestiary</p>
     <h2 class="display" data-i18n="best.title">See each one up close.</h2>
     <p class="lede" data-i18n="best.lede">Choose a creature, watch it move, and learn its habits. Drag to turn.</p>
@@ -149,7 +88,7 @@
     <div class="filters" id="filters" role="group" aria-label="Filter"></div>
     <div class="roster-tools">
      <label class="search"><span class="sr-only" data-i18n="best.search">Search species</span><input id="search" type="search" autocomplete="off" data-i18n-placeholder="best.search" placeholder="Search species"></label>
-     <label class="sort"><span class="sr-only" data-i18n="best.sort">Sort</span><select id="sort"><option value="size" data-i18n="best.sortSize">Largest first</option><option value="name" data-i18n="best.sortName">Name</option><option value="version" data-i18n="best.sortVersion">Version</option></select></label>
+     <label class="sort"><span class="sr-only" data-i18n="best.sort">Sort</span><select id="sort"><option value="size" data-i18n="best.sortSize">Largest first</option><option value="name" data-i18n="best.sortName">Name</option></select></label>
     </div>
    </div>
    <p class="roster-count" id="roster-count"></p>
@@ -159,23 +98,23 @@
 
  <section class="mechanics band" id="mecanicas">
   <div class="wrap">
-   <div class="section-head reveal">
+   <div class="section-head">
     <p class="eyebrow" data-i18n="mech.eyebrow">How it plays</p>
     <h2 class="display" data-i18n="mech.title">Survive with what the age provides.</h2>
     <p class="lede" data-i18n="mech.lede">Find food, build a shelter, and prepare for what lives beyond camp.</p>
    </div>
    <div class="bento">
-    <article class="tile tile-egg reveal">
+    <article class="tile tile-egg">
      <div class="egg-stage" id="egg-stage" aria-hidden="true"><span class="sprite egg-sprite" id="egg-sprite"></span><span class="egg-crack"></span></div>
      <h3 data-i18n="mech.egg.t">From the egg to your first journey</h3>
      <p data-i18n="mech.egg.p">Tend to the eggs and be there when they hatch. The hatchlings will recognise you as family.</p>
     </article>
-    <article class="tile tile-sex reveal">
+    <article class="tile tile-sex">
      <div class="pair" id="sex-pair"><figure><img id="pair-male" alt=""><figcaption data-i18n="best.male">Male</figcaption></figure><figure><img id="pair-female" alt=""><figcaption data-i18n="best.female">Female</figcaption></figure></div>
      <h3 data-i18n="mech.sex.t">Male and female</h3>
      <p data-i18n="mech.sex.p">Colours, crests, and markings vary between males and females. Find a pair and raise the next generation.</p>
     </article>
-    <article class="tile tile-tame reveal">
+    <article class="tile tile-tame">
      <ol class="tame-steps">
       <li><span class="sprite" data-sprite="item:raw_dino_meat"></span><span data-i18n="mech.tame.s1">Offer the right food.</span></li>
       <li><span class="sprite" data-sprite="egg:tyrannosaurus"></span><span data-i18n="mech.tame.s2">Raise companions from hatchlings.</span></li>
@@ -184,23 +123,23 @@
      <h3 data-i18n="mech.tame.t">Taming</h3>
      <p data-i18n="mech.tame.p">Earn an animal’s trust and bring a companion on your explorations.</p>
     </article>
-    <article class="tile tile-ride reveal">
+    <article class="tile tile-ride">
      <svg class="flight" viewBox="0 0 400 140" aria-hidden="true"><path class="flight-path" d="M10 120 C 90 120, 110 30, 200 40 S 320 110, 390 30"/><circle class="flight-dot" r="5"/></svg>
      <h3 data-i18n="mech.ride.t">Riding and flight</h3>
      <p data-i18n="mech.ride.p">Ride across the plains or take flight on a Pteranodon. From up there, it is easier to choose your next destination.</p>
     </article>
-    <article class="tile tile-science reveal">
+    <article class="tile tile-science">
      <h3 data-i18n="mech.sci.t">Field Notebook</h3>
      <p data-i18n="mech.sci.p">Dig up fossils, observe the wildlife, and record your discoveries. Each page helps you understand the creatures around you.</p>
      <ol class="levels" id="levels"></ol>
      <ul class="tools" id="tools"></ul>
     </article>
-    <article class="tile tile-arms reveal">
+    <article class="tile tile-arms">
      <h3 data-i18n="mech.arms.t">Weapons of the age</h3>
      <ul class="slots" id="weapons"></ul>
      <p class="small" data-i18n="mech.arms.p">Knives, clubs, and spears crafted from stone, bone, and flint.</p>
     </article>
-    <article class="tile tile-journal reveal">
+    <article class="tile tile-journal">
      <h3><span data-i18n="mech.journal.t">Field Journal</span> <span class="soon-badge" data-story-soon data-i18n="soon">Coming soon</span></h3>
      <p data-i18n="mech.journal.p">Follow the expedition’s clues, gather amber fragments, and rebuild the Leap Altar. There is more waiting on the other side.</p>
      <div class="journal" id="journal"></div>
@@ -209,30 +148,62 @@
   </div>
  </section>
 
- <section class="roadmap band" id="roteiro">
-  <div class="wrap roadmap-grid">
-   <div class="section-head sticky-head reveal">
-    <p class="eyebrow" data-i18n="road.eyebrow">Roadmap</p>
-    <h2 class="display" data-i18n="road.title">The next chapter.</h2>
-    <p class="lede" data-i18n="road.lede">New creatures, landscapes, and clues for the journey ahead. See what is in progress and what comes next.</p>
-    <div class="progress-card"><p><strong id="road-made">59</strong> <span data-i18n="road.made">creatures already modelled</span></p><div class="progress"><span id="road-progress"></span></div><p class="small" data-i18n="road.of">of 152 planned on the roadmap</p></div>
+ <section class="story" id="historia">
+  <div class="story-pin">
+   <canvas class="story-sky" id="story-sky" aria-hidden="true"></canvas>
+   <div class="story-meteor" id="story-meteor" aria-hidden="true"></div>
+   <div class="story-lines" id="story-lines"><p class="story-kicker" data-i18n="story.kicker">The story · The Leap</p></div>
+  </div>
+ </section>
+
+ <section class="chronicle band" id="cronica">
+  <div class="wrap chronicle-grid">
+   <div class="chronicle-copy">
+    <p class="eyebrow" data-i18n="chron.eyebrow">The Terrassic Project</p>
+    <h2 class="display" data-i18n="chron.title">She crossed first.</h2>
+    <p data-i18n="chron.p1">The Terrassic Project began with a discovery at a fossil site: amber that could open a window into the past. Dr. Katyusha stepped through and disappeared.</p>
+    <p data-i18n="chron.p2">While trying to find her, you end up in the Cretaceous empty-handed. The notes she left behind are your first clues to what happened and how to find a way home.</p>
+    <p class="rule" data-i18n="chron.rule">Follow the clues or find a place to stay.</p>
    </div>
-   <ol class="versions" id="versions"></ol>
+   <div class="notebook" id="notebook">
+    <div class="notebook-tabs" role="tablist" aria-label="Field Notebook" id="notebook-tabs"></div>
+    <article class="page" id="notebook-page" aria-live="polite"></article>
+    <div class="notebook-nav"><button type="button" class="icon-btn" id="page-prev" aria-label="Previous page">←</button><span id="page-count"></span><button type="button" class="icon-btn" id="page-next" aria-label="Next page">→</button></div>
+   </div>
+  </div>
+ </section>
+
+ <section class="soon-story band" id="historia-em-breve" hidden>
+  <div class="wrap soon-story-grid">
+   <p class="eyebrow"><span data-i18n="soonstory.eyebrow">Story</span> <span class="soon-badge" data-i18n="soon">Coming soon</span></p>
+   <h2 class="display" data-i18n="soonstory.title">Story mode comes later.</h2>
+   <p class="lede" data-i18n="soonstory.p">Dr. Katyusha’s expedition, the Rift and the chapters arrive in a future version.</p>
+  </div>
+ </section>
+
+ <section class="eras band" id="eras">
+  <div class="wrap">
+   <div class="section-head">
+    <p class="eyebrow" data-i18n="eras.eyebrow">Chapters</p>
+    <h2 class="display" data-i18n="eras.title">One era at a time.</h2>
+    <p class="lede" data-i18n="eras.lede">The story chapters arrive in a future version. For now, Terrassic takes place in the Late Cretaceous.</p>
+   </div>
+   <div class="eras-track" id="eras-track"></div>
   </div>
  </section>
 
  <section class="install band" id="jogar">
   <div class="wrap install-grid">
-   <div class="reveal">
+   <div>
     <p class="eyebrow" data-i18n="inst.eyebrow">Play</p>
     <h2 class="display" data-i18n="inst.title">How to install.</h2>
     <p class="lede" data-i18n="inst.lede">The files are on CurseForge. Download the one for your loader, Fabric or Forge, and follow the steps.</p>
     <div class="install-actions">
-     <a class="btn btn-primary magnetic" id="download" href="https://www.curseforge.com/minecraft/mc-mods/terrassic" target="_blank" rel="noopener noreferrer"><span data-i18n="inst.curseforge">Download on CurseForge</span><span aria-hidden="true">↗</span></a>
+     <a class="btn btn-primary" id="download" href="https://www.curseforge.com/minecraft/mc-mods/terrassic" target="_blank" rel="noopener noreferrer"><span data-i18n="inst.curseforge">Download on CurseForge</span><span aria-hidden="true">↗</span></a>
     </div>
     <p class="install-links"><a href="./wiki/" data-i18n="inst.wiki">Mod wiki</a><a id="report-link" href="./wiki/#reportar" data-i18n="inst.report">Report a problem</a><a id="discord" href="#" target="_blank" rel="noopener noreferrer" hidden>Discord</a><a href="https://ko-fi.com/terrassic" target="_blank" rel="noopener noreferrer" data-i18n="inst.donate">Support on Ko-fi</a></p>
    </div>
-   <div class="loader reveal">
+   <div class="loader">
     <div class="seg" role="tablist" aria-label="Loader"><button type="button" role="tab" id="tab-fabric" aria-selected="true">Fabric</button><button type="button" role="tab" id="tab-forge" aria-selected="false" tabindex="-1">Forge</button></div>
     <ol class="steps" id="steps"></ol>
    </div>
@@ -241,8 +212,8 @@
 
  <section class="faq band" id="duvidas">
   <div class="wrap faq-grid">
-   <h2 class="display reveal" data-i18n="faq.title">Before you play.</h2>
-   <div class="faq-list reveal" id="faq"></div>
+   <h2 class="display" data-i18n="faq.title">Before you play.</h2>
+   <div class="faq-list" id="faq"></div>
   </div>
  </section>
 </main>

@@ -1,10 +1,10 @@
-// The wiki page (/wiki/): installation, how it plays, every creature's Field Guide, eras, roadmap and FAQ, in the
+// The wiki page (/wiki/): installation, how it plays, every creature's Field Guide, eras and FAQ, in the
 // mod's three languages. Same data as the home page, no 3D, and a stable address for each part (#instalacao,
 // #tyrannosaurus...) to link from CurseForge and Modrinth.
 import {detectLang,setLang,t,pick,getLang} from './i18n.js';
-import {links,report,story} from './site-config.js';
+import {links,report,story,isReady} from './site-config.js';
 import {SPECIES,LORE} from './generated/species.js';
-import {ERAS,VERSIONS,GUIDE_LEVELS,TOOLS,WEAPONS,FAQ} from './content.js';
+import {ERAS,GUIDE_LEVELS,TOOLS,WEAPONS,FAQ} from './content.js';
 import {W,DEPS} from './wiki-content.js';
 import {sprite} from './sprites.js';
 import {assetUrl} from './assets.js';
@@ -18,11 +18,10 @@ const fmt=n=>new Intl.NumberFormat(getLang()==='pt'?'pt-BR':getLang(),{maximumFr
 const norm=x=>x.normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase(),ALIAS={tyrannosaurus:'t. rex trex',velociraptor:'raptor',triceratops:'trike'};
 const GROUPS=['all','predator','herbivore','flyer','water'],GUIDE_KEYS=['sci','behavior','taming','utility'];
 const lengthLabel=s=>s.group==='flyer'&&['pteranodon','quetzalcoatlus','hatzegopteryx','ichthyornis'].includes(s.id)?'fact.wing':'fact.length';
-const verLabel=v=>v==='v0.2'?t('ver.base'):t('ver.next',{v});
 
 // The table of contents; the sub-entries of a section are indented.
 const SECTIONS=()=>[['comecar',w('start.t')],['instalacao',w('inst.t')],['fabric',w('fabric.t'),1],['forge',w('forge.t'),1],['multiplayer',w('mp.t'),1],['atualizar',w('up.t'),1],
- ['como-se-joga',w('play.t')],['criaturas',w('crea.t')],['eras',w('eras.t')],['roteiro',w('road.t')],['faq',w('faq.t')],...(reporting()?[['reportar',w('bug.t')]]:[])];
+ ['como-se-joga',w('play.t')],['criaturas',w('crea.t')],['eras',w('eras.t')],['faq',w('faq.t')],...(reporting()?[['reportar',w('bug.t')]]:[])];
 
 let group='all',query='';const open=new Set();
 const sub=(id,title,...kids)=>Object.assign(h('div','wiki-sub',h('h3','wiki-h3',title),...kids),{id});
@@ -63,13 +62,13 @@ function play(){
 function creature(s){
  const d=el('details','sp');d.id=s.id;d.open=open.has(s.id);d.dataset.group=s.group;
  d.addEventListener('toggle',()=>{d.open?open.add(s.id):open.delete(s.id)});
- const img=el('img','sp-art');img.alt='';img.loading='lazy';img.decoding='async';img.src=assetUrl(`thumbs/${s.id}.webp`);img.onerror=()=>img.remove();
+ const img=el('img','sp-art');img.alt='';img.loading='lazy';img.decoding='async';img.src=assetUrl(`thumbs/${s.id}.webp`);img.onerror=()=>img.remove();if(!isReady(s.id))img.classList.add('is-soon');
  const names=[...new Set(Object.values(s.name))].filter(n=>n!==pick(s.name)).join(' · ');
- const facts=[[lengthLabel(s),`${fmt(s.length)} m`],['fact.diet',pick(LORE.diets[s.diet])],['fact.era',pick(LORE.eras[s.era])],['fact.mount',t(`mount.${s.mount}`)],['fact.tame',t(`tame.${s.tame}`)],['fact.version',verLabel(s.version)]];
+ const facts=[[lengthLabel(s),`${fmt(s.length)} m`],['fact.diet',pick(LORE.diets[s.diet])],['fact.era',pick(LORE.eras[s.era])],['fact.mount',t(`mount.${s.mount}`)],['fact.tame',t(`tame.${s.tame}`)]];
  const copy=el('button','chip',w('crea.link'));copy.type='button';
  copy.addEventListener('click',()=>{const url=`${location.origin}${location.pathname}#${s.id}`;navigator.clipboard?.writeText(url).then(()=>{copy.textContent=w('crea.copied');setTimeout(()=>{copy.textContent=w('crea.link')},1600)},()=>{})});
  d.append(h('summary','',img,h('span','sp-head',h('span','sp-name',sprite(`egg:${s.id}`,24),el('strong','',pick(s.name))),names&&el('span','sp-alt',names),
-   el('span','sp-sub',`${fmt(s.length)} m · ${t(`one.${s.group}`)} · ${pick(LORE.eras[s.era])}`)),el('span',`status ${s.version==='v0.2'?'status-done':'status-plan'}`,s.version==='v0.2'?w('crea.in'):s.version),el('i','sp-plus','+')),
+   el('span','sp-sub',`${fmt(s.length)} m · ${t(`one.${s.group}`)} · ${pick(LORE.eras[s.era])}`)),!isReady(s.id)&&el('span','status status-plan',t('soon')),el('i','sp-plus','+')),
   h('div','sp-body',h('dl','facts',...facts.map(([k,v])=>h('div','',el('dt','',t(k)),el('dd','',v)))),
    ...GUIDE_KEYS.filter(k=>pick(s.guide[k])).map(k=>h('div','sp-guide',el('h4','wiki-h4',t(`guide.${k}`)),el('p','',pick(s.guide[k])))),
    story&&pick(s.guide.note)&&h('blockquote','note',el('p','',pick(s.guide.note)),el('cite','',t('best.noteBy'))),h('p','sp-actions',copy)));
@@ -94,11 +93,6 @@ function eras(){
   story?el('span',`status status-${e.status}`,`${e.version} · ${t(`road.${e.status}`)}`):el('span','status status-plan',t('soon'))),{id:`era-${e.id}`}))),{id:'eras'});
 }
 
-function roadmap(){
- return Object.assign(h('section','wiki-section',h('h2','wiki-h2',w('road.t')),el('p','lede',w('road.lede')),
-  h('ol','wiki-road',...VERSIONS.map(v=>h('li','',h('div','wiki-road-head',el('strong','',v.v),el('span','',pick(v.name)),el('span',`status status-${v.status}`,t(`road.${v.status}`))),
-   v.detail&&el('p','',pick(v.detail)),v.add?el('p','small',t('road.new',{n:v.add})):null)))),{id:'roteiro'});
-}
 
 function faq(){
  const item=f=>h('details','',h('summary','',el('span','',pick(f.q)),el('i','','+')),el('p','',pick(f.a)));
@@ -179,7 +173,7 @@ function footer(){
 
 function render(){
  setLang(getLang());document.title=w('title');$('to-site').textContent=w('site');if(links.download)$('cta').href=links.download;
- $('conteudo').replaceChildren(...[start(),install(),play(),creatures(),eras(),roadmap(),faq(),reportSection()].filter(Boolean));toc();footer();watch();
+ $('conteudo').replaceChildren(...[start(),install(),play(),creatures(),eras(),faq(),reportSection()].filter(Boolean));toc();footer();watch();
 }
 
 setLang(detectLang());
