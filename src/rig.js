@@ -37,6 +37,10 @@ export function createModel(data,texture,sex='male',{shadows=false,merge=false,b
   const [name,from,to,origin,rotation,inflate,faces]=model.cubes[index];
   const size=from.map((n,i)=>Math.max(.005,to[i]-n+2*(inflate||0)+(merge&&bias?index*.0016:0)));
   const geo=new THREE.BoxGeometry(...size),uv=geo.attributes.uv;
+  // A face the model does not draw (geo.json leaves it out, the import writes [0,0,0,0]) is dropped; otherwise it would
+  // show the texture's corner pixel, e.g. dark edges around a thin sail or crest.
+  const empty=faces.map(f=>!f||f[0]===f[2]&&f[1]===f[3]);
+  if(empty.some(Boolean)){geo.setIndex([...geo.index.array].filter((_,k)=>!empty[Math.floor(k/6)]));geo.clearGroups()}
   faces.forEach((f,i)=>{
    const coords=[[f[0]/w,1-f[1]/h],[f[2]/w,1-f[1]/h],[f[0]/w,1-f[3]/h],[f[2]/w,1-f[3]/h]];
    for(let j=0;j<Math.round((f[4]||0)/90);j++){const c=[...coords];[coords[0],coords[1],coords[3],coords[2]]=[c[2],c[0],c[1],c[3]];}

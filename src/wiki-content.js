@@ -3,9 +3,12 @@
 const T=(pt,en,es)=>({pt,en,es});
 
 export const DEPS=[
- {name:'Architectury API',v:'9.2.14',loaders:['fabric','forge'],url:'https://www.curseforge.com/minecraft/mc-mods/architectury-api'},
- {name:'GeckoLib',v:'4.8.4',loaders:['fabric','forge'],url:'https://www.curseforge.com/minecraft/mc-mods/geckolib'},
- {name:'Fabric API',v:'0.92.6+1.20.1',loaders:['fabric'],url:'https://www.curseforge.com/minecraft/mc-mods/fabric-api'},
+ {name:'Architectury API',v:'13.0.11',mc:'1.21.1',loaders:['fabric','neoforge'],url:'https://www.curseforge.com/minecraft/mc-mods/architectury-api'},
+ {name:'GeckoLib',v:'4.9.3',mc:'1.21.1',loaders:['fabric','neoforge'],url:'https://www.curseforge.com/minecraft/mc-mods/geckolib'},
+ {name:'Fabric API',v:'0.116.17+1.21.1',mc:'1.21.1',loaders:['fabric'],url:'https://www.curseforge.com/minecraft/mc-mods/fabric-api'},
+ {name:'Architectury API',v:'9.2.14',mc:'1.20.1',loaders:['fabric','forge'],url:'https://www.curseforge.com/minecraft/mc-mods/architectury-api'},
+ {name:'GeckoLib',v:'4.8.4',mc:'1.20.1',loaders:['fabric','forge'],url:'https://www.curseforge.com/minecraft/mc-mods/geckolib'},
+ {name:'Fabric API',v:'0.92.6+1.20.1',mc:'1.20.1',loaders:['fabric'],url:'https://www.curseforge.com/minecraft/mc-mods/fabric-api'},
 ];
 
 export const W={
@@ -22,7 +25,7 @@ export const W={
 
  'start.t':T('Começar','Getting started','Empezar'),
  'start.cards':[
-  {id:'instalacao',t:T('Instalar','Install','Instalar'),p:T('Requisitos, Fabric ou Forge e as dependências.','Requirements, Fabric or Forge and the dependencies.','Requisitos, Fabric o Forge y las dependencias.')},
+  {id:'instalacao',t:T('Instalar','Install','Instalar'),p:T('Requisitos, Fabric, NeoForge ou Forge e as dependências.','Requirements, Fabric, NeoForge or Forge and the dependencies.','Requisitos, Fabric, NeoForge o Forge y las dependencias.')},
   {id:'como-se-joga',t:T('Como se joga','How it plays','Cómo se juega'),p:T('Ovos, domesticação, montaria, ciência e armas.','Eggs, taming, riding, science and weapons.','Huevos, domesticación, montura, ciencia y armas.')},
   {id:'criaturas',t:T('Criaturas','Creatures','Criaturas'),p:T('As {n} espécies, com o Guia de Campo de cada uma.','All {n} species, each with its Field Guide.','Las {n} especies, cada una con su Guía de Campo.')},
   {id:'faq',t:T('Dúvidas','FAQ','Preguntas'),p:T('Versões, multiplayer e como reportar um problema.','Versions, multiplayer and how to report a problem.','Versiones, multijugador y cómo reportar un problema.')},
@@ -30,20 +33,24 @@ export const W={
 
  'inst.t':T('Instalação','Installation','Instalación'),
  'req.t':T('Requisitos','Requirements','Requisitos'),
- req:[T('Minecraft Java Edition 1.20.1.','Minecraft Java Edition 1.20.1.','Minecraft Java Edition 1.20.1.'),
-  T('Java 17, ou o Java que o seu launcher já instala.','Java 17, or the runtime your launcher already provides.','Java 17, o el que tu launcher ya instala.'),
-  T('Fabric Loader ou Forge 1.20.1 (47.x).','Fabric Loader or Forge 1.20.1 (47.x).','Fabric Loader o Forge 1.20.1 (47.x).')],
+ req:[T('Minecraft Java Edition 1.21.1 ou 1.20.1. O conteúdo é o mesmo nas duas.','Minecraft Java Edition 1.21.1 or 1.20.1. The content is the same on both.','Minecraft Java Edition 1.21.1 o 1.20.1. El contenido es el mismo en las dos.'),
+  T('Java 21 no 1.21.1 e Java 17 no 1.20.1. O launcher oficial já instala o certo.','Java 21 for 1.21.1 and Java 17 for 1.20.1. The official launcher already installs the right one.','Java 21 para 1.21.1 y Java 17 para 1.20.1. El launcher oficial ya instala el correcto.'),
+  T('No 1.21.1: Fabric Loader ou NeoForge 21.1. No 1.20.1: Fabric Loader ou Forge 47.x.','On 1.21.1: Fabric Loader or NeoForge 21.1. On 1.20.1: Fabric Loader or Forge 47.x.','En 1.21.1: Fabric Loader o NeoForge 21.1. En 1.20.1: Fabric Loader o Forge 47.x.')],
+
  'deps.t':T('Dependências','Dependencies','Dependencias'),
- 'deps.mod':T('Mod','Mod','Mod'),'deps.v':T('Versão usada no desenvolvimento','Version used in development','Versión usada en el desarrollo'),'deps.for':T('Para','For','Para'),
+ 'deps.mod':T('Mod','Mod','Mod'),'deps.mc':T('Minecraft','Minecraft','Minecraft'),'deps.v':T('Versão usada no desenvolvimento','Version used in development','Versión usada en el desarrollo'),'deps.for':T('Para','For','Para'),
  'deps.note':T('Essas são as versões da configuração de desenvolvimento; outras versões da mesma linha costumam funcionar.','These are the versions of the development setup; other versions of the same line usually work.','Son las versiones de la configuración de desarrollo; otras versiones de la misma línea suelen funcionar.'),
- 'fabric.t':T('No Fabric','On Fabric','En Fabric'),'forge.t':T('No Forge','On Forge','En Forge'),
- fabric:[T('Instale o Fabric Loader para o Minecraft 1.20.1.','Install Fabric Loader for Minecraft 1.20.1.','Instala Fabric Loader para Minecraft 1.20.1.'),
-  T('Coloque na pasta mods da instância a Fabric API, a Architectury API e o GeckoLib, todos na versão Fabric para 1.20.1.','Put Fabric API, Architectury API and GeckoLib in the instance’s mods folder, all as Fabric builds for 1.20.1.','Pon en la carpeta mods de la instancia Fabric API, Architectury API y GeckoLib, todos en la versión Fabric para 1.20.1.'),
-  T('Adicione terrassic-fabric-{v}.jar na mesma pasta e abra o jogo.','Add terrassic-fabric-{v}.jar to the same folder and launch the game.','Añade terrassic-fabric-{v}.jar en la misma carpeta y abre el juego.')],
+ 'fabric.t':T('No Fabric','On Fabric','En Fabric'),'neoforge.t':T('No NeoForge (1.21.1)','On NeoForge (1.21.1)','En NeoForge (1.21.1)'),'forge.t':T('No Forge (1.20.1)','On Forge (1.20.1)','En Forge (1.20.1)'),
+ fabric:[T('Instale o Fabric Loader para a sua versão do Minecraft, 1.21.1 ou 1.20.1.','Install Fabric Loader for your Minecraft version, 1.21.1 or 1.20.1.','Instala Fabric Loader para tu versión de Minecraft, 1.21.1 o 1.20.1.'),
+  T('Coloque na pasta mods da instância a Fabric API, a Architectury API e o GeckoLib, todos na versão Fabric para essa versão do Minecraft (tabela acima).','Put Fabric API, Architectury API and GeckoLib in the instance’s mods folder, all as Fabric builds for that Minecraft version (table above).','Pon en la carpeta mods de la instancia Fabric API, Architectury API y GeckoLib, todos en la versión Fabric para esa versión de Minecraft (tabla de arriba).'),
+  T('Adicione terrassic-fabric-1.21.1-{v}.jar ou terrassic-fabric-1.20.1-{v}.jar na mesma pasta e abra o jogo.','Add terrassic-fabric-1.21.1-{v}.jar or terrassic-fabric-1.20.1-{v}.jar to the same folder and launch the game.','Añade terrassic-fabric-1.21.1-{v}.jar o terrassic-fabric-1.20.1-{v}.jar en la misma carpeta y abre el juego.')],
+ neoforge:[T('Instale o NeoForge 21.1 para o Minecraft 1.21.1.','Install NeoForge 21.1 for Minecraft 1.21.1.','Instala NeoForge 21.1 para Minecraft 1.21.1.'),
+  T('Coloque na pasta mods a Architectury API e o GeckoLib na versão NeoForge para 1.21.1.','Put the NeoForge builds of Architectury API and GeckoLib for 1.21.1 in the mods folder.','Pon en la carpeta mods Architectury API y GeckoLib en la versión NeoForge para 1.21.1.'),
+  T('Adicione terrassic-neoforge-1.21.1-{v}.jar na mesma pasta e abra o jogo.','Add terrassic-neoforge-1.21.1-{v}.jar to the same folder and launch the game.','Añade terrassic-neoforge-1.21.1-{v}.jar en la misma carpeta y abre el juego.')],
  forge:[T('Instale o Forge 1.20.1 (47.x).','Install Forge 1.20.1 (47.x).','Instala Forge 1.20.1 (47.x).'),
   T('Coloque na pasta mods a Architectury API e o GeckoLib na versão Forge para 1.20.1.','Put the Forge builds of Architectury API and GeckoLib for 1.20.1 in the mods folder.','Pon en la carpeta mods Architectury API y GeckoLib en la versión Forge para 1.20.1.'),
-  T('Adicione terrassic-forge-{v}.jar na mesma pasta e abra o jogo.','Add terrassic-forge-{v}.jar to the same folder and launch the game.','Añade terrassic-forge-{v}.jar en la misma carpeta y abre el juego.')],
- 'forge.warn':T('Não instale a Fabric API numa instância Forge. Use só o arquivo do Terrassic do seu loader: os de Fabric e Forge não funcionam juntos.','Do not install Fabric API in a Forge instance. Use only the Terrassic file for your loader: the Fabric and Forge files do not work together.','No instales Fabric API en una instancia Forge. Usa solo el archivo de Terrassic de tu loader: los de Fabric y Forge no funcionan juntos.'),
+  T('Adicione terrassic-forge-1.20.1-{v}.jar na mesma pasta e abra o jogo.','Add terrassic-forge-1.20.1-{v}.jar to the same folder and launch the game.','Añade terrassic-forge-1.20.1-{v}.jar en la misma carpeta y abre el juego.')],
+ 'forge.warn':T('Não instale a Fabric API numa instância Forge ou NeoForge. Use só o arquivo do Terrassic que tem o seu loader e a sua versão do Minecraft no nome: os outros não funcionam juntos.','Do not install Fabric API in a Forge or NeoForge instance. Use only the Terrassic file whose name has your loader and Minecraft version: the others do not work together.','No instales Fabric API en una instancia Forge o NeoForge. Usa solo el archivo de Terrassic que lleva tu loader y tu versión de Minecraft en el nombre: los otros no funcionan juntos.'),
  'mp.t':T('Multiplayer e servidores','Multiplayer and servers','Multijugador y servidores'),
  mp:[T('O Terrassic precisa estar no servidor e no cliente de cada jogador, com as dependências dos dois lados.','Terrassic is required on the server and on every player’s client, with the dependencies on both sides.','Terrassic tiene que estar en el servidor y en el cliente de cada jugador, con las dependencias en ambos lados.'),
   T('Use a mesma versão do Terrassic, do Minecraft e do loader no servidor e em todos os clientes.','Use the same Terrassic, Minecraft and loader versions on the server and on every client.','Usa la misma versión de Terrassic, de Minecraft y del loader en el servidor y en todos los clientes.'),
@@ -80,7 +87,8 @@ export const W={
 
  'faq.t':T('Dúvidas frequentes','Frequently asked questions','Preguntas frecuentes'),
  faq:[
-  {q:T('Posso usar os arquivos de Fabric e Forge juntos?','Can I use the Fabric and Forge files together?','¿Puedo usar los archivos de Fabric y Forge juntos?'),a:T('Não. Escolha o arquivo do loader da sua instância.','No. Pick the file that matches your instance’s loader.','No. Elige el archivo del loader de tu instancia.')},
+  {q:T('Qual arquivo eu baixo?','Which file do I download?','¿Qué archivo descargo?'),a:T('O que tem o seu loader e a sua versão do Minecraft no nome, por exemplo terrassic-neoforge-1.21.1-{v}.jar. Os arquivos de loaders diferentes não funcionam juntos.','The one whose name has your loader and Minecraft version, for example terrassic-neoforge-1.21.1-{v}.jar. Files for different loaders do not work together.','El que lleva tu loader y tu versión de Minecraft en el nombre, por ejemplo terrassic-neoforge-1.21.1-{v}.jar. Los archivos de loaders distintos no funcionan juntos.')},
+  {q:T('O Terrassic funciona no 1.21.1?','Does Terrassic work on 1.21.1?','¿Terrassic funciona en 1.21.1?'),a:T('Sim. Desde a 1.1.4 há arquivos para 1.21.1 (Fabric e NeoForge) e para 1.20.1 (Fabric e Forge), com o mesmo conteúdo.','Yes. Since 1.1.4 there are files for 1.21.1 (Fabric and NeoForge) and for 1.20.1 (Fabric and Forge), with the same content.','Sí. Desde la 1.1.4 hay archivos para 1.21.1 (Fabric y NeoForge) y para 1.20.1 (Fabric y Forge), con el mismo contenido.')},
   {q:T('Todo jogador precisa do mod?','Does every player need the mod?','¿Cada jugador necesita el mod?'),a:T('Sim. O Terrassic e as dependências vão no servidor e no cliente de cada jogador.','Yes. Terrassic and its dependencies go on the server and on every player’s client.','Sí. Terrassic y sus dependencias van en el servidor y en el cliente de cada jugador.')},
   {q:T('É uma versão final?','Is this a finished release?','¿Es una versión final?'),a:T('Não. As versões atuais são alfa: pode haver bugs e o conteúdo muda. Mantenha sempre backups dos mundos.','No. Current versions are alpha: bugs and content changes may happen. Always keep world backups.','No. Las versiones actuales son alfa: puede haber errores y el contenido cambia. Guarda siempre copias de tus mundos.')},
   {q:T('O mod usa inteligência artificial enquanto eu jogo?','Does the mod use generative AI while I play?','¿El mod usa inteligencia artificial mientras juego?'),a:T('Não. Ferramentas de IA ajudaram no código e nos textos do projeto, mas o jogo não se conecta a nenhum serviço de IA. Os detalhes estão nas declarações de conteúdo do Modrinth.','No. AI tools helped with the project’s code and text, but the game does not connect to any AI service. Details are in the Modrinth content disclosures.','No. Herramientas de IA ayudaron con el código y los textos del proyecto, pero el juego no se conecta a ningún servicio de IA. Los detalles están en las declaraciones de contenido de Modrinth.')},
@@ -90,7 +98,7 @@ export const W={
   'Found a problem? Tell us what happened and how to reproduce it. No account needed.',
   '¿Encontraste un problema? Cuéntanos qué pasó y cómo repetirlo. No necesitas crear una cuenta.'),
  'bug.version':T('Versão do Terrassic','Terrassic version','Versión de Terrassic'),
- 'bug.loader':T('Loader','Loader','Loader'),
+ 'bug.loader':T('Loader','Loader','Loader'),'bug.mc':T('Minecraft','Minecraft','Minecraft'),
  'bug.where':T('Onde acontece','Where it happens','Dónde ocurre'),
  'bug.where.sp':T('Singleplayer','Singleplayer','Un jugador'),'bug.where.mp':T('Multiplayer (servidor)','Multiplayer (server)','Multijugador (servidor)'),'bug.where.both':T('Nos dois','Both','En ambos'),
  'bug.what':T('O que aconteceu?','What happened?','¿Qué pasó?'),

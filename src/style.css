@@ -192,7 +192,10 @@ button{cursor:pointer}
 .roster-bar{display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;align-items:center;margin-top:44px}
 .filters{display:flex;gap:6px;flex-wrap:wrap}
 .roster-tools{display:flex;gap:8px;flex-wrap:wrap}
-.search input,.sort select{background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:8px 14px;font-size:14px;color:var(--bone);min-width:0}
+.search input,.sort select{height:38px;background-color:var(--surface);border:1px solid var(--line);border-radius:8px;padding:0 14px;font-size:14px;line-height:36px;color:var(--bone);min-width:0}
+.sort select{-webkit-appearance:none;appearance:none;padding-right:36px;cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6' shape-rendering='crispEdges'%3E%3Cpath fill='%23b3a48c' d='M0 0h2v2H0zM2 2h2v2H2zM4 4h2v2H4zM6 2h2v2H6zM8 0h2v2H8z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;background-size:10px 6px}
+.sort select:hover{border-color:var(--basalt-500)}
+.sort select option{background:var(--basalt-900);color:var(--bone)}
 .search input{width:220px;max-width:100%}
 .search input:focus,.sort select:focus{outline:none;border-color:var(--amber)}
 .roster-count{font:12px var(--mono);color:var(--muted);margin:16px 0 14px}
@@ -330,23 +333,50 @@ button{cursor:pointer}
  .story-kicker{position:static;margin-bottom:24px}
 }
 
-/* Opening: the title, one line about the mod and the download on the left; the latest finished animal on the right,
-   standing still in its idle loop. A normal section: nothing is pinned to the scroll. */
-.hero{position:relative;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);align-items:center;gap:24px;min-height:min(820px,100svh);padding:96px var(--gutter-r) 56px var(--gutter-l);background:#dbb15b;color:var(--basalt-900);overflow:hidden}
-.hero-copy{display:grid;gap:14px;max-width:560px;position:relative;z-index:1}
-.hero-word{margin:0 0 10px;line-height:0}
-.hero-word img{width:100%;height:auto;image-rendering:pixelated}
+/* Opening film: the amber sky of the old site, the T. rex on a chunk of the mod's blocks and the meteor that the scroll brings in. */
+.film{position:relative;height:520svh;background:var(--basalt-950)}
+.film-stage{--film-bg:#dbb15b;--intro:1;--quote:0;--chapter:0;--fade:0;position:sticky;top:0;height:100svh;min-height:560px;overflow:clip;isolation:isolate;background:var(--film-bg);color:var(--basalt-900)}
+.film-stage::before{content:"";position:absolute;inset:0;z-index:-3;background:radial-gradient(70% 55% at 75% 8%,rgba(255,238,190,.55),transparent 70%),linear-gradient(0deg,rgba(185,119,28,.35),transparent 45%)}
+.film-word{position:absolute;left:50%;top:calc(15% + env(safe-area-inset-top,0px));width:min(94vw,1500px);margin:0;line-height:0;transform:translate(-50%,calc((1 - var(--intro))*-150px));opacity:calc(.12 + var(--intro)*.88);z-index:-2}
+.film-word img{width:100%;height:auto;image-rendering:pixelated}
+.hero-canvas{position:absolute;inset:0;z-index:-1;opacity:0;transition:opacity 1.2s ease}
+.film.is-live .hero-canvas{opacity:1}
+.film.no-webgl .hero-canvas{opacity:1;background:68% 62%/min(56vw,760px) auto no-repeat}
+.film-stage::after{content:"";position:absolute;inset:0;z-index:4;pointer-events:none;background:var(--basalt-950);opacity:var(--fade)}
+.hero-canvas canvas{width:100%!important;height:100%!important;display:block;image-rendering:pixelated}
+.film-copy{position:absolute;z-index:3}
+.film-intro{left:var(--gutter-l);bottom:clamp(70px,11vh,120px);max-width:470px;opacity:var(--intro);transform:translateY(calc((1 - var(--intro))*30px));pointer-events:auto}
+.film-intro .hero-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}
+.btn-dark{background:var(--basalt-900);color:var(--amber-300);box-shadow:0 10px 24px -12px rgba(20,16,20,.7)}
+.btn-dark:hover{background:var(--basalt-700)}
+.btn-line{color:var(--basalt-900);box-shadow:0 0 0 1.5px var(--basalt-900) inset}
+.btn-line:hover{background:rgba(20,16,20,.08)}
+.film-quote{left:50%;top:22%;width:min(760px,88vw);text-align:center;transform:translate(-50%,calc((1 - var(--quote))*24px));opacity:var(--quote)}
+.film-quote p{font:400 48px/64px var(--hand);color:var(--basalt-900);-webkit-font-smoothing:none}
+@media(max-width:760px){.film-quote p{font-size:32px;line-height:44px}}
+.film-quote span{display:block;margin-top:12px;font:500 12px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--ink)}
+.film-chapter{left:var(--gutter-l);top:24%;max-width:520px;opacity:var(--chapter);transform:translateY(calc((1 - var(--chapter))*24px))}
+.film-chapter h2{font:900 clamp(56px,8vw,128px)/.9 var(--display);color:var(--basalt-950);margin-top:10px;text-shadow:0 2px 0 rgba(255,220,150,.35)}
+.film-chapter p:last-child{margin-top:14px;font-size:18px;color:var(--basalt-900);max-width:30ch}
+.film-top{position:absolute;z-index:4;right:var(--gutter-r);top:calc(76px + env(safe-area-inset-top,0px));display:flex;flex-direction:column;align-items:flex-end;gap:10px}
+.hero-status{display:flex;align-items:center;gap:10px;font:12px var(--mono);color:var(--ink);transition:opacity .6s}
+.film.is-loaded .hero-status{opacity:.6}
+.hero-meter{width:80px;height:3px;background:rgba(20,16,20,.15);border-radius:2px;overflow:hidden}
+.hero-meter span{display:block;height:100%;width:0;background:var(--basalt-900);transition:width .5s var(--ease)}
+.hero-sound{display:inline-flex;align-items:center;gap:9px;border:1.5px solid var(--basalt-900);background:transparent;color:var(--basalt-900);border-radius:999px;padding:7px 14px 7px 11px;font:500 12px var(--mono)}
+.hero-sound:hover{background:rgba(20,16,20,.08)}
+.hero-sound[aria-pressed=true]{background:var(--basalt-900);color:var(--amber-300)}
+.hero-sound-icon{width:14px;height:12px;background:currentColor;clip-path:polygon(0 30%,30% 30%,65% 0,65% 100%,30% 70%,0 70%)}
+.scroll-cue{position:absolute;z-index:4;right:var(--gutter-r);bottom:30px;display:flex;align-items:center;gap:12px;font:500 12px var(--mono);color:var(--basalt-900);text-decoration:none}
+.scroll-arrow{font:20px/1 var(--body);animation:nudge 1.6s var(--ease) infinite}
+@keyframes nudge{50%{transform:translateY(5px)}}
+.film-track{position:absolute;left:0;right:0;bottom:0;height:3px;background:rgba(20,16,20,.12);z-index:4}
+.film-track span{display:block;height:100%;width:0;background:var(--basalt-900)}
+.no-webgl .hero-status,.no-webgl .hero-sound{display:none}
 .film-eyebrow{font:400 12px/1.5 var(--mono);letter-spacing:.04em;text-transform:uppercase;color:var(--ink)}
-.film-lede{font-size:clamp(17px,1.5vw,20px);line-height:1.5;color:var(--basalt-900)}
+.film-lede{margin-top:12px;font-size:clamp(17px,1.5vw,20px);line-height:1.5;color:var(--basalt-900)}
 .hero-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:8px}
-.hero-canvas{position:relative;height:min(62vh,560px);min-height:320px;opacity:0;transition:opacity .6s ease;background:center/contain no-repeat}
-.hero-canvas.is-live,.hero-canvas.is-still{opacity:1}
-.hero-canvas canvas{width:100%!important;height:100%!important;display:block}
 section[id]{scroll-margin-top:56px}
-@media (max-width:860px){
- .hero{grid-template-columns:1fr;padding-top:84px;min-height:0}
- .hero-canvas{height:300px;min-height:0;order:-1}
-}
 
 /* "Coming soon": animals whose new model is not ready show only a silhouette against a lit backdrop, and the story
    gives way to one short block (site-config.js: models.ready, story). */
@@ -422,3 +452,78 @@ section[id]{scroll-margin-top:56px}
 /* Long names (Argentinossauro, Opisthocoelicaudia) fit the two-column cards on phones instead of breaking a letter off. */
 .card-name{hyphens:auto}
 @media (max-width:760px){.card-name{font-size:15px}}
+
+/* The opening on small screens, on a phone on its side and with reduced motion (from the first site). */
+@media (max-width:760px){
+  .film{height:440svh}
+ .film-word{top:calc(112px + env(safe-area-inset-top,0px))}
+ .film-intro{bottom:64px;right:var(--gutter-r)}
+ .film-lede{font-size:16px}
+ .film-quote{top:20%}.film-chapter{top:18%}
+ .film-top{top:calc(62px + env(safe-area-inset-top,0px))}.hero-status{display:none}
+ .scroll-cue{bottom:22px}
+}
+/* A phone on its side: the opening fits the short screen, title on top, copy bottom left, the animal to the right. */
+@media (orientation:landscape) and (max-height:520px){
+ .film-stage{min-height:0}
+ .film-word{top:calc(58px + env(safe-area-inset-top,0px));width:min(52vw,560px)}
+ .film-top{top:calc(58px + env(safe-area-inset-top,0px))}.hero-status{display:none}
+ .film-intro{bottom:14px;max-width:min(46vw,440px)}
+ .film-eyebrow{font-size:11px}.film-lede{margin-top:6px;font-size:15px;line-height:1.45}
+ .film-intro .hero-actions{margin-top:12px}.film-intro .btn{padding:10px 16px;gap:10px;font-size:15px}
+ .film-quote{top:24%}.film-quote p{font-size:32px;line-height:44px}
+ .film-chapter{top:22%}.film-chapter h2{font-size:clamp(40px,7vw,64px)}.film-chapter p:last-child{font-size:16px}
+ .scroll-cue{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+ .film{height:auto}.film-stage{position:relative;height:100svh}.scroll-cue{display:none}
+}
+
+/* The loading screen: a Cretaceous night with the Rift glowing on the horizon, and the title carved in dark stone,
+   sitting exactly where the opening shows it (loader.js measures it). As the site loads (--p, 0 to 1) the letters
+   light up from left to right behind a hot seam of amber; at the end the amber sky floods in around the title, the
+   screen fades and the opening is underneath, with the same title in the same place. */
+html.is-loading,html.is-loading body{overflow:hidden}
+.loader-screen{--p:0;position:fixed;inset:0;z-index:100;overflow:hidden;color:var(--stone-300);
+ background:radial-gradient(70% 45% at 50% var(--ty,30%),rgba(242,181,68,calc(var(--p)*.13)),transparent 70%),radial-gradient(120% 50% at 50% 115%,rgba(240,122,26,.42),transparent 64%),radial-gradient(90% 70% at 50% 125%,rgba(94,56,102,.5),transparent),var(--basalt-950);
+ transition:opacity .5s ease,visibility .5s;animation:loaderGiveUp .6s 20s forwards}
+.loader-screen.is-done{opacity:0;visibility:hidden}
+.loader-title{position:absolute;left:50%;top:30%;width:min(94vw,1500px);aspect-ratio:970/210;transform:translate(-50%,-50%)}
+.loader-title.is-placed{transform:none}
+.loader-title img{position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelated}
+.loader-title-dim{filter:brightness(.2) saturate(.3) contrast(1.1)}
+/* The lit layers are masked on a box with room around the letters, so their glow is never cut into a rectangle. --cut
+   is where the light has reached; the seam is a band of the mod's amber-finish title glowing just behind it. */
+.loader-reveal{--pad:48px;--cut:calc(var(--pad) + var(--p)*(100% - 2*var(--pad)));position:absolute;inset:calc(-1*var(--pad));pointer-events:none}
+.loader-reveal img{inset:var(--pad);width:calc(100% - 2*var(--pad));height:calc(100% - 2*var(--pad))}
+.loader-lit{--band:max(12px,4%);-webkit-mask:linear-gradient(90deg,#000 calc(var(--cut) - var(--band)),transparent var(--cut));mask:linear-gradient(90deg,#000 calc(var(--cut) - var(--band)),transparent var(--cut))}
+.loader-lit img{filter:drop-shadow(0 0 calc(6px + var(--p)*12px) rgba(242,181,68,.4))}
+.loader-seam{--band:max(12px,4%);-webkit-mask:linear-gradient(90deg,transparent calc(var(--cut) - var(--band)*2),#000 calc(var(--cut) - var(--band)*.6),#000 var(--cut),transparent var(--cut));mask:linear-gradient(90deg,transparent calc(var(--cut) - var(--band)*2),#000 calc(var(--cut) - var(--band)*.6),#000 var(--cut),transparent var(--cut));opacity:min(1,var(--p)*40,(1 - var(--p))*40);transition:opacity .3s}
+.loader-seam img{filter:brightness(1.35) drop-shadow(0 0 5px rgba(255,190,80,.9)) drop-shadow(0 0 10px rgba(240,122,26,.55))}
+.loader-line{position:absolute;left:50%;top:var(--line-top,calc(30% + 14vw));transform:translateX(-50%);display:flex;gap:14px;margin:0;white-space:nowrap;font:500 12px/1.4 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--amber);transition:opacity .3s}
+.loader-pct{color:var(--bone);font-variant-numeric:tabular-nums;min-width:4ch}
+.loader-motes{position:absolute;inset:0;pointer-events:none;transition:opacity .4s}
+.loader-motes i{position:absolute;bottom:-8px;width:var(--s,3px);height:var(--s,3px);background:var(--amber-300);box-shadow:0 0 calc(var(--s,3px)*3) rgba(242,181,68,.85);animation:mote var(--d,9s) linear var(--delay,0s) infinite}
+.loader-flood{position:absolute;inset:0;background:rgb(219,177,91);clip-path:circle(0 at var(--fx,50%) var(--fy,30%));pointer-events:none}
+.loader-screen.is-flooding .loader-flood{clip-path:circle(150vmax at var(--fx,50%) var(--fy,30%));transition:clip-path .9s cubic-bezier(.65,0,.35,1)}
+.loader-screen.is-flooding .loader-line,.loader-screen.is-flooding .loader-motes,.loader-screen.is-flooding .loader-seam{opacity:0}
+.loader-screen.is-flooding .loader-lit{-webkit-mask:none;mask:none}.loader-screen.is-flooding .loader-lit img{filter:none;transition:filter .9s}
+@keyframes mote{0%{transform:translate(0,0);opacity:0}12%{opacity:var(--o,1)}100%{transform:translate(var(--drift,12px),-105vh);opacity:0}}
+@keyframes loaderGiveUp{to{opacity:0;visibility:hidden}}
+@media (prefers-reduced-motion:reduce){.loader-motes{display:none}}
+
+/* Install: four files (Minecraft version × loader); on a narrow screen the tabs wrap into a 2×2 grid. */
+.seg-wrap{flex-wrap:wrap;border-radius:12px;gap:2px}
+.seg-wrap button{border-radius:9px;white-space:nowrap}
+@media (max-width:560px){.seg-wrap{display:grid;grid-template-columns:1fr 1fr;width:100%}}
+
+/* The weapons' 3D stage: the chosen weapon doing what it does in the game (items3d.js). */
+.arms-stage{position:relative;height:260px;margin:4px 0 12px;border-radius:8px;border:1px solid var(--line);overflow:hidden;
+ background:radial-gradient(60% 80% at 50% 70%,#3a2a20 0,#1d171b 70%,#141016 100%)}
+.arms-stage[hidden]{display:none}
+.arms-stage canvas{position:absolute;inset:0;width:100%!important;height:100%!important;display:block;image-rendering:pixelated}
+.arms-caption{position:absolute;left:12px;top:10px;z-index:1;font:400 11px/1 var(--mono);letter-spacing:.04em;text-transform:uppercase;color:var(--amber)}
+.slots button.slot{width:100%;text-align:left;font:inherit;color:inherit;cursor:pointer}
+.slot[aria-pressed=true]{border-color:var(--amber);background:var(--raised)}
+.slots li{list-style:none}
+@media (max-width:760px){.arms-stage{height:200px}}

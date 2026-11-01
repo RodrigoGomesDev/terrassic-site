@@ -1,5 +1,5 @@
 import {SPECIES,LORE} from './generated/species.js';
-import {ERAS,VERSIONS,GUIDE_LEVELS,TOOLS,WEAPONS,INSTALL,FAQ} from './content.js';
+import {ERAS,VERSIONS,GUIDE_LEVELS,TOOLS,WEAPONS,INSTALL,INSTALL_TABS,FAQ} from './content.js';
 import {t,pick} from './i18n.js';
 import {report,story,isReady} from './site-config.js';
 import {sprite,paintSprite} from './sprites.js';
@@ -14,9 +14,30 @@ const scrollers=[];export const onScroll=fn=>scrollers.push(fn);
 let ticking=false;const frame=()=>{ticking=false;for(const fn of scrollers)fn()};
 addEventListener('scroll',()=>{if(!ticking){ticking=true;requestAnimationFrame(frame)}},{passive:true});addEventListener('resize',()=>requestAnimationFrame(frame));
 
+// The opening film: scroll progress drives the sky colour, the captions, the flash and the 3D scene.
+const SKY=[[0,[219,177,91]],[.84,[219,177,91]],[1,[20,16,20]]];
+const sky=p=>{let i=0;while(i<SKY.length-2&&SKY[i+1][0]<p)i++;const [a,ca]=SKY[i],[b,cb]=SKY[i+1],k=smooth((p-a)/(b-a));return `rgb(${ca.map((v,j)=>Math.round(v+(cb[j]-v)*k)).join(',')})`};
+export function initFilm(){
+ const film=$('inicio'),stage=$('film-stage'),listeners=[];
+ // Without story mode there is no notebook quote nor chapter card: the T. rex roars and the camera dives on its own.
+ const win=(p,a,b,c,d)=>story?smooth((p-a)/(b-a))*(1-smooth((p-c)/(d-c))):0;
+ const update=()=>{
+  const p=reduced?.62:pinProgress(film);
+  stage.style.setProperty('--film-bg',sky(p));stage.style.setProperty('--intro',(1-smooth(p/.1)).toFixed(3));
+  stage.style.setProperty('--quote',win(p,.1,.15,.26,.31).toFixed(3));stage.style.setProperty('--chapter',win(p,.34,.39,.5,.56).toFixed(3));
+  // The dive into the mouth breaks into big blocks (hero.js), then fades to the dark of the story in steps.
+  stage.style.setProperty('--fade',(Math.round(smooth((p-.86)/.1)*6)/6).toFixed(3));
+  $('film-fill').style.width=`${p*100}%`;$('scroll-label').textContent=t(p<.3?'film.scroll':p<.84?'film.scroll2':'film.scroll3');
+  $('topbar').classList.toggle('on-light',film.getBoundingClientRect().bottom>innerHeight*.5&&p<.9);
+  for(const fn of listeners)fn(p);
+ };
+ onScroll(update);
+ const render=()=>{if(story){const page=LORE.pages.find(x=>x.day===1203)||LORE.pages.at(-1),text=pick(page.text);$('film-quote').textContent=text.slice(0,text.indexOf('.')+1);$('film-cite').textContent=`${t('best.noteBy')} · ${t('book.day')} ${page.day}`}update()};
+ return {render,listen:fn=>{listeners.push(fn);fn(reduced?.62:pinProgress(film))}};
+}
+
 export function initHeader(){
- const bar=$('topbar'),hero=$('inicio');
- new IntersectionObserver(([e])=>bar.classList.toggle('on-light',e.isIntersecting),{rootMargin:`-${bar.offsetHeight+16}px 0px -100% 0px`}).observe(hero);
+ const bar=$('topbar');
  // On small screens the sections sit behind a Menu button; choosing one, or Esc, closes it again.
  const toggle=$('nav-toggle'),setOpen=o=>{bar.classList.toggle('is-open',o);toggle.setAttribute('aria-expanded',String(o))};
  toggle.addEventListener('click',()=>setOpen(!bar.classList.contains('is-open')));
@@ -129,10 +150,20 @@ export function initMechanics(thumbnailer){
  for(const s of document.querySelectorAll('[data-sprite]'))paintSprite(s,s.dataset.sprite,Number(s.dataset.size)||32);
  const para=SPECIES.find(s=>s.id==='parasaurolophus');$('sex-pair').classList.toggle('is-soon',!isReady(para.id));
  const pair=new IntersectionObserver(([e])=>{if(!e.isIntersecting)return;pair.disconnect();for(const sex of ['male','female'])picture(`parasaurolophus-${sex}`,()=>thumbnailer().then(t=>t.request(para,sex))).then(url=>{$(`pair-${sex}`).src=url}).catch(()=>{})},{rootMargin:'400px'});pair.observe($('sex-pair'));
+ // The weapons' 3D stage loads only when the card comes near.
+ let weapon='blowgun',armsStage=null;
+ const showWeapon=()=>{const w=WEAPONS.find(x=>x.id===weapon);$('arms-caption').textContent=pick(w.name);armsStage?.show(w)};
+ const armsIO=new IntersectionObserver(([e])=>{if(!e.isIntersecting)return;armsIO.disconnect();
+  import('./items3d.js').then(({WeaponStage})=>{const s=new WeaponStage($('arms-stage'));if(!s.renderer){$('arms-stage').hidden=true;return}armsStage=s;showWeapon()}).catch(()=>{$('arms-stage').hidden=true})},{rootMargin:'400px'});
+ armsIO.observe($('arms-stage'));
  return ()=>{
   $('levels').replaceChildren(...GUIDE_LEVELS.map((l,i)=>{const li=el('li');li.style.setProperty('--i',i);li.append(el('strong','',pick(l.name)),el('span','',pick(!story&&l.howSoon?l.howSoon:l.how)));return li}));
   $('tools').replaceChildren(...TOOLS.map(x=>{const li=el('li');li.append(sprite(x.sprite,32),el('span','',pick(x.name)));return li}));
-  $('weapons').replaceChildren(...WEAPONS.map(w=>{const li=el('li','slot');li.append(sprite(w.sprite,32));const d=el('div');d.append(el('span','slot-name',pick(w.name)),el('span','slot-dmg',w.thrown?`${w.dmg} · ${w.thrown} ${t('mech.thrown')}`:w.dmg));li.append(d);return li}));
+  // Each slot is a button: it shows that weapon on the 3D stage above, doing what it does in the game.
+  $('weapons').replaceChildren(...WEAPONS.map(w=>{const li=el('li');const b=el('button','slot');b.type='button';b.dataset.weapon=w.id;b.setAttribute('aria-pressed',String(w.id===weapon));
+   b.append(sprite(w.sprite,32));const d=el('div');d.append(el('span','slot-name',pick(w.name)),el('span','slot-dmg',w.note?pick(w.note):w.thrown?`${w.dmg} · ${w.thrown} ${t('mech.thrown')}`:w.dmg));b.append(d);
+   b.addEventListener('click',()=>{weapon=w.id;for(const x of $('weapons').querySelectorAll('.slot'))x.setAttribute('aria-pressed',String(x.dataset.weapon===weapon));showWeapon()});li.append(b);return li}));
+  showWeapon();
   $('journal').hidden=!story;
   const themes=Object.keys(LORE.themes);
   $('journal').replaceChildren(...themes.map(th=>{const col=el('div','journal-col');col.append(el('h4','',pick(LORE.themes[th])));const ul=el('ul');for(const o of LORE.objectives.filter(o=>o.theme===th)){const li=el('li');li.title=pick(o.text);li.append(el('span','check'),el('span','',pick(o.title)));ul.append(li)}col.append(ul);return col}));
@@ -140,14 +171,16 @@ export function initMechanics(thumbnailer){
 }
 
 export function initInstall(links){
- let loader='fabric';
- const render=()=>{for(const n of ['fabric','forge']){const tab=$(`tab-${n}`);tab.setAttribute('aria-selected',String(n===loader));tab.tabIndex=n===loader?0:-1}
-  $('steps').replaceChildren(...INSTALL[loader].map(s=>el('li','',pick(s))));
+ let loader=INSTALL_TABS[0][0];const tabs=$('install-tabs'),ids=INSTALL_TABS.map(([id])=>id);
+ tabs.replaceChildren(...INSTALL_TABS.map(([id,label])=>{const b=el('button','',label);b.type='button';b.setAttribute('role','tab');b.id=`tab-${id}`;
+  b.addEventListener('click',()=>{loader=id;render()});
+  b.addEventListener('keydown',e=>{if(e.key!=='ArrowLeft'&&e.key!=='ArrowRight')return;e.preventDefault();const k=(ids.indexOf(loader)+(e.key==='ArrowRight'?1:-1)+ids.length)%ids.length;loader=ids[k];render();$(`tab-${loader}`).focus()});return b}));
+ const render=()=>{for(const n of ids){const tab=$(`tab-${n}`);tab.setAttribute('aria-selected',String(n===loader));tab.tabIndex=n===loader?0:-1}
+  $('steps').replaceChildren(...INSTALL[loader].map(s=>el('li','',pick(s).replace('{v}',links.version))));
   if(links.download)for(const id of ['download','hero-download'])$(id).href=links.download;
   for(const id of ['discord','foot-discord']){$(id).hidden=!links.discord;if(links.discord)$(id).href=links.discord}
   // The wiki only has a report section once the form has its key or there is a Discord (same rule as wiki.js).
   $('report-link').hidden=!(report.web3formsKey||links.discord||import.meta.env.DEV)};
- for(const n of ['fabric','forge']){$(`tab-${n}`).addEventListener('click',()=>{loader=n;render()});$(`tab-${n}`).addEventListener('keydown',e=>{if(e.key==='ArrowLeft'||e.key==='ArrowRight'){e.preventDefault();loader=n==='fabric'?'forge':'fabric';render();$(`tab-${loader}`).focus()}})}
  return render;
 }
 

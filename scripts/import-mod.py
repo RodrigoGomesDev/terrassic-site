@@ -104,7 +104,8 @@ CELL = 32
 ITEMS = ['field_notebook', 'amber_lens', 'sketching_charcoal', 'hair_brush', 'flint_chisel', 'clay_jar', 'blood_sample',
          'raw_amber', 'loose_page', 'flint_spear', 'horn_spear', 'flint_knife', 'flint_hatchet', 'bone_club', 'tail_club',
          'rex_tooth_dagger', 'rex_tooth', 'triceratops_horn', 'ankylosaurus_club', 'blowgun', 'tranq_dart', 'sleep_herb',
-         'raw_dino_meat', 'cooked_prime_meat', 'platform_saddle', 'sketch']
+         'raw_dino_meat', 'cooked_prime_meat', 'platform_saddle', 'sketch', 'hunting_bow', 'flint_arrow',
+         'narcotic_arrow', 'bola', 'tyrannosaurus_saddle', 'pteranodon_saddle', 'velociraptor_harness']
 BLOCKS = ['tyrannosaurus_egg_0', 'tyrannosaurus_egg_1', 'tyrannosaurus_egg_2', 'triceratops_egg_0', 'triceratops_egg_1',
           'triceratops_egg_2', 'amber_block', 'amber_with_insect', 'amber_with_leaf', 'amber_with_feather', 'bone_pile',
           'tyrannosaurus_skull_fossil']
@@ -210,6 +211,41 @@ def story():
                 eras={k: tri(v) for k, v in lore.ERAS.items()}, diets={k: tri(v) for k, v in lore.DIETS.items()})
 
 
+# ------------------------------------------------------------------ weapons in 3D
+# The 3D models the game draws in the hand and in the air (vanilla item models made of boxes), plus the flat item
+# pictures the site extrudes into pixel-thick 3D like the game does (items/<name>.png). See src/items3d.js.
+ITEM_MODELS = ['flint_spear_held', 'horn_spear_held', 'blowgun_blowing', 'bola_thrown']
+ITEM_FLAT = ['flint_knife', 'flint_hatchet', 'bone_club', 'rex_tooth_dagger', 'tail_club', 'hunting_bow',
+             'hunting_bow_pulling_0', 'hunting_bow_pulling_1', 'hunting_bow_pulling_2', 'flint_arrow', 'narcotic_arrow',
+             'tranq_dart', 'blowgun', 'bola', 'flint_spear', 'horn_spear', 'sleep_herb']
+
+
+def export_items3d():
+    out = OUT / 'items'
+    out.mkdir(parents=True, exist_ok=True)
+    tex = lambda ref: ref.split(':')[-1].split('/')[-1]
+
+    def resolve(name):
+        d = json.loads((RES / 'models/item' / f'{name}.json').read_text())
+        if 'parent' in d and d['parent'].startswith('terrassic:'):
+            base = resolve(d['parent'].split('/')[-1])
+            base.update({k: v for k, v in d.items() if k != 'parent'})
+            return base
+        return d
+    for name in ITEM_MODELS:
+        d = resolve(name)
+        textures = {k: tex(v) for k, v in d['textures'].items() if not v.startswith('#')}
+        for t in set(textures.values()):
+            shutil.copy2(RES / 'textures/item' / f'{t}.png', out / f'{t}.png')
+        elements = [{k: e[k] for k in ('from', 'to', 'rotation', 'faces') if k in e} for e in d['elements']]
+        for e in elements:
+            for f in e['faces'].values():
+                f['texture'] = textures[f['texture'].lstrip('#')]
+        (out / f'{name}.json').write_text(json.dumps(r4({'elements': elements}), separators=(',', ':')))
+    for name in ITEM_FLAT:
+        shutil.copy2(RES / 'textures/item' / f'{name}.png', out / f'{name}.png')
+
+
 def main():
     (OUT / 'species').mkdir(parents=True, exist_ok=True)
     (SITE / 'src/generated').mkdir(parents=True, exist_ok=True)
@@ -245,6 +281,7 @@ def main():
         ))
     atlas = build_atlas([s['id'] for s in species])
     blocks = copy_blocks()
+    export_items3d()
     # Optional: the site's own softer drawings of the scenery blocks (scripts/blocktex.py), still under review.
     if '--soft-blocks' in sys.argv:
         import blocktex

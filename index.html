@@ -6,7 +6,7 @@
 <title>Terrassic: a dinosaur mod for Minecraft</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <meta name="theme-color" content="#1c181e">
-<meta name="description" content="Terrassic, a dinosaur mod for Minecraft Java 1.20.1 on Fabric and Forge.">
+<meta name="description" content="Terrassic, a dinosaur mod for Minecraft Java 1.21.1 and 1.20.1, on Fabric, NeoForge and Forge.">
 <meta property="og:title" content="Terrassic">
 <meta property="og:type" content="website">
 <!-- Link previews (Discord, Reddit, WhatsApp). Crawlers need an absolute address: when the site has its domain, put it in front of this path. -->
@@ -14,13 +14,19 @@
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
-<meta property="og:description" content="Terrassic, a dinosaur mod for Minecraft Java 1.20.1 on Fabric and Forge.">
+<meta property="og:description" content="Terrassic, a dinosaur mod for Minecraft Java 1.21.1 and 1.20.1, on Fabric, NeoForge and Forge.">
 <link rel="icon" href="./assets/monograma_64.png" sizes="64x64">
 <link rel="icon" href="./assets/monograma_32.png" sizes="32x32">
 <link rel="apple-touch-icon" href="./assets/monograma_256.png">
 <link rel="stylesheet" href="./src/style.css">
 </head>
 <body>
+<div class="loader-screen" id="loader" role="status" aria-live="polite">
+ <div class="loader-motes" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+ <div class="loader-flood" aria-hidden="true"></div>
+ <div class="loader-title" id="loader-title"><img class="loader-title-dim" src="./assets/letreiro_osso.png" alt="Terrassic"><span class="loader-reveal loader-lit" aria-hidden="true"><img src="./assets/letreiro_osso.png" alt=""></span><span class="loader-reveal loader-seam" aria-hidden="true"><img src="./assets/letreiro_ambar.png" alt=""></span></div>
+ <p class="loader-line" id="loader-line"><span id="loader-text" data-i18n="loader.text">Waking the dinosaurs</span><span class="loader-pct" id="loader-pct">0%</span></p>
+</div>
 <a class="skip" href="#bestiario" data-i18n="skip">Skip to the bestiary</a>
 
 <header class="topbar" id="topbar">
@@ -41,18 +47,33 @@
 </header>
 
 <main>
- <section class="hero" id="inicio">
-  <div class="hero-copy">
-   <h1 class="hero-word"><img src="./assets/letreiro_osso.png" alt="Terrassic"></h1>
-   <p class="film-eyebrow" data-i18n="hero.eyebrow">A Minecraft Java 1.20.1 mod · Fabric and Forge</p>
+ <section class="film" id="inicio">
+  <div class="film-stage" id="film-stage">
+   <h1 class="film-word"><img src="./assets/letreiro_osso.png" alt="Terrassic"></h1>
+   <div class="hero-canvas" id="hero-canvas" aria-hidden="true"></div>
+   <div class="film-copy film-intro">
+    <p class="film-eyebrow" data-i18n="hero.eyebrow">A mod for Minecraft Java 1.21.1 and 1.20.1 · Fabric, NeoForge and Forge</p>
    <p class="film-lede" data-i18n="hero.lede">There's a three-toed footprint by the river, and it's bigger than you. Whatever left it is still nearby.</p>
    <div class="hero-actions">
     <a class="btn btn-dark" id="hero-download" href="https://www.curseforge.com/minecraft/mc-mods/terrassic" target="_blank" rel="noopener noreferrer"><span data-i18n="hero.download">Download on CurseForge</span><span aria-hidden="true">↗</span></a>
     <a class="btn btn-line" href="#bestiario"><span data-i18n="hero.cta">Meet the creatures</span><span aria-hidden="true">→</span></a>
    </div>
-   <p class="hero-dlnote" data-i18n="hero.dlnote">Opens the Terrassic page on CurseForge, with the files for Fabric and Forge.</p>
+   <p class="hero-dlnote" data-i18n="hero.dlnote">Opens the Terrassic page on CurseForge, with the files for Fabric, NeoForge and Forge.</p>
+   </div>
+   <div class="film-copy film-quote" aria-hidden="true"><p id="film-quote"></p><span id="film-cite"></span></div>
+   <div class="film-copy film-chapter" aria-hidden="true"><p class="film-eyebrow" data-i18n="film.chapter">Chapter 1 · Late Cretaceous</p><h2 data-i18n="film.title">Echoes of the End.</h2><p data-i18n="film.line">You are not alone here.</p></div>
+   <div class="film-top"><span class="hero-status" aria-live="polite"><span class="hero-meter"><span id="hero-meter"></span></span><span id="hero-status" data-i18n="hero.loading">Loading the T. rex</span></span><button type="button" class="hero-sound" id="hero-sound" aria-pressed="false"><span class="hero-sound-icon" aria-hidden="true"></span><span data-i18n="hero.sound">Hear the roar</span></button></div>
+   <a class="scroll-cue" href="#historia"><span class="scroll-arrow" aria-hidden="true">↓</span><span id="scroll-label" data-i18n="film.scroll">Scroll and it roars</span></a>
+   <div class="film-track" aria-hidden="true"><span id="film-fill"></span></div>
   </div>
-  <div class="hero-canvas" id="hero-canvas" aria-hidden="true"></div>
+ </section>
+
+ <section class="story" id="historia">
+  <div class="story-pin">
+   <canvas class="story-sky" id="story-sky" aria-hidden="true"></canvas>
+   <div class="story-meteor" id="story-meteor" aria-hidden="true"></div>
+   <div class="story-lines" id="story-lines"><p class="story-kicker"><span data-i18n="story.kicker">The story · The Leap</span> <span class="soon-badge" data-story-soon data-i18n="soon">Coming soon</span></p></div>
+  </div>
  </section>
 
  <section class="bestiary band" id="bestiario">
@@ -140,8 +161,9 @@
     </article>
     <article class="tile tile-arms">
      <h3 data-i18n="mech.arms.t">Weapons of the age</h3>
+     <div class="arms-stage" id="arms-stage" aria-hidden="true"><span class="arms-caption" id="arms-caption"></span></div>
      <ul class="slots" id="weapons"></ul>
-     <p class="small" data-i18n="mech.arms.p">Knives, clubs, and spears crafted from stone, bone, and flint.</p>
+     <p class="small" data-i18n="mech.arms.p">Knives, clubs and spears of stone, bone and flint, and a bow, a blowgun and a bola for what should not get close.</p>
     </article>
     <article class="tile tile-journal" id="tile-journal">
      <h3><span data-i18n="mech.journal.t">Field Journal</span> <span class="soon-badge" data-story-soon data-i18n="soon">Coming soon</span></h3>
@@ -149,14 +171,6 @@
      <div class="journal" id="journal"></div>
     </article>
    </div>
-  </div>
- </section>
-
- <section class="story" id="historia">
-  <div class="story-pin">
-   <canvas class="story-sky" id="story-sky" aria-hidden="true"></canvas>
-   <div class="story-meteor" id="story-meteor" aria-hidden="true"></div>
-   <div class="story-lines" id="story-lines"><p class="story-kicker" data-i18n="story.kicker">The story · The Leap</p></div>
   </div>
  </section>
 
@@ -198,14 +212,14 @@
   <div class="wrap install-grid">
    <div>
     <h2 class="display" data-i18n="inst.title">How to install.</h2>
-    <p class="lede" data-i18n="inst.lede">The files are on CurseForge. Download the one for your loader, Fabric or Forge, and follow the steps.</p>
+    <p class="lede" data-i18n="inst.lede">The files are on CurseForge, one for each Minecraft version and loader. Pick yours and follow the steps.</p>
     <div class="install-actions">
      <a class="btn btn-primary" id="download" href="https://www.curseforge.com/minecraft/mc-mods/terrassic" target="_blank" rel="noopener noreferrer"><span data-i18n="inst.curseforge">Download on CurseForge</span><span aria-hidden="true">↗</span></a>
     </div>
     <p class="install-links"><a href="./wiki/" data-i18n="inst.wiki">Mod wiki</a><a id="report-link" href="./wiki/#reportar" data-i18n="inst.report">Report a problem</a><a id="discord" href="#" target="_blank" rel="noopener noreferrer" hidden>Discord</a><a href="https://ko-fi.com/terrassic" target="_blank" rel="noopener noreferrer" data-i18n="inst.donate">Support on Ko-fi</a></p>
    </div>
    <div class="loader">
-    <div class="seg" role="tablist" aria-label="Loader"><button type="button" role="tab" id="tab-fabric" aria-selected="true">Fabric</button><button type="button" role="tab" id="tab-forge" aria-selected="false" tabindex="-1">Forge</button></div>
+    <div class="seg seg-wrap" role="tablist" aria-label="Loader" id="install-tabs"></div>
     <ol class="steps" id="steps"></ol>
    </div>
   </div>

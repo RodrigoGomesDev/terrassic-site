@@ -22,7 +22,7 @@ const ALL=[...SPECIES,...PLANNED],dietLabel=d=>LORE.diets[d]?pick(LORE.diets[d])
 const lengthLabel=s=>s.wing||s.group==='flyer'&&['pteranodon','quetzalcoatlus','hatzegopteryx','ichthyornis'].includes(s.id)?'fact.wing':'fact.length';
 
 // The table of contents; the sub-entries of a section are indented.
-const SECTIONS=()=>[['comecar',w('start.t')],['instalacao',w('inst.t')],['fabric',w('fabric.t'),1],['forge',w('forge.t'),1],['multiplayer',w('mp.t'),1],['atualizar',w('up.t'),1],
+const SECTIONS=()=>[['comecar',w('start.t')],['instalacao',w('inst.t')],['fabric',w('fabric.t'),1],['neoforge',w('neoforge.t'),1],['forge',w('forge.t'),1],['multiplayer',w('mp.t'),1],['atualizar',w('up.t'),1],
  ['como-se-joga',w('play.t')],['criaturas',w('crea.t')],['eras',w('eras.t')],['faq',w('faq.t')],...(reporting()?[['reportar',w('bug.t')]]:[])];
 
 let group='all',query='';const open=new Set();
@@ -32,19 +32,20 @@ const note=(text,kind='warn')=>h('p',`wiki-note is-${kind}`,text);
 
 function start(){
  const cards=h('div','wiki-cards',...W['start.cards'].map(c=>{const a=h('a','wiki-card',el('strong','',pick(c.t)),el('span','',pick(c.p).replace('{n}',SPECIES.length)));a.href=`#${c.id}`;return a}));
- return Object.assign(h('section','wiki-section wiki-intro',el('p','eyebrow','Minecraft Java 1.20.1 · Fabric · Forge'),el('h1','display',w('title')),el('p','lede',w('lede')),
+ return Object.assign(h('section','wiki-section wiki-intro',el('p','eyebrow','Minecraft Java 1.21.1 · 1.20.1 · Fabric · NeoForge · Forge'),el('h1','display',w('title')),el('p','lede',w('lede')),
   note(w('alpha')),el('p','small',w('updated',{v:links.version})),cards),{id:'comecar'});
 }
 
 function install(){
- const v=links.version,deps=h('table','wiki-table',h('thead','',h('tr','',el('th','',w('deps.mod')),el('th','',w('deps.v')),el('th','',w('deps.for')))),
-  h('tbody','',...DEPS.map(d=>h('tr','',h('td','',ext(d.url,d.name)),h('td','',el('code','',d.v)),el('td','',d.loaders.map(l=>l[0].toUpperCase()+l.slice(1)).join(' · '))))));
+ const v=links.version,deps=h('table','wiki-table',h('thead','',h('tr','',el('th','',w('deps.mod')),el('th','',w('deps.mc')),el('th','',w('deps.v')),el('th','',w('deps.for')))),
+  h('tbody','',...DEPS.map(d=>h('tr','',h('td','',ext(d.url,d.name)),el('td','',d.mc),h('td','',el('code','',d.v)),el('td','',d.loaders.map(l=>({neoforge:'NeoForge'}[l]||l[0].toUpperCase()+l.slice(1))).join(' · '))))));
  const dl=h('p','wiki-actions',ext(links.download,t('inst.curseforge'),'btn btn-primary'),links.modrinth&&ext(links.modrinth,'Modrinth','btn btn-ghost'));
  return Object.assign(h('section','wiki-section',h('h2','wiki-h2',w('inst.t')),dl,
   sub('requisitos',w('req.t'),list(W.req)),
   sub('dependencias',w('deps.t'),h('div','wiki-scroll',deps),el('p','small',w('deps.note'))),
-  sub('fabric',w('fabric.t'),list(W.fabric.map(s=>pick(s).replace('{v}',v)),true)),
-  sub('forge',w('forge.t'),list(W.forge.map(s=>pick(s).replace('{v}',v)),true),note(w('forge.warn'))),
+  sub('fabric',w('fabric.t'),list(W.fabric.map(s=>pick(s).replaceAll('{v}',v)),true)),
+  sub('neoforge',w('neoforge.t'),list(W.neoforge.map(s=>pick(s).replaceAll('{v}',v)),true)),
+  sub('forge',w('forge.t'),list(W.forge.map(s=>pick(s).replaceAll('{v}',v)),true),note(w('forge.warn'))),
   sub('multiplayer',w('mp.t'),list(W.mp)),
   sub('atualizar',w('up.t'),list(W.up,true),note(w('up.warn')))),{id:'instalacao'});
 }
@@ -107,7 +108,7 @@ function eras(){
 
 
 function faq(){
- const item=f=>h('details','',h('summary','',el('span','',pick(f.q)),el('i','','+')),el('p','',pick(f.a)));
+ const item=f=>h('details','',h('summary','',el('span','',pick(f.q)),el('i','','+')),el('p','',pick(f.a).replaceAll('{v}',links.version)));
  return Object.assign(h('section','wiki-section',h('h2','wiki-h2',w('faq.t')),h('div','faq-list',...[...FAQ.map(f=>story||!f.aSoon?f:{...f,a:f.aSoon}),...W.faq].map(item))),{id:'faq'});
 }
 
@@ -116,7 +117,7 @@ function faq(){
 // form that cannot send. What the visitor typed survives a change of language.
 const formKey=report.web3formsKey,showForm=!!formKey||import.meta.env.DEV;
 const reporting=()=>showForm||!!links.discord;
-const draft={version:links.version,loader:'fabric',where:'sp'};let sent=false;
+const draft={version:links.version,mc:'1.21.1',loader:'fabric',where:'sp'};let sent=false;
 function bugForm(){
  const form=el('form','wiki-form');
  const field=(name,label,control,{optional,hint}={})=>{control.name=name;control.id=`bug-${name}`;if(draft[name]!==undefined&&control.type!=='radio')control.value=draft[name];
@@ -125,14 +126,14 @@ function bugForm(){
  const input=(type,attrs={})=>Object.assign(el('input'),{type,...attrs});
  const area=(attrs={})=>Object.assign(el('textarea'),{rows:4,...attrs});
  const select=(opts)=>{const s=el('select');for(const [v,l] of opts){const o=el('option','',l);o.value=v;s.append(o)}return s};
- const loader=h('fieldset','wiki-field wiki-radios',el('legend','',w('bug.loader')),...['fabric','forge'].map(v=>{const r=input('radio',{name:'loader',value:v,checked:draft.loader===v});return h('label','',r,el('span','',v[0].toUpperCase()+v.slice(1)))}));
+ const loader=h('fieldset','wiki-field wiki-radios',el('legend','',w('bug.loader')),...['fabric','neoforge','forge'].map(v=>{const r=input('radio',{name:'loader',value:v,checked:draft.loader===v});return h('label','',r,el('span','',{neoforge:'NeoForge'}[v]||v[0].toUpperCase()+v.slice(1)))}));
  const log=input('url',{placeholder:'https://mclo.gs/…'}),hint=el('p','wiki-hint');hint.append(...w('bug.log.hint').split('mclo.gs').flatMap((part,i)=>i?[ext('https://mclo.gs','mclo.gs'),part]:[part]));
  const status=el('p','wiki-form-status');status.setAttribute('aria-live','polite');
  const send=el('button','btn btn-primary',w('bug.send'));send.type='submit';
  // A trap for bots: people never see or tick it.
  const trap=input('checkbox',{name:'botcheck',tabIndex:-1});trap.className='wiki-trap';trap.setAttribute('aria-hidden','true');
  form.append(
-  h('div','wiki-form-row',field('version',w('bug.version'),input('text',{required:true,autocomplete:'off'})),loader,
+  h('div','wiki-form-row',field('version',w('bug.version'),input('text',{required:true,autocomplete:'off'})),field('mc',w('bug.mc'),select([['1.21.1','1.21.1'],['1.20.1','1.20.1']])),loader,
    field('where',w('bug.where'),select([['sp',w('bug.where.sp')],['mp',w('bug.where.mp')],['both',w('bug.where.both')]]))),
   field('what',w('bug.what'),area({required:true,placeholder:w('bug.what.hint'),rows:5})),
   field('steps',w('bug.steps'),area({placeholder:w('bug.steps.hint')}),{optional:true}),
@@ -148,8 +149,8 @@ function bugForm(){
  form.addEventListener('submit',async e=>{
   e.preventDefault();if(!formKey){status.textContent=w('bug.nokey');return}
   const d=Object.fromEntries(new FormData(form)),where={sp:'Singleplayer',mp:'Multiplayer',both:'Singleplayer e multiplayer'}[d.where];
-  const body={access_key:formKey,subject:`Terrassic · bug ${d.version} ${d.loader}: ${d.what.trim().slice(0,60)}`,from_name:'Wiki do Terrassic',botcheck:d.botcheck||'',
-   'Versão do Terrassic':d.version,'Loader':d.loader,'Onde':where,'O que aconteceu':d.what,'Passos':d.steps||'-','Log':d.log||'-','Outros mods':d.mods||'-','Contato':d.contact||'-','Idioma':getLang(),'Navegador':navigator.userAgent};
+  const body={access_key:formKey,subject:`Terrassic · bug ${d.version} ${d.loader} ${d.mc}: ${d.what.trim().slice(0,60)}`,from_name:'Wiki do Terrassic',botcheck:d.botcheck||'',
+   'Versão do Terrassic':d.version,'Minecraft':d.mc,'Loader':d.loader,'Onde':where,'O que aconteceu':d.what,'Passos':d.steps||'-','Log':d.log||'-','Outros mods':d.mods||'-','Contato':d.contact||'-','Idioma':getLang(),'Navegador':navigator.userAgent};
   if(/^\S+@\S+\.\S+$/.test(d.contact||''))body.email=d.contact.trim();
   send.disabled=true;send.textContent=w('bug.sending');status.textContent='';
   // Sent as plain form data, like Web3Forms' own snippet: a JSON body makes the browser ask first (CORS preflight),
