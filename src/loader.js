@@ -24,11 +24,14 @@ export function createLoader(){
  const update=()=>{
   let sum=0,w=0;for(const j of jobs.values()){sum+=j.p*j.weight;w+=j.weight}
   target=w?sum/w:0;const waiting=[...jobs].find(([,j])=>j.p<1);say(waiting?`loader.${waiting[0]}`:'loader.done');
-  if(!finished&&w&&!waiting)finished=true;
+  if(!finished&&w&&!waiting)finish();
  };
  // The light moves smoothly towards the real progress (never faster than a full sweep in about a second, and in
  // steps of the title's own pixels), so a fast load still reads and a slow one never sits still.
  let last=performance.now();
+ // A browser that stops drawing frames (a tab or an in-app view in the background) would leave the light half way
+ // with everything loaded: once all is in, the screen closes a moment later whatever the frames do.
+ function finish(){if(finished)return;finished=true;setTimeout(()=>{if(!closing)close()},2500)}
  const tick=now=>{if(closing)return;const dt=Math.min(.1,(now-last)/1000);last=now;
   const goal=finished?1:target;shown=reduced?goal:Math.min(goal,shown+Math.max(.05,(goal-shown)*3.5)*dt);
   screen.style.setProperty('--p',(Math.floor(shown*120)/120).toFixed(4));pct.textContent=`${Math.round(shown*100)}%`;
@@ -42,7 +45,7 @@ export function createLoader(){
   const r=title.getBoundingClientRect();screen.style.setProperty('--fx',`${r.left+r.width/2}px`);screen.style.setProperty('--fy',`${r.top+r.height/2}px`);
   setTimeout(()=>{screen.classList.add('is-flooding');setTimeout(lift,950)},300);
  };
- setTimeout(()=>{finished=true},LIMIT);
+ setTimeout(finish,LIMIT);
  return {
   ready,
   // track(name, weight) gives a job whose progress goes from 0 to 1; it is done at 1 (or when it fails).
