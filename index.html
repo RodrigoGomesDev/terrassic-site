@@ -6,7 +6,7 @@
 <title>Terrassic: a dinosaur mod for Minecraft</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <meta name="theme-color" content="#1c181e">
-<meta name="description" content="Survive among dinosaurs in Minecraft. Raise companions from the egg, ride the big ones and take to the skies. Minecraft Java 1.20.1, Fabric and Forge.">
+<meta name="description" content="Life-size dinosaurs for Minecraft Java 1.20.1, one block to the metre. Fabric and Forge.">
 <meta property="og:title" content="Terrassic">
 <meta property="og:type" content="website">
 <!-- Link previews (Discord, Reddit, WhatsApp). Crawlers need an absolute address: when the site has its domain, put it in front of this path. -->
@@ -14,7 +14,7 @@
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
-<meta property="og:description" content="Survive among dinosaurs in Minecraft. Raise companions from the egg, ride the big ones and take to the skies. Minecraft Java 1.20.1, Fabric and Forge.">
+<meta property="og:description" content="Life-size dinosaurs for Minecraft Java 1.20.1, one block to the metre. Fabric and Forge.">
 <link rel="icon" href="./assets/monograma_64.png" sizes="64x64">
 <link rel="icon" href="./assets/monograma_32.png" sizes="32x32">
 <link rel="apple-touch-icon" href="./assets/monograma_256.png">
@@ -45,7 +45,7 @@
   <div class="hero-copy">
    <h1 class="hero-word"><img src="./assets/letreiro_osso.png" alt="Terrassic"></h1>
    <p class="film-eyebrow" data-i18n="hero.eyebrow">A Minecraft Java 1.20.1 mod · Fabric and Forge</p>
-   <p class="film-lede" data-i18n="hero.lede">Survive among dinosaurs in Minecraft. Raise companions from the egg, ride the big ones and take to the skies.</p>
+   <p class="film-lede" data-i18n="hero.lede">Life-size dinosaurs in Minecraft, one block to the metre. An adult T. rex is thirteen blocks long, and a hatchling that breaks out of its egg near you is yours from the start.</p>
    <div class="hero-actions">
     <a class="btn btn-dark" id="hero-download" href="https://www.curseforge.com/minecraft/mc-mods/terrassic" target="_blank" rel="noopener noreferrer"><span data-i18n="hero.download">Download on CurseForge</span><span aria-hidden="true">↗</span></a>
     <a class="btn btn-line" href="#bestiario"><span data-i18n="hero.cta">Meet the creatures</span><span aria-hidden="true">→</span></a>
@@ -59,7 +59,7 @@
   <div class="wrap">
    <div class="section-head">
     <h2 class="display" data-i18n="best.title">See each one up close.</h2>
-    <p class="lede" data-i18n="best.lede">Choose a creature, watch it move, and learn its habits. Drag to turn.</p>
+    <p class="lede" data-i18n="best.lede">Pick a creature to see its model, its animations and the field notes. Drag to turn.</p>
    </div>
    <div class="specimen">
     <div class="stage" id="stage">
@@ -105,36 +105,36 @@
   <div class="wrap">
    <div class="section-head">
     <h2 class="display" data-i18n="mech.title">Survive with what the age provides.</h2>
-    <p class="lede" data-i18n="mech.lede">Find food, build a shelter, and prepare for what lives beyond camp.</p>
+    <p class="lede" data-i18n="mech.lede">In your world, herbivores move in herds, predators hunt, and herds leave nests of eggs on the ground. Your first dinosaur usually comes out of one of those nests.</p>
    </div>
    <div class="bento">
     <article class="tile tile-egg">
      <div class="egg-stage" id="egg-stage" aria-hidden="true"><span class="sprite egg-sprite" id="egg-sprite"></span><span class="egg-crack"></span></div>
      <h3 data-i18n="mech.egg.t">From the egg to your first journey</h3>
-     <p data-i18n="mech.egg.p">Tend to the eggs and be there when they hatch. The hatchlings will recognise you as family.</p>
+     <p data-i18n="mech.egg.p">Take an egg from a wild nest, set it down near your base and wait: the hatchling that comes out is already yours. The adults notice as soon as you start breaking the egg loose, so pick your moment.</p>
     </article>
     <article class="tile tile-sex">
      <div class="pair" id="sex-pair"><figure><img id="pair-male" alt=""><figcaption data-i18n="best.male">Male</figcaption></figure><figure><img id="pair-female" alt=""><figcaption data-i18n="best.female">Female</figcaption></figure></div>
      <h3 data-i18n="mech.sex.t">Male and female</h3>
-     <p data-i18n="mech.sex.p">Colours, crests, and markings vary between males and females. Find a pair and raise the next generation.</p>
+     <p data-i18n="mech.sex.p">Colour and crest change from one to the other, so you can tell them apart from a distance. A tamed pair that is well fed will lay eggs.</p>
     </article>
     <article class="tile tile-tame">
      <ol class="tame-steps">
-      <li><span class="sprite" data-sprite="item:raw_dino_meat"></span><span data-i18n="mech.tame.s1">Offer the right food.</span></li>
-      <li><span class="sprite" data-sprite="egg:tyrannosaurus"></span><span data-i18n="mech.tame.s2">Raise companions from hatchlings.</span></li>
-      <li><span class="sprite" data-sprite="item:tranq_dart"></span><span data-i18n="mech.tame.s3">Come prepared for the tougher ones.</span></li>
+      <li><span class="sprite" data-sprite="item:raw_dino_meat"></span><span data-i18n="mech.tame.s1">Food: the calmer ones take it from your hand.</span></li>
+      <li><span class="sprite" data-sprite="egg:tyrannosaurus"></span><span data-i18n="mech.tame.s2">Egg: the hatchling is born tame.</span></li>
+      <li><span class="sprite" data-sprite="item:tranq_dart"></span><span data-i18n="mech.tame.s3">Knockout: a club or a tranquilliser dart, then food while it sleeps.</span></li>
      </ol>
      <h3 data-i18n="mech.tame.t">Taming</h3>
-     <p data-i18n="mech.tame.p">Earn an animal’s trust and bring a companion on your explorations.</p>
+     <p data-i18n="mech.tame.p">Your animal follows you, stays where you tell it to and joins your fights. The more you have studied the species, the sooner it accepts you.</p>
     </article>
     <article class="tile tile-ride">
      <div class="ride-art" aria-hidden="true"><span class="sprite" data-sprite="item:platform_saddle" data-size="96"></span></div>
      <h3 data-i18n="mech.ride.t">Riding and flight</h3>
-     <p data-i18n="mech.ride.p">Ride across the plains or take flight on a Pteranodon. From up there, it is easier to choose your next destination.</p>
+     <p data-i18n="mech.ride.p">With a saddle, you can ride a good share of the animals. The Pteranodon flies, the Mosasaurus swims, and the Alamosaurus carries a platform you can build on.</p>
     </article>
     <article class="tile tile-science">
      <h3 data-i18n="mech.sci.t">Field Notebook</h3>
-     <p data-i18n="mech.sci.p">Dig up fossils, observe the wildlife, and record your discoveries. Each page helps you understand the creatures around you.</p>
+     <p data-i18n="mech.sci.p">Dig up fossils, sketch the animals you come across and keep it all in the Field Notebook. A species you have studied well is easier to tame and to fight.</p>
      <ol class="levels" id="levels"></ol>
      <ul class="tools" id="tools"></ul>
     </article>

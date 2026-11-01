@@ -105,7 +105,9 @@ export function initEras(){
  const track=$('eras-track');
  return ()=>track.replaceChildren(...ERAS.map((e,i)=>{
    const card=el('article',`era era-${e.id}`);card.style.setProperty('--era-a',e.colors[1]);
-   const art=el('div','era-art');art.append(landscape(document.createElement('canvas'),e,(i+3)*7919));if(eraArt.has(e.id))art.append(eraImage(eraArt.get(e.id)));art.dataset.era=e.id;art.style.background=e.colors[0];
+   const art=el('div','era-art');art.append(landscape(document.createElement('canvas'),e,(i+3)*7919));if(eraArt.has(e.id))art.append(eraImage(eraArt.get(e.id)));art.dataset.era=e.id;
+   // Without the story the chapters are only a promise: the diorama shows as a silhouette, like the animals being remade.
+   if(story)art.style.background=e.colors[0];else art.append(el('span','soon-tag',t('soon')));
    const body=el('div','era-body');
    body.append(el('p','era-n',pick(e.n)),el('h3','',pick(e.name)),el('p','era-when',`${pick(e.era)}${e.ma?` · ${e.ma[0]}–${e.ma[1]} Ma`:''}`),el('p','era-land',pick(e.land)));
    const dl=el('dl','era-facts');for(const [k,v] of story?[['eras.where',e.where],['eras.event',e.event],['eras.boss',e.boss],['eras.plants',e.plants]]:[['eras.where',e.where],['eras.plants',e.plants]]){const d=el('div');d.append(el('dt','',t(k)),el('dd','',pick(v)));dl.append(d)}

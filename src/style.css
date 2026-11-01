@@ -411,7 +411,10 @@ section[id]{scroll-margin-top:56px}
 .tile-journal[hidden]{display:none}
 .tile-arms:has(+ .tile-journal[hidden]){grid-column:1/-1}
 /* Eras while story mode is off: the section is "coming soon", the landscapes dimmed. */
-.eras.is-soon .era-art{filter:saturate(.35) brightness(.7)}
+.eras.is-soon .era-art{background:radial-gradient(60% 60% at 50% 58%,#8a5a2c 0,#3a2620 55%,#18141a 100%)}
+.eras.is-soon .era-art canvas{display:none}
+.eras.is-soon .era-photo{filter:brightness(0) opacity(.9)}
+.eras.is-soon .era-art .soon-tag{z-index:1}
 .eras.is-soon .era h3{color:var(--stone-300)}
 .display .soon-badge{vertical-align:middle;margin-left:10px}
 .roster-head:first-child{margin-top:0;padding-top:0;border-top:0}
