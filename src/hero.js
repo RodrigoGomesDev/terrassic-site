@@ -34,9 +34,16 @@ export class Hero{
   r.shadowMap.enabled=true;r.shadowMap.type=THREE.PCFSoftShadowMap;host.append(r.domElement);
   this.scene=new THREE.Scene();this.camera=new THREE.PerspectiveCamera(28,1,.1,400);
   this.scene.add(new THREE.HemisphereLight(0xfff0d0,0x7a5a32,2));
-  const sun=new THREE.DirectionalLight(0xfff1d6,2.6);sun.position.set(-10,22,18);sun.castShadow=true;sun.shadow.mapSize.set(2048,2048);Object.assign(sun.shadow.camera,{left:-22,right:22,top:22,bottom:-22,near:1,far:90});sun.shadow.bias=-.0004;sun.shadow.normalBias=.04;this.scene.add(sun);this.guard=new QualityGuard(r,{shadows:[sun]});
+  const sun=new THREE.DirectionalLight(0xfff1d6,2.6);sun.position.set(-12,34,-6);sun.castShadow=true;sun.shadow.mapSize.set(2048,2048);Object.assign(sun.shadow.camera,{left:-22,right:22,top:22,bottom:-22,near:1,far:90});sun.shadow.bias=-.0004;sun.shadow.normalBias=.04;this.scene.add(sun);this.guard=new QualityGuard(r,{shadows:[sun]});
   // A floor that only catches the shadow, so the animal stands on the page colour.
-  const floor=new THREE.Mesh(new THREE.PlaneGeometry(80,80),new THREE.ShadowMaterial({color:0x3b2a1a,opacity:.25}));floor.rotation.x=-Math.PI/2;floor.receiveShadow=true;this.scene.add(floor);
+  // The shadow fades out well before the edge of the box, so it never ends in a straight cut.
+  const floorMat=new THREE.ShadowMaterial({color:0x3b2a1a,opacity:.3});
+  floorMat.onBeforeCompile=sh=>{sh.uniforms.fadeCenter=this.fadeCenter;sh.uniforms.fadeRadius=this.fadeRadius;
+   sh.vertexShader=sh.vertexShader.replace('#include <common>','#include <common>\nvarying vec3 vFloor;').replace('#include <begin_vertex>','#include <begin_vertex>\nvFloor=(modelMatrix*vec4(position,1.)).xyz;');
+   sh.fragmentShader=sh.fragmentShader.replace('#include <common>','#include <common>\nvarying vec3 vFloor;uniform vec2 fadeCenter;uniform float fadeRadius;')
+    .replace(/}\s*$/,' gl_FragColor.a*=1.-smoothstep(fadeRadius*.55,fadeRadius,length(vFloor.xz-fadeCenter));\n}')};
+  this.fadeCenter={value:new THREE.Vector2()};this.fadeRadius={value:20};
+  const floor=new THREE.Mesh(new THREE.PlaneGeometry(80,80),floorMat);floor.rotation.x=-Math.PI/2;floor.receiveShadow=true;this.scene.add(floor);
   this.visible=true;this.last=performance.now();
   new ResizeObserver(()=>this.resize()).observe(host);
   new IntersectionObserver(([e])=>{this.visible=e.isIntersecting}).observe(host);
@@ -44,7 +51,7 @@ export class Hero{
   spawn(species,{shadows:true}).then(c=>{
    this.animal=c;c.holder.rotation.y=-1.1;this.scene.add(c.holder);c.holder.updateMatrixWorld(true);
    const box=new THREE.Box3().setFromObject(c.model.root);this.size=box.getSize(new THREE.Vector3());this.center=box.getCenter(new THREE.Vector3());
-   c.holder.position.y=-box.min.y;this.center.y-=box.min.y;this.resize();onReady(c);
+   c.holder.position.y=-box.min.y;this.center.y-=box.min.y;this.fadeCenter.value.set(this.center.x,this.center.z);this.fadeRadius.value=Math.max(this.size.x,this.size.z)*.75;this.resize();onReady(c);
   }).catch(e=>{console.warn(e);onFail(e)});
   this.tick=this.tick.bind(this);requestAnimationFrame(this.tick);
  }

@@ -28,11 +28,13 @@
   <a href="#historia" data-i18n="nav.story">Story</a>
   <a href="#eras" data-i18n="nav.eras">Eras</a>
   <a href="./wiki/" data-i18n="nav.wiki">Wiki</a>
+  <a class="nav-play" href="#jogar" data-i18n="nav.cta">Play</a>
  </nav>
  <div class="lang" role="group" aria-label="Idioma / Language">
   <button type="button" data-lang="pt" aria-pressed="false">PT</button><button type="button" data-lang="en" aria-pressed="true">EN</button><button type="button" data-lang="es" aria-pressed="false">ES</button>
  </div>
  <a class="nav-cta" href="#jogar" data-i18n="nav.cta">Play</a>
+ <button type="button" class="nav-toggle" id="nav-toggle" aria-expanded="false" aria-controls="nav" data-i18n="nav.menu">Menu</button>
 </header>
 
 <main>
@@ -125,7 +127,7 @@
      <p data-i18n="mech.tame.p">Earn an animal’s trust and bring a companion on your explorations.</p>
     </article>
     <article class="tile tile-ride">
-     <svg class="flight" viewBox="0 0 400 140" aria-hidden="true"><path class="flight-path" d="M10 120 C 90 120, 110 30, 200 40 S 320 110, 390 30"/><circle class="flight-dot" r="5"/></svg>
+     <div class="ride-art" aria-hidden="true"><span class="sprite" data-sprite="item:platform_saddle" data-size="96"></span></div>
      <h3 data-i18n="mech.ride.t">Riding and flight</h3>
      <p data-i18n="mech.ride.p">Ride across the plains or take flight on a Pteranodon. From up there, it is easier to choose your next destination.</p>
     </article>

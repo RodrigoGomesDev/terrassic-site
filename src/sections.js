@@ -16,10 +16,15 @@ addEventListener('scroll',()=>{if(!ticking){ticking=true;requestAnimationFrame(f
 
 export function initHeader(){
  const bar=$('topbar'),hero=$('inicio');
- new IntersectionObserver(([e])=>bar.classList.toggle('on-light',e.isIntersecting),{rootMargin:'-60px 0px -100% 0px'}).observe(hero);
- const links=[...document.querySelectorAll('.nav a[href^="#"]')],targets=links.map(a=>document.querySelector(a.getAttribute('href')));
+ new IntersectionObserver(([e])=>bar.classList.toggle('on-light',e.isIntersecting),{rootMargin:`-${Math.round(bar.offsetHeight/2)}px 0px -100% 0px`}).observe(hero);
+ // On small screens the sections sit behind a Menu button; choosing one, or Esc, closes it again.
+ const toggle=$('nav-toggle'),setOpen=o=>{bar.classList.toggle('is-open',o);toggle.setAttribute('aria-expanded',String(o))};
+ toggle.addEventListener('click',()=>setOpen(!bar.classList.contains('is-open')));
+ for(const a of document.querySelectorAll('.nav a'))a.addEventListener('click',()=>setOpen(false));
+ addEventListener('keydown',e=>{if(e.key==='Escape'&&bar.classList.contains('is-open')){setOpen(false);toggle.focus()}});
+ const links=[...document.querySelectorAll('.nav a[href^="#"]:not(.nav-play)')],targets=links.map(a=>document.querySelector(a.getAttribute('href')));
  onScroll(()=>{bar.classList.toggle('is-solid',scrollY>40);
-  const mid=innerHeight*.4;let active=-1;targets.forEach((s,i)=>{if(s&&s.getBoundingClientRect().top<mid)active=i});links.forEach((a,i)=>a.classList.toggle('is-active',i===active))});
+  const mid=innerHeight*.4;let active=-1;targets.forEach((s,i)=>{const r=s?.getBoundingClientRect();if(r&&r.top<mid&&r.bottom>mid)active=i});links.forEach((a,i)=>a.classList.toggle('is-active',i===active))});
 }
 
 // The intro screen of the mod, line by line, driven by scroll, while a meteor falls behind the text.
@@ -119,11 +124,11 @@ export function initMechanics(thumbnailer){
   if(step===3){const t0=performance.now(),run=now=>{const t=(now-t0)/2600;eggStage(eg,3,Math.min(1,t));if(t<1)requestAnimationFrame(run)};requestAnimationFrame(run)}
   setTimeout(next,step===3?3000:1600)};
  if(!reduced)setTimeout(next,1600);
- for(const s of document.querySelectorAll('[data-sprite]'))paintSprite(s,s.dataset.sprite,32);
+ for(const s of document.querySelectorAll('[data-sprite]'))paintSprite(s,s.dataset.sprite,Number(s.dataset.size)||32);
  const para=SPECIES.find(s=>s.id==='parasaurolophus');$('sex-pair').classList.toggle('is-soon',!isReady(para.id));
  const pair=new IntersectionObserver(([e])=>{if(!e.isIntersecting)return;pair.disconnect();for(const sex of ['male','female'])picture(`parasaurolophus-${sex}`,()=>thumbnailer().then(t=>t.request(para,sex))).then(url=>{$(`pair-${sex}`).src=url}).catch(()=>{})},{rootMargin:'400px'});pair.observe($('sex-pair'));
  return ()=>{
-  $('levels').replaceChildren(...GUIDE_LEVELS.map((l,i)=>{const li=el('li');li.style.setProperty('--i',i);li.append(el('strong','',pick(l.name)),el('span','',pick(l.how)));return li}));
+  $('levels').replaceChildren(...GUIDE_LEVELS.map((l,i)=>{const li=el('li');li.style.setProperty('--i',i);li.append(el('strong','',pick(l.name)),el('span','',pick(!story&&l.howSoon?l.howSoon:l.how)));return li}));
   $('tools').replaceChildren(...TOOLS.map(x=>{const li=el('li');li.append(sprite(x.sprite,32),el('span','',pick(x.name)));return li}));
   $('weapons').replaceChildren(...WEAPONS.map(w=>{const li=el('li','slot');li.append(sprite(w.sprite,32));const d=el('div');d.append(el('span','slot-name',pick(w.name)),el('span','slot-dmg',w.thrown?`${w.dmg} · ${w.thrown} ${t('mech.thrown')}`:w.dmg));li.append(d);return li}));
   $('journal').hidden=!story;

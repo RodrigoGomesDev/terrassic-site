@@ -51,7 +51,7 @@ function install(){
 
 function play(){
  const card=(key,...extra)=>h('div','wiki-mech',el('h3','wiki-h3',t(`mech.${key}.t`)),el('p','',t(`mech.${key}.p`)),...extra);
- const levels=h('ol','wiki-levels',...GUIDE_LEVELS.map(l=>h('li','',el('strong','',pick(l.name)),el('span','',pick(l.how)))));
+ const levels=h('ol','wiki-levels',...GUIDE_LEVELS.map(l=>h('li','',el('strong','',pick(l.name)),el('span','',pick(!story&&l.howSoon?l.howSoon:l.how)))));
  const tools=h('ul','wiki-items',...TOOLS.map(x=>h('li','',sprite(x.sprite,32),el('span','',pick(x.name)))));
  const arms=h('div','wiki-scroll',h('table','wiki-table',h('thead','',h('tr','',el('th','',w('arms.weapon')),el('th','',w('arms.dmg')))),
   h('tbody','',...WEAPONS.map(x=>h('tr','',h('td','',h('span','wiki-item',sprite(x.sprite,24),el('span','',pick(x.name)))),el('td','',x.thrown?`${x.dmg} · ${x.thrown} ${t('mech.thrown')}`:x.dmg))))));

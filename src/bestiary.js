@@ -10,7 +10,8 @@ const GROUPS=['all','predator','herbivore','flyer','water'];
 const GUIDE_KEYS=['sci','behavior','taming','utility'];
 // The animals in the game, then the Cretaceous ones still on the plan (no model yet, only name and size).
 const ALL=[...SPECIES,...PLANNED];
-const MAX_LENGTH=Math.max(...ALL.map(s=>s.length));
+// The ruler ends at the next 10 m above the longest animal, and its labels are drawn from that same number.
+const MAX_LENGTH=Math.ceil(Math.max(...ALL.map(s=>s.length))/10)*10;
 const dietLabel=d=>LORE.diets[d]?pick(LORE.diets[d]):t(`diet.${d}`);
 const fmt=n=>new Intl.NumberFormat(getLang()==='en'?'en':getLang()==='es'?'es':'pt-BR',{maximumFractionDigits:2}).format(n);
 // The mod lists pterosaurs by wingspan.
@@ -19,6 +20,7 @@ const lengthLabel=s=>s.wing||s.group==='flyer'&&['pteranodon','quetzalcoatlus','
 export function initBestiary({viewerReady,thumbnailer}){
  let selected=SPECIES.find(s=>s.id==='tyrannosaurus'),sex='male',group='all',query='',sort='size',guideKey='sci',viewer=null,anim='idle';
  const roster=$('roster'),cards=new Map();
+ $('dossier-ruler').querySelector('.ruler-scale').replaceChildren(...Array.from({length:MAX_LENGTH/10+1},(_,i)=>Object.assign(document.createElement('span'),{textContent:i?`${i*10} m`:'0'})));
  // Cards: thumbnails are rendered from the real models the first time a card comes near the screen.
  for(const s of PLANNED){
   const li=document.createElement('li'),b=document.createElement('button');b.type='button';b.className='card is-planned';b.dataset.id=s.id;
@@ -60,7 +62,7 @@ export function initBestiary({viewerReady,thumbnailer}){
   if(first>=0){plannedHead.textContent=t('best.plannedHead',{n:list.length-first});items.splice(first,0,plannedHead)}
   roster.replaceChildren(...items);
   list.forEach(s=>{const c=cards.get(s.id);
-   c.button.querySelector('.card-name').textContent=pick(s.name);c.button.querySelector('.soon-tag')?.replaceChildren(t('soon'));c.button.querySelector('.card-sub').textContent=s.planned?`${fmt(s.length)} m · ${pick(LORE.eras[s.era])}`:`${fmt(s.length)} m · ${t(`one.${s.group}`)}`;
+   c.button.querySelector('.card-name').textContent=pick(s.name);c.button.querySelector('.soon-tag')?.replaceChildren(t('soon'));c.button.querySelector('.card-sub').textContent=s.planned?`${fmt(s.length)} m\n${pick(LORE.eras[s.era])}`:`${fmt(s.length)} m · ${t(`one.${s.group}`)}`;
    c.button.setAttribute('aria-label',s.planned?`${pick(s.name)}, ${t('soon')}`:t('best.view',{name:pick(s.name)}));c.button.setAttribute('aria-pressed',String(s===selected))});
   $('roster-count').textContent=list.length?t('best.count',{n:list.length,total:ALL.length}):t('best.none');
  }
