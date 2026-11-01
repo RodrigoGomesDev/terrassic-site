@@ -45,7 +45,7 @@ loader.wait('meteor',1,Promise.all([import('./storyfx.js'),fetch(asset('meteor/m
 const rexJob=loader.track('rex',6);
 let heroLoaded=0;const heroStatus=()=>{$('hero-status').textContent=heroLoaded>=1?t('hero.ready'):t('hero.loading')};
 const film=document.querySelector('.film');
-// What the T. rex must never cover: the header, the sound button, the scroll cue, the title and the captions on screen
+// What the T. rex must never cover: the header, the status line, the scroll cue, the title and the captions on screen
 // right now (tight boxes of their words, buttons and images, so a short line leaves its side free).
 const stage=$('film-stage'),captions=[['.film-word','--intro'],['.film-intro','--intro'],['.film-quote','--quote'],['.film-chapter','--chapter']].map(([s,v])=>[document.querySelector(s),v]);
 const inked=el=>{const rects=[],range=document.createRange(),walk=document.createTreeWalker(el,NodeFilter.SHOW_TEXT);
@@ -64,10 +64,6 @@ import('./hero.js').then(({Hero})=>{
   onFail:noGL,avoid:heroAvoid});
  if(!hero.renderer)return noGL();
  if(import.meta.env.DEV)window.__hero=hero;
- // The roar is heard only after the visitor turns the sound on (browsers block sound that starts by itself).
- const roar=new Audio(asset('audio/tyrannosaurus-roar-pixabay.mp3'));roar.preload='none';roar.volume=.9;let sound=false;
- $('hero-sound').addEventListener('click',e=>{sound=!sound;e.currentTarget.setAttribute('aria-pressed',String(sound));if(sound){roar.load();if(hero.rex?.animator.scrubbing){roar.currentTime=0;roar.play().catch(()=>{})}}else roar.pause()});
- hero.onRoar=()=>{if(sound&&hero.visible)setTimeout(()=>{roar.currentTime=0;roar.play().catch(()=>{})},350)};
  filmProgress(p=>hero.setProgress(p));
 }).catch(noGL);
 

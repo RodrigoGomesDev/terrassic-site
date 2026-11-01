@@ -149,7 +149,7 @@ export function initMechanics(thumbnailer){
  if(!reduced)setTimeout(next,1600);
  for(const s of document.querySelectorAll('[data-sprite]'))paintSprite(s,s.dataset.sprite,Number(s.dataset.size)||32);
  const para=SPECIES.find(s=>s.id==='parasaurolophus');$('sex-pair').classList.toggle('is-soon',!isReady(para.id));
- const pair=new IntersectionObserver(([e])=>{if(!e.isIntersecting)return;pair.disconnect();for(const sex of ['male','female'])picture(`parasaurolophus-${sex}`,()=>thumbnailer().then(t=>t.request(para,sex))).then(url=>{$(`pair-${sex}`).src=url}).catch(()=>{})},{rootMargin:'400px'});pair.observe($('sex-pair'));
+ const pair=new IntersectionObserver(([e])=>{if(!e.isIntersecting)return;pair.disconnect();for(const sex of ['male','female'])picture(`parasaurolophus-${sex}`,()=>thumbnailer().then(t=>t.request(para,sex))).then(url=>{const img=$(`pair-${sex}`);img.src=url;img.alt=`${pick(para.name)}, ${t(`best.${sex}`).toLowerCase()}`}).catch(()=>{})},{rootMargin:'400px'});pair.observe($('sex-pair'));
  // The weapons' 3D stage loads only when the card comes near.
  let weapon='blowgun',armsStage=null;
  const showWeapon=()=>{const w=WEAPONS.find(x=>x.id===weapon);$('arms-caption').textContent=pick(w.name);armsStage?.show(w)};

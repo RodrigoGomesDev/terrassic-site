@@ -20,7 +20,7 @@ export const UI={
  'film.line':["Você não está sozinho aqui.", "You are not alone here.", "No estás solo aquí."],
  'film.scroll':['Role e ele ruge','Scroll and it roars','Desplázate y ruge'],'film.scroll2':["Chegue mais perto", "Take a closer look", "Acércate"],'film.scroll3':['Continue para a história','Continue to the story','Sigue hacia la historia'],
  'hero.note':["Conheça as criaturas do Terrassic.", "Meet the creatures of Terrassic.", "Conoce las criaturas de Terrassic."],
- 'hero.sound':['Ouvir o rugido','Hear the roar','Oír el rugido'],
+
  'story.kicker':['A história · O Salto','The story · The Leap','La historia · El Salto'],
  'chron.eyebrow':['O Projeto Terrassic','The Terrassic Project','El Proyecto Terrassic'],
  'chron.title':["Ela atravessou primeiro.", "She crossed first.", "Ella cruzó primero."],
@@ -33,7 +33,7 @@ export const UI={
  'eras.event':['Evento','Event','Evento'],'eras.boss':['Chefe','Boss','Jefe'],'eras.where':['Onde','Where','Dónde'],'eras.fauna':['Quem vive lá','Who lives there','Quién vive allí'],'eras.plants':['Plantas','Plants','Plantas'],
  'best.eyebrow':['Bestiário','Bestiary','Bestiario'],'best.title':["Bestiário", "Bestiary", "Bestiario"],
  'best.lede':["Escolha uma criatura para ver o modelo, as animações e as anotações de campo. Arraste para girar.", "Pick a creature to see its model, its animations and the field notes. Drag to turn.", "Elige una criatura para ver el modelo, las animaciones y las notas de campo. Arrastra para girar."],
- 'best.male':['Macho','Male','Macho'],'best.female':['Fêmea','Female','Hembra'],'best.sound':['Som','Sound','Sonido'],
+ 'best.male':['Macho','Male','Macho'],'best.female':['Fêmea','Female','Hembra'],
  'best.search':['Buscar espécie','Search species','Buscar especie'],'best.sort':['Ordenar','Sort','Ordenar'],'best.sortSize':['Maior primeiro','Largest first','Más grande primero'],'best.sortName':['Nome','Name','Nombre'],'best.sortVersion':['Versão','Version','Versión'],
  'best.count':['{n} de {total} criaturas','{n} of {total} creatures','{n} de {total} criaturas'],'best.none':['Nenhuma espécie com esse nome.','No species by that name.','Ninguna especie con ese nombre.'],
  'best.noteBy':["Dra. Katyusha", "Dr. Katyusha", "Dra. Katyusha"],'best.loading':['Carregando o modelo…','Loading the model…','Cargando el modelo…'],'best.static':["Visualização 3D indisponível.", "3D preview unavailable.", "Vista 3D no disponible."],

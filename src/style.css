@@ -365,17 +365,12 @@ button{cursor:pointer}
 .film.is-loaded .hero-status{opacity:.6}
 .hero-meter{width:80px;height:3px;background:rgba(20,16,20,.15);border-radius:2px;overflow:hidden}
 .hero-meter span{display:block;height:100%;width:0;background:var(--basalt-900);transition:width .5s var(--ease)}
-.hero-sound{display:inline-flex;align-items:center;gap:9px;border:1.5px solid var(--basalt-900);background:transparent;color:var(--basalt-900);border-radius:999px;padding:7px 14px 7px 11px;font:500 12px var(--mono)}
-.hero-sound:hover{background:rgba(20,16,20,.08)}
-.hero-sound[aria-pressed=true]{background:var(--basalt-900);color:var(--amber-300)}
-.hero-sound-icon{width:14px;height:12px;background:currentColor;clip-path:polygon(0 30%,30% 30%,65% 0,65% 100%,30% 70%,0 70%)}
 .scroll-cue{position:absolute;z-index:4;right:var(--gutter-r);bottom:30px;display:flex;align-items:center;gap:12px;font:500 12px var(--mono);color:var(--basalt-900);text-decoration:none}
 .scroll-arrow{font:20px/1 var(--body);animation:nudge 1.6s var(--ease) infinite}
 @keyframes nudge{50%{transform:translateY(5px)}}
 .film-track{position:absolute;left:0;right:0;bottom:0;height:3px;background:rgba(20,16,20,.12);z-index:4}
 .film-track span{display:block;height:100%;width:0;background:var(--basalt-900)}
-.no-webgl .hero-status,.no-webgl .hero-sound{display:none}
-.film-eyebrow{font:400 12px/1.5 var(--mono);letter-spacing:.04em;text-transform:uppercase;color:var(--ink)}
+.no-webgl .hero-status,.no-webgl .film-eyebrow{font:400 12px/1.5 var(--mono);letter-spacing:.04em;text-transform:uppercase;color:var(--ink)}
 .film-lede{margin-top:12px;font-size:clamp(17px,1.5vw,20px);line-height:1.5;color:var(--basalt-900)}
 .hero-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:8px}
 section[id]{scroll-margin-top:56px}
@@ -528,4 +523,5 @@ html.is-loading,html.is-loading body{overflow:hidden}
 .slots button.slot{width:100%;text-align:left;font:inherit;color:inherit;cursor:pointer}
 .slot[aria-pressed=true]{border-color:var(--amber);background:var(--raised)}
 .slots li{list-style:none}
-@media (max-width:760px){.arms-stage{height:200px}}
+@media (max-width:760px){.arms-stage{height:180px;position:sticky;top:calc(60px + env(safe-area-inset-top,0px));z-index:2}
+ .slots{grid-template-columns:1fr 1fr;gap:6px}.slot{gap:8px;padding:6px 8px}.slot-name{font-size:13px;line-height:1.2}.slot-dmg{font-size:11px}}

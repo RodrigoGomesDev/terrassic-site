@@ -87,25 +87,21 @@ export function initBestiary({viewerReady,thumbnailer}){
   // Animals still on the plan have no guide yet: only the facts above and the "coming soon" line.
   $('guide-tabs').hidden=$('guide-text').hidden=!!s.planned;$('stage').classList.toggle('is-planned',!!s.planned);
   $('stage-planned').hidden=!s.planned;$('stage-planned').textContent=t('best.plannedStage',{name:pick(s.name)});
-  if(s.planned){$('dossier-egg').hidden=true;$('dossier-note').hidden=true;$('dossier-soon').hidden=false;$('dossier-soon-tag').textContent=t('soon');$('dossier-soon-text').textContent=t('best.planned');$('stage').classList.remove('is-soon');$('sound-toggle').hidden=true;$('anim-chips').replaceChildren();return}
+  if(s.planned){$('dossier-egg').hidden=true;$('dossier-note').hidden=true;$('dossier-soon').hidden=false;$('dossier-soon-tag').textContent=t('soon');$('dossier-soon-text').textContent=t('best.planned');$('stage').classList.remove('is-soon');$('anim-chips').replaceChildren();return}
   const tabs=$('guide-tabs');tabs.replaceChildren(...GUIDE_KEYS.map(k=>{const b=document.createElement('button');b.type='button';b.role='tab';b.textContent=t(`guide.${k}`);b.setAttribute('aria-selected',String(k===guideKey));b.tabIndex=k===guideKey?0:-1;b.addEventListener('click',()=>{guideKey=k;renderDossier()});return b}));
   const text=$('guide-text');text.textContent=pick(s.guide[guideKey]);text.classList.remove('swap');void text.offsetWidth;text.classList.add('swap');
   $('note-text').textContent=pick(s.guide.note);$('dossier-note').hidden=!story||!pick(s.guide.note);
   const soon=!isReady(s.id);$('dossier-soon').hidden=!soon;$('dossier-soon-tag').textContent=t('soon');$('dossier-soon-text').textContent=t('best.soon');
   $('stage').classList.toggle('is-soon',soon);
   $('stage-canvas').setAttribute('aria-label',t('best.canvas',{name:pick(s.name)}));
-  $('sound-toggle').hidden=s.id!=='tyrannosaurus'||!viewer;
   renderAnims();
  }
  function renderAnims(){
   const host=$('anim-chips');host.replaceChildren(...selected.anims.map(a=>{const b=document.createElement('button');b.type='button';b.className='chip';b.dataset.anim=a;b.textContent=t(`anim.${a}`)!==`anim.${a}`?t(`anim.${a}`):a;b.setAttribute('aria-pressed',String(a===anim));b.addEventListener('click',()=>playAnim(a));return b}));
  }
- const roar=new Audio(assetUrl('audio/tyrannosaurus-roar-pixabay.mp3'));roar.preload='none';roar.volume=.5;let sound=false;
- $('sound-toggle').addEventListener('click',()=>{sound=!sound;$('sound-toggle').setAttribute('aria-pressed',String(sound));if(!sound)roar.pause()});
  function playAnim(a){
   const clip=viewer?.current?.animator.clips[a];if(!clip)return;
   if(clip.loop)anim=a;viewer.play(a);
-  if(a==='roar'&&sound&&selected.id==='tyrannosaurus'){roar.currentTime=0;roar.play().catch(()=>{})}
   for(const b of $('anim-chips').children){b.setAttribute('aria-pressed',String(b.dataset.anim===anim));b.classList.toggle('is-playing',!clip.loop&&b.dataset.anim===a)}
  }
  function select(s){
