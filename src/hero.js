@@ -44,7 +44,7 @@ export class Hero{
   // A neutral floor that only catches the shadow, so the animal stands on the page colour.
   const floor=new THREE.Mesh(new THREE.PlaneGeometry(60,60),new THREE.ShadowMaterial({color:0x3b2a1a,opacity:.28}));floor.rotation.x=-Math.PI/2;floor.receiveShadow=true;this.scene.add(floor);
   this.progress=0;this.target=0;this.time=0;this.last=performance.now();this.pointer=new THREE.Vector2();this.look=new THREE.Vector2();this.visible=true;this.roarPlayed=false;
-  this.head=new THREE.Vector3();this.mouth=new THREE.Vector3();this.tmp=new THREE.Vector3();
+  this.head=new THREE.Vector3();this.mouth=new THREE.Vector3();this.hinge=new THREE.Vector3();this.tip=new THREE.Vector3();this.tmp=new THREE.Vector3();
   this.tick=this.tick.bind(this);new ResizeObserver(()=>this.resize()).observe(host);this.resize();
   addEventListener('pointermove',e=>{this.pointer.set(e.clientX/innerWidth-.5,e.clientY/innerHeight-.5)},{passive:true});
   new IntersectionObserver(([e])=>{this.visible=e.isIntersecting},{rootMargin:'60px'}).observe(host);
@@ -112,20 +112,24 @@ export class Hero{
   const w=smooth(p,ROAR[0]-.04,ROAR[0]+.02)*(1-smooth(p,ROAR[1],ROAR[1]+.05));
   a.scrub('roar',(p-ROAR[0])/(ROAR[1]-ROAR[0])*a.clips.roar.length,w);a.update(this.reduced?0:dt);
   if(p>ROAR[0]+.01&&!this.roarPlayed){this.roarPlayed=true;this.onRoar()}if(p<ROAR[0]-.04)this.roarPlayed=false;
-  const gape=smooth(p,GAPE[0],GAPE[1]),jaw=bones.get('jaw'),neck=bones.get('neck1'),skull=bones.get('skull');
+  const gape=smooth(p,GAPE[0],GAPE[1]),jaw=bones.get('jaw'),neck=bones.get('neck'),skull=bones.get('skull');
   if(jaw){const open=gape*THREE.MathUtils.degToRad(52);jaw.rotation.x=Math.min(jaw.rotation.x,jaw.userData.baseRotation.x-open)}
   if(neck)neck.rotation.x+=gape*.16;if(skull)skull.rotation.x+=gape*.1;
   this.rex.holder.updateMatrixWorld(true);
   (skull||bones.get('head')).getWorldPosition(this.head);
-  // The mouth: just above the lower jaw's teeth, measured from the jaw's own blocks (bone pivots sit at the hinge).
-  if(jaw){this.box=(this.box||new THREE.Box3()).setFromObject(jaw);this.box.getCenter(this.mouth);this.mouth.y=this.box.max.y+.55}else this.mouth.copy(this.head);
+  // Front three-quarter direction the animal faces (the model looks down -Z, turned by its yaw).
+  const yaw=this.rex.holder.rotation.y,front=new THREE.Vector3(-Math.sin(yaw),0,-Math.cos(yaw)),sideV=new THREE.Vector3(front.z,0,-front.x);
+  // The mouth: the middle of the open jaws, just behind the teeth, measured from the jaw's own blocks (its bone pivot
+  // sits at the hinge and its tip is the block corner furthest along the way the animal faces).
+  if(jaw){let reach=-Infinity;const v=this.tmp;
+   jaw.traverse(m=>{if(!m.isMesh)return;if(!m.geometry.boundingBox)m.geometry.computeBoundingBox();const {min,max}=m.geometry.boundingBox;
+    for(let i=0;i<8;i++){v.set(i&1?max.x:min.x,i&2?max.y:min.y,i&4?max.z:min.z).applyMatrix4(m.matrixWorld);const d=v.dot(front);if(d>reach){reach=d;this.tip.copy(v)}}});
+   jaw.getWorldPosition(this.hinge);this.mouth.lerpVectors(this.hinge,this.tip,.7);this.mouth.y=(this.mouth.y+this.hinge.y)/2}else this.mouth.copy(this.head);
   // Camera: close on the face, pull back to the whole animal while it roars, then fly into the open mouth.
   this.look.x=damp(this.look.x,this.pointer.x,3,dt);this.look.y=damp(this.look.y,this.pointer.y,3,dt);
   const far=this.portrait?1.5:1,out=smooth(p,0,.32)*(1-smooth(p,.5,.78)),dive=smooth(p,.62,.98);
-  // Front three-quarter direction the animal faces (the model looks down -Z, turned by its yaw).
-  const yaw=this.rex.holder.rotation.y,front=new THREE.Vector3(-Math.sin(yaw),0,-Math.cos(yaw)),sideV=new THREE.Vector3(front.z,0,-front.x);
   const target=this.head.clone().lerp(new THREE.Vector3(0,4.2,0),out*.75);
-  // Into the mouth: aim just above the lower teeth.
+  // Into the mouth: aim between the jaws.
   const mouth=this.mouth.clone();
   const dist=lerp(lerp(9,30,out),1.1,dive)*far;
   const eye=target.clone().lerp(mouth,dive).addScaledVector(front,dist).addScaledVector(sideV,lerp(dist*.35,0,dive)).add(new THREE.Vector3(0,lerp(dist*.12,.15,dive),0));
