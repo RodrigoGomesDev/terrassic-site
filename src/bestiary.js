@@ -28,7 +28,13 @@ export function initBestiary({viewerReady,thumbnailer}){
   b.addEventListener('click',()=>{select(s);document.getElementById('stage').scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'center'})});
   li.append(b);cards.set(s.id,{li,button:b});
  }
- const plannedHead=Object.assign(document.createElement('li'),{className:'roster-head'});
+ // The list is split in three parts with their own heading: new model, in the game but being remade, not in the game
+ // yet. The two long parts show their first row or two and open the rest on request, so the page does not turn into
+ // 120 cards to scroll past; a search or a filter always shows every match.
+ const PART_KEYS=['best.partReady','best.partRemake','best.plannedHead'],PREVIEW=12,open=new Set();
+ const heads=PART_KEYS.map(()=>Object.assign(document.createElement('li'),{className:'roster-head'}));
+ const mores=PART_KEYS.map((_,i)=>{const li=document.createElement('li');li.className='roster-more';const b=document.createElement('button');b.type='button';b.className='chip';
+  b.addEventListener('click',()=>{open.add(i);renderRoster();roster.querySelectorAll('.card')[0]&&cards.get(b.dataset.next)?.button.focus()});li.append(b);return li});
  for(const s of SPECIES){
   const li=document.createElement('li'),b=document.createElement('button');b.type='button';b.className='card';b.dataset.id=s.id;
   b.innerHTML=`<span class="card-art"><img alt="" decoding="async"></span><span class="card-meta"><span class="card-name"></span><span class="card-sub"></span></span>`;
@@ -57,9 +63,12 @@ export function initBestiary({viewerReady,thumbnailer}){
  }
  function renderRoster(){
   for(const b of filters.children){b.textContent=t(`group.${b.dataset.group}`);b.setAttribute('aria-pressed',String(b.dataset.group===group))}
-  const list=visible(),items=list.map(s=>cards.get(s.id).li),first=list.findIndex(s=>s.planned);
-  // A heading row marks where the animals that are not in the game yet begin.
-  if(first>=0){plannedHead.textContent=t('best.plannedHead',{n:list.length-first});items.splice(first,0,plannedHead)}
+  const list=visible(),items=[],part=s=>s.planned?2:isReady(s.id)?0:1,narrowed=query||group!=='all';
+  for(let i=0;i<3;i++){const inPart=list.filter(s=>part(s)===i);if(!inPart.length)continue;
+   heads[i].textContent=t(PART_KEYS[i],{n:inPart.length});items.push(heads[i]);
+   const shown=narrowed||open.has(i)||inPart.length<=PREVIEW+2?inPart:inPart.slice(0,PREVIEW);
+   items.push(...shown.map(s=>cards.get(s.id).li));
+   if(shown.length<inPart.length){const btn=mores[i].firstChild;btn.textContent=t('best.showAll',{n:inPart.length});btn.dataset.next=inPart[PREVIEW].id;items.push(mores[i])}}
   roster.replaceChildren(...items);
   list.forEach(s=>{const c=cards.get(s.id);
    c.button.querySelector('.card-name').textContent=pick(s.name);c.button.querySelector('.soon-tag')?.replaceChildren(t('soon'));c.button.querySelector('.card-sub').textContent=s.planned?`${fmt(s.length)} m\n${pick(LORE.eras[s.era])}`:`${fmt(s.length)} m · ${t(`one.${s.group}`)}`;

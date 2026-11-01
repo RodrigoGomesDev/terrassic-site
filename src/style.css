@@ -205,7 +205,7 @@ button{cursor:pointer}
 .card.has-art img{opacity:1;transform:none}
 .card-art .sprite{position:absolute;left:8px;top:8px;z-index:1}
 .card-meta{padding:10px 12px 12px;display:grid;gap:2px;min-width:0}
-.card-name{font:400 18px/1.15 var(--mono);color:var(--bone);overflow-wrap:break-word}
+.card-name{font:400 17px/1.15 var(--mono);color:var(--bone);overflow-wrap:anywhere}
 .card-sub{font:11px var(--mono);color:var(--muted)}
 
 /* Mechanics bento */
@@ -238,7 +238,7 @@ button{cursor:pointer}
 .ride-art{height:150px;display:grid;place-items:center}
 .ride-art .sprite{image-rendering:pixelated}
 .levels{list-style:none;margin:6px 0 0;padding:0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;counter-reset:lv}
-.levels li{position:relative;background:var(--basalt-900);border:1px solid var(--line);border-radius:8px;padding:14px 12px 12px;display:grid;gap:6px;min-width:0}
+.levels li{position:relative;background:var(--basalt-900);border:1px solid var(--line);border-radius:8px;padding:14px 12px 12px;display:grid;gap:6px;min-width:0;align-content:start}
 .levels li::before{counter-increment:lv;content:counter(lv);font:400 30px/1 var(--display);color:var(--amber)}
 .levels strong{color:var(--bone);font-size:15px}
 .levels span{font-size:13px;color:var(--muted)}
@@ -414,3 +414,8 @@ section[id]{scroll-margin-top:56px}
 .eras.is-soon .era-art{filter:saturate(.35) brightness(.7)}
 .eras.is-soon .era h3{color:var(--stone-300)}
 .display .soon-badge{vertical-align:middle;margin-left:10px}
+.roster-head:first-child{margin-top:0;padding-top:0;border-top:0}
+.roster-more{grid-column:1/-1;display:flex;justify-content:center;padding-top:4px}
+/* Long names (Argentinossauro, Opisthocoelicaudia) fit the two-column cards on phones instead of breaking a letter off. */
+.card-name{hyphens:auto}
+@media (max-width:760px){.card-name{font-size:15px}}
