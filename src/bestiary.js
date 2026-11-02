@@ -81,7 +81,7 @@ export function initBestiary({viewerReady,thumbnailer}){
  }
 
  function renderDossier(){
-  const s=selected;$('dossier-name').textContent=pick(s.name);$('dossier-latin').textContent=s.name.en;$('dossier-group').textContent=kind(s);
+  const s=selected;$('dossier-name').textContent=breakable(pick(s.name));$('dossier-name').classList.toggle('is-long',pick(s.name).length>14);$('dossier-latin').textContent=s.name.en;$('dossier-group').textContent=kind(s);
   paintSprite($('dossier-egg'),`egg:${s.id}`,40);
   const facts=[[lengthLabel(s),`${fmt(s.length)} m`],['fact.diet',dietLabel(s.diet)],['fact.era',pick(LORE.eras[s.era])],...s.planned?[['fact.version',t('best.notYet')]]:[['fact.mount',t(`mount.${s.mount}`)],['fact.tame',t(`tame.${s.tame}`)]]];
   $('dossier-facts').replaceChildren(...facts.map(([k,v])=>{const d=document.createElement('div');d.innerHTML='<dt></dt><dd></dd>';d.firstChild.textContent=t(k);d.lastChild.textContent=v;return d}));
