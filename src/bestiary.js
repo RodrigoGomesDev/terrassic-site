@@ -97,7 +97,8 @@ export function initBestiary({viewerReady,thumbnailer}){
   renderAnims();
  }
  function renderAnims(){
-  const host=$('anim-chips');host.replaceChildren(...selected.anims.map(a=>{const b=document.createElement('button');b.type='button';b.className='chip';b.dataset.anim=a;b.textContent=t(`anim.${a}`)!==`anim.${a}`?t(`anim.${a}`):a;b.setAttribute('aria-pressed',String(a===anim));b.addEventListener('click',()=>playAnim(a));return b}));
+  // The alpha T. rex (Marfim, Brasa) has its own moves in the same file; the site shows the common animal only.
+  const host=$('anim-chips');host.replaceChildren(...selected.anims.filter(a=>!a.startsWith('alpha_')).map(a=>{const b=document.createElement('button');b.type='button';b.className='chip';b.dataset.anim=a;b.textContent=t(`anim.${a}`)!==`anim.${a}`?t(`anim.${a}`):a;b.setAttribute('aria-pressed',String(a===anim));b.addEventListener('click',()=>playAnim(a));return b}));
  }
  function playAnim(a){
   const clip=viewer?.current?.animator.clips[a];if(!clip)return;

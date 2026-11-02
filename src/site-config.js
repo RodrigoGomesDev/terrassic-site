@@ -13,7 +13,7 @@ export const links={
 // Espécies cujo modelo novo (estudo próprio, aprovado pelo Rodrigo) já está pronto. As outras aparecem no site
 // como silhueta com "Em breve": no bestiário, nas miniaturas e na abertura. Ex.: ready:['carnotaurus'].
 export const models={
- ready:['velociraptor','spinosaurus','pteranodon','tyrannosaurus','carnotaurus','giganotosaurus','protoceratops'],
+ ready:['velociraptor','spinosaurus','pteranodon','tyrannosaurus','carnotaurus','giganotosaurus','protoceratops','triceratops','gallimimus'],
 };
 export const isReady=id=>models.ready.includes(id);
 
