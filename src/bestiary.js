@@ -15,6 +15,8 @@ const ALL=[...SPECIES,...PLANNED];
 // The ruler ends at the next 10 m above the longest animal, and its labels are drawn from that same number.
 const MAX_LENGTH=Math.ceil(Math.max(...ALL.map(s=>s.length))/10)*10;
 const dietLabel=d=>LORE.diets[d]?pick(LORE.diets[d]):t(`diet.${d}`);
+// The "herbivore" group also holds the omnivores (Gallimimus, Oviraptor...): those are labelled by what they eat.
+const kind=s=>s.group==='herbivore'&&s.diet==='omnivore'?dietLabel(s.diet):t(`one.${s.group}`);
 const fmt=n=>new Intl.NumberFormat(getLang()==='en'?'en':getLang()==='es'?'es':'pt-BR',{maximumFractionDigits:2}).format(n);
 // The mod lists pterosaurs by wingspan.
 const lengthLabel=s=>s.wing||s.group==='flyer'&&['pteranodon','quetzalcoatlus','hatzegopteryx','ichthyornis'].includes(s.id)?'fact.wing':'fact.length';
@@ -73,13 +75,13 @@ export function initBestiary({viewerReady,thumbnailer}){
    if(shown.length<inPart.length){const btn=mores[i].firstChild;btn.textContent=t('best.showAll',{n:inPart.length});btn.dataset.next=inPart[PREVIEW].id;items.push(mores[i])}}
   roster.replaceChildren(...items);
   list.forEach(s=>{const c=cards.get(s.id);
-   c.button.querySelector('.card-name').textContent=breakable(pick(s.name));c.button.querySelector('.soon-tag')?.replaceChildren(t('soon'));c.button.querySelector('.card-sub').textContent=s.planned?`${fmt(s.length)} m\n${pick(LORE.eras[s.era])}`:`${fmt(s.length)} m · ${t(`one.${s.group}`)}`;
+   c.button.querySelector('.card-name').textContent=breakable(pick(s.name));c.button.querySelector('.soon-tag')?.replaceChildren(t('soon'));c.button.querySelector('.card-sub').textContent=s.planned?`${fmt(s.length)} m\n${pick(LORE.eras[s.era])}`:`${fmt(s.length)} m · ${kind(s)}`;
    c.button.setAttribute('aria-label',s.planned?`${pick(s.name)}, ${t('soon')}`:t('best.view',{name:pick(s.name)}));c.button.setAttribute('aria-pressed',String(s===selected))});
   $('roster-count').textContent=list.length?t('best.count',{n:list.length,total:ALL.length}):t('best.none');
  }
 
  function renderDossier(){
-  const s=selected;$('dossier-name').textContent=pick(s.name);$('dossier-latin').textContent=s.name.en;$('dossier-group').textContent=t(`one.${s.group}`);
+  const s=selected;$('dossier-name').textContent=pick(s.name);$('dossier-latin').textContent=s.name.en;$('dossier-group').textContent=kind(s);
   paintSprite($('dossier-egg'),`egg:${s.id}`,40);
   const facts=[[lengthLabel(s),`${fmt(s.length)} m`],['fact.diet',dietLabel(s.diet)],['fact.era',pick(LORE.eras[s.era])],...s.planned?[['fact.version',t('best.notYet')]]:[['fact.mount',t(`mount.${s.mount}`)],['fact.tame',t(`tame.${s.tame}`)]]];
   $('dossier-facts').replaceChildren(...facts.map(([k,v])=>{const d=document.createElement('div');d.innerHTML='<dt></dt><dd></dd>';d.firstChild.textContent=t(k);d.lastChild.textContent=v;return d}));

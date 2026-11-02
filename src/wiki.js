@@ -19,6 +19,8 @@ const fmt=n=>new Intl.NumberFormat(getLang()==='pt'?'pt-BR':getLang(),{maximumFr
 const norm=x=>x.normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase(),ALIAS={tyrannosaurus:'t. rex trex',velociraptor:'raptor',triceratops:'trike'};
 const GROUPS=['all','predator','herbivore','flyer','water'],GUIDE_KEYS=['sci','behavior','taming','utility'];
 const ALL=[...SPECIES,...PLANNED],dietLabel=d=>LORE.diets[d]?pick(LORE.diets[d]):t(`diet.${d}`);
+// The "herbivore" group also holds the omnivores (Gallimimus, Oviraptor...): those are labelled by what they eat.
+const kind=s=>s.group==='herbivore'&&s.diet==='omnivore'?dietLabel(s.diet):t(`one.${s.group}`);
 const lengthLabel=s=>s.wing||s.group==='flyer'&&['pteranodon','quetzalcoatlus','hatzegopteryx','ichthyornis'].includes(s.id)?'fact.wing':'fact.length';
 
 // The table of contents; the sub-entries of a section are indented.
@@ -69,7 +71,7 @@ function creature(s){
  if(s.planned){const names=[...new Set(Object.values(s.name))].filter(n=>n!==pick(s.name)).join(' · ');
   d.classList.add('is-planned');
   d.append(h('summary','',el('span','sp-art sp-none-art',''),h('span','sp-head',h('span','sp-name',el('strong','',pick(s.name))),names&&el('span','sp-alt',names),
-    el('span','sp-sub',`${fmt(s.length)} m · ${t(`one.${s.group}`)} · ${pick(LORE.eras[s.era])}`)),el('span','status status-plan',t('soon')),el('i','sp-plus','+')),
+    el('span','sp-sub',`${fmt(s.length)} m · ${kind(s)} · ${pick(LORE.eras[s.era])}`)),el('span','status status-plan',t('soon')),el('i','sp-plus','+')),
    h('div','sp-body',h('dl','facts',...[[lengthLabel(s),`${fmt(s.length)} m`],['fact.diet',dietLabel(s.diet)],['fact.era',pick(LORE.eras[s.era])],['fact.version',t('best.notYet')]].map(([k,v])=>h('div','',el('dt','',t(k)),el('dd','',v)))),el('p','',t('best.planned'))));
   return d}
  const img=el('img','sp-art');img.alt='';img.loading='lazy';img.decoding='async';img.src=assetUrl(`thumbs/${s.id}.webp`);img.onerror=()=>img.remove();if(!isReady(s.id))img.classList.add('is-soon');
@@ -78,7 +80,7 @@ function creature(s){
  const copy=el('button','chip',w('crea.link'));copy.type='button';
  copy.addEventListener('click',()=>{const url=`${location.origin}${location.pathname}#${s.id}`;navigator.clipboard?.writeText(url).then(()=>{copy.textContent=w('crea.copied');setTimeout(()=>{copy.textContent=w('crea.link')},1600)},()=>{})});
  d.append(h('summary','',img,h('span','sp-head',h('span','sp-name',sprite(`egg:${s.id}`,24),el('strong','',pick(s.name))),names&&el('span','sp-alt',names),
-   el('span','sp-sub',`${fmt(s.length)} m · ${t(`one.${s.group}`)} · ${pick(LORE.eras[s.era])}`)),!isReady(s.id)&&el('span','status status-plan',t('soon')),el('i','sp-plus','+')),
+   el('span','sp-sub',`${fmt(s.length)} m · ${kind(s)} · ${pick(LORE.eras[s.era])}`)),!isReady(s.id)&&el('span','status status-plan',t('soon')),el('i','sp-plus','+')),
   h('div','sp-body',h('dl','facts',...facts.map(([k,v])=>h('div','',el('dt','',t(k)),el('dd','',v)))),
    ...GUIDE_KEYS.filter(k=>pick(s.guide[k])).map(k=>h('div','sp-guide',el('h4','wiki-h4',t(`guide.${k}`)),el('p','',pick(s.guide[k])))),
    story&&pick(s.guide.note)&&h('blockquote','note',el('p','',pick(s.guide.note)),el('cite','',t('best.noteBy'))),h('p','sp-actions',copy)));
