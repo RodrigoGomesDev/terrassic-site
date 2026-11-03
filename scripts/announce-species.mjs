@@ -14,13 +14,15 @@ export const SITE=(process.env.SITE_URL||'https://terrassic.vercel.app').replace
 const COLOR=0xF2B544;// AMBER_500, the brand accent
 const MAX_PER_PUSH=5;// a push that releases more than this is a mistake or a migration: never flood the channel
 
-const PT={
- group:{predator:'Predador',herbivore:'Herbívoro',flyer:'Voador',water:'Aquático'},
- diet:{carnivore:'Carnívoro',herbivore:'Herbívoro',omnivore:'Onívoro',piscivore:'Piscívoro'},
- tame:{egg:'Desde o ovo',food:'Alimentando',knockout:'Por nocaute',baby:'Só filhote',none:'Não se doma'},
- mount:{ride:'Montável',platform:'Sela de plataforma',shoulder:'No ombro',none:'Não montável'},
+// The Discord server is organised in English (the shared language) with Portuguese and Spanish sections, so the post
+// is written the same way: English base, then a short block in Portuguese and in Spanish.
+const EN={
+ group:{predator:'Predator',herbivore:'Herbivore',flyer:'Flyer',water:'Aquatic'},
+ diet:{carnivore:'Carnivore',herbivore:'Herbivore',omnivore:'Omnivore',piscivore:'Piscivore'},
+ tame:{egg:'From the egg',food:'By feeding',knockout:'By knockout',baby:'Only as a baby',none:"Can't be tamed"},
+ mount:{ride:'Rideable',platform:'Platform saddle',shoulder:'Shoulder pet',none:'Not rideable'},
 };
-const meters=n=>new Intl.NumberFormat('pt-BR',{maximumFractionDigits:1}).format(n);
+const meters=n=>new Intl.NumberFormat('en-US',{maximumFractionDigits:1}).format(n);
 const clip=(s,n)=>(s.length>n?`${s.slice(0,n-1).trimEnd()}…`:s);
 
 // The ids inside `ready:[...]` of a site-config.js text (the code line, not the example in the comment above it).
@@ -37,24 +39,26 @@ export function message(s,{role=null,image}={}){
  const tall=s.hitbox?.[1];
  const embed={
   color:COLOR,
-  author:{name:'Novas espécies · Terrassic',icon_url:`${SITE}/assets/monograma_64.png`},
-  title:s.name.pt,url:`${SITE}/wiki/#${s.id}`,
-  description:clip([g.sci?.pt,g.behavior?.pt].filter(Boolean).join('\n\n'),900),
+  author:{name:'New species · Terrassic',icon_url:`${SITE}/assets/monograma_64.png`},
+  title:s.name.en,url:`${SITE}/wiki/#${s.id}`,
+  description:clip([g.sci?.en,g.behavior?.en].filter(Boolean).join('\n\n'),900),
   fields:[
-   {name:'Tipo',value:[...new Set([PT.group[s.group],PT.diet[s.diet]])].join(' · '),inline:true},// "Herbívoro" once
-   {name:'Tamanho',value:`${meters(s.length)} m${tall?` · ${meters(tall)} m de altura`:''}`,inline:true},
-   {name:'Montaria',value:PT.mount[s.mount]||'—',inline:true},
-   {name:'Como domar',value:clip(g.taming?.pt||PT.tame[s.tame]||'—',1000)},
-   ...(g.utility?.pt?[{name:'Para que serve',value:clip(g.utility.pt,1000)}]:[]),
-   {name:'English · Español',value:clip(`**${s.name.en}** — ${first(g.sci?.en)}\n**${s.name.es}** — ${first(g.sci?.es)}`,1000)},
+   {name:'Type',value:[...new Set([EN.group[s.group],EN.diet[s.diet]])].join(' · '),inline:true},// "Herbivore" once
+   {name:'Size',value:`${meters(s.length)} m long${tall?` · ${meters(tall)} m tall`:''}`,inline:true},
+   {name:'Riding',value:EN.mount[s.mount]||'—',inline:true},
+   {name:'How to tame',value:clip(g.taming?.en||EN.tame[s.tame]||'—',1000)},
+   ...(g.utility?.en?[{name:"What it's good for",value:clip(g.utility.en,1000)}]:[]),
+   {name:'Português',value:clip(`**${s.name.pt}**: ${first(g.sci?.pt)}${g.taming?.pt?`\n**Como domar:** ${first(g.taming.pt)}`:''}`,1000)},
+   {name:'Español',value:clip(`**${s.name.es}**: ${first(g.sci?.es)}${g.taming?.es?`\n**Cómo domesticarlo:** ${first(g.taming.es)}`:''}`,1000)},
   ],
   image:{url:`attachment://${image}`},
-  footer:{text:'Ficha completa no Guia de Campo do jogo e no /dino do Rexpert'},
+  footer:{text:"Full entry in the in-game Field Guide and Rexpert's /dino · Ficha completa no Guia de Campo"},
   timestamp:new Date().toISOString(),
  };
+ const names=[...new Set([s.name.pt,s.name.es].filter(n=>n!==s.name.en))];
  return {
   username:'Terrassic',avatar_url:`${SITE}/assets/monograma_256.png`,
-  content:`${role?`<@&${role}> `:''}Chegou o **${s.name.pt}** refeito: modelo novo, animações e ficha atualizada.`,
+  content:`${role?`<@&${role}> `:''}**${s.name.en}**${names.length?` (${names.join(' · ')})`:''} is here, redesigned · chegou refeito · llegó rehecho.`,
   embeds:[embed],
   allowed_mentions:{roles:role?[role]:[]},
  };

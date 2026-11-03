@@ -14,16 +14,18 @@ export const PAL={
  rift500:'#F07A1A',dusk700:'#3A2240',dusk500:'#5E3866',fern400:'#7FAF55',blood500:'#C4473A',sky400:'#8FB4C8',
 };
 
-// Portuguese labels: the cards speak the community's main language; the post text carries English and Spanish.
-const PT={
- group:{predator:'Predador',herbivore:'Herbívoro',flyer:'Voador',water:'Aquático'},
- diet:{carnivore:'Carnívoro',herbivore:'Herbívoro',omnivore:'Onívoro',piscivore:'Piscívoro'},
- era:{late_cretaceous:'Cretáceo Superior',jurassic:'Jurássico'},
- mount:{ride:'Montável',platform:'Sela de plataforma',shoulder:'Vai no ombro',none:null},
+// The Discord server is organised in English (the shared language), with Portuguese and Spanish sections, so the art
+// does the same: English labels, the scientific name as the big title (the same in every language) and the
+// Portuguese and Spanish names right under it.
+const EN={
+ group:{predator:'Predator',herbivore:'Herbivore',flyer:'Flyer',water:'Aquatic'},
+ diet:{carnivore:'Carnivore',herbivore:'Herbivore',omnivore:'Omnivore',piscivore:'Piscivore'},
+ era:{late_cretaceous:'Late Cretaceous',jurassic:'Jurassic'},
+ mount:{ride:'Rideable',platform:'Platform saddle',shoulder:'Shoulder pet',none:null},
 };
 // Chips under the name: type, diet only when it says something new, mount, era.
-const chips=s=>[PT.group[s.group],PT.diet[s.diet]!==PT.group[s.group]?PT.diet[s.diet]:null,PT.mount[s.mount],PT.era[s.era]??s.era].filter(Boolean);
-const meters=n=>new Intl.NumberFormat('pt-BR',{maximumFractionDigits:1}).format(n);
+const chips=s=>[EN.group[s.group],EN.diet[s.diet]!==EN.group[s.group]?EN.diet[s.diet]:null,EN.mount[s.mount],EN.era[s.era]??s.era].filter(Boolean);
+const meters=n=>new Intl.NumberFormat('en-US',{maximumFractionDigits:1}).format(n);
 
 // ---- pixel helpers -------------------------------------------------------------------------------------------------
 const canvas=(w,h)=>{const c=document.createElement('canvas');c.width=Math.max(1,Math.ceil(w));c.height=Math.max(1,Math.ceil(h));return c};
@@ -113,7 +115,7 @@ async function fonts(){await Promise.all(['12px Entalhe','8px Sedimento'].map(f=
 
 // ---- the release card --------------------------------------------------------------------------------------------
 // 1600 x 900: landscape, the animal on the right, the name and its real scale on the left.
-export async function speciesCard(thumbnailer,species,{width=1600,height=900,sex='male',label='NOVO NO TERRASSIC',site='terrassic.vercel.app/wiki',logo}={}){
+export async function speciesCard(thumbnailer,species,{width=1600,height=900,sex='male',label='NEW IN TERRASSIC',site='terrassic.vercel.app/wiki',logo}={}){
  await fonts();
  const out=canvas(width,height),g=out.getContext('2d');
  const land=landscape(width,height,{seed:species.id,sunX:.66});g.drawImage(land.canvas,0,0);
@@ -125,9 +127,9 @@ export async function speciesCard(thumbnailer,species,{width=1600,height=900,sex
 
  const left=84;let y=96;
  const lab=pixelText(label,{scale:3,color:PAL.amber500,spacing:2});g.drawImage(lab,left,y);y+=lab.height+34;
- const name=fitText(species.name.pt.toLocaleUpperCase('pt-BR'),{font:'Entalhe',px:12,color:PAL.bone100,shadow:PAL.basalt950},width*.5,[8,7,6,5,4]);
+ const name=fitText(species.name.en.toLocaleUpperCase('en-US'),{font:'Entalhe',px:12,color:PAL.bone100,shadow:PAL.basalt950},width*.5,[8,7,6,5,4]);
  g.drawImage(name,left,y);y+=name.height+22;
- const sci=pixelText(species.name.en,{scale:4,color:PAL.stone300});g.drawImage(sci,left,y);y+=sci.height+40;
+ const sci=pixelText([...new Set([species.name.pt,species.name.es])].join(' · '),{scale:4,color:PAL.stone300});g.drawImage(sci,left,y);y+=sci.height+40;
  let x=left;for(const text of chips(species)){const c=chip(text);if(x+c.width>width*.52){x=left;y+=c.height+12}g.drawImage(c,x,y);x+=c.width+14}
  y+=chip('X').height+44;
 
@@ -136,9 +138,9 @@ export async function speciesCard(thumbnailer,species,{width=1600,height=900,sex
  const pw=player(g,left,base,s,PAL.stone300);
  const sil=silhouette(render,PAL.amber500),k=(tall*s)/sil.height;g.imageSmoothingEnabled=true;g.drawImage(sil,left+pw+28,base-sil.height*k,sil.width*k,sil.height*k);
  g.fillStyle=PAL.basalt600;g.fillRect(left-8,base,Math.max(pw+28+sil.width*k+16,420),3);
- const cap=pixelText(`${meters(species.length)} m de comprimento · ${meters(tall)} m de altura`,{scale:3,color:PAL.stone200});
+ const cap=pixelText(`${meters(species.length)} m long · ${meters(tall)} m tall`,{scale:3,color:PAL.stone200});
  g.drawImage(cap,left,base+18);
- const unit=pixelText('1 bloco = 1 metro, como no jogo',{scale:2,color:PAL.stone400});g.drawImage(unit,left,base+18+cap.height+12);
+ const unit=pixelText('1 block · 1 bloco · 1 bloque = 1 m',{scale:2,color:PAL.stone400});g.drawImage(unit,left,base+18+cap.height+12);
 
  // footer: the sign and the address
  if(logo){const lh=46,lw=logo.width*lh/logo.height;g.imageSmoothingEnabled=false;g.drawImage(logo,left,height-lh-44,lw,lh)}
@@ -159,8 +161,8 @@ export async function channelBanner(thumbnailer,{title,subtitle='',species=[],wi
  const renders=await Promise.all(list.map(s=>thumbnailer.still(s,{width:1100,height:740}).then(r=>({s,r}))));
  renders.sort((a,b)=>(b.s.hitbox?.[1]??0)-(a.s.hitbox?.[1]??0)).forEach(({r},i)=>{const [cx,hk,mw]=slots[i]||slots[0];stand(g,r,{cx:width*cx,groundY:land.groundY+10,maxW:width*mw,maxH:height*hk*1.2})});
  const left=Math.round(height*.17);
- const t=fitText(title.toLocaleUpperCase('pt-BR'),{font:'Entalhe',px:12,color:PAL.bone100,shadow:PAL.basalt950},width*.46,[10,9,8,7,6,5]);
- const sub=subtitle?pixelText(subtitle,{scale:4,color:PAL.amber500}):null;
+ const t=fitText(title.toLocaleUpperCase('en-US'),{font:'Entalhe',px:12,color:PAL.bone100,shadow:PAL.basalt950},width*.46,[10,9,8,7,6,5]);
+ const sub=subtitle?fitText(subtitle,{color:PAL.amber500},width*.44,[4,3]):null;
  const block=t.height+(sub?sub.height+26:0);let y=Math.round((height-block)/2)-10;
  g.drawImage(t,left,y);y+=t.height+26;if(sub)g.drawImage(sub,left,y);
  if(logo){const lh=34,lw=logo.width*lh/logo.height;g.imageSmoothingEnabled=false;g.drawImage(logo,width-lw-40,30,lw,lh)}
@@ -171,16 +173,20 @@ export const loadLogo=url=>loadImage(url);
 
 // One header per channel that shows information (Discord has no channel banner: big servers post a 4:1 image at the
 // top of each read-only channel). Only animals with the new model; change the list when channels change.
+// Keys are the channel names of the Discord server (English base); the subtitle carries Portuguese and Spanish.
 export const BANNERS=[
- {key:'boas-vindas',title:'Boas-vindas',subtitle:'Comece a expedição por aqui',species:['tyrannosaurus','velociraptor']},
- {key:'regras',title:'Regras',subtitle:'Para a expedição ir bem para todos',species:['triceratops']},
- {key:'faq-e-ajuda',title:'Dúvidas',subtitle:'Instalação, versões e respostas rápidas',species:['protoceratops']},
- {key:'links',title:'Links',subtitle:'Download, wiki e site oficial',species:['pteranodon']},
- {key:'anuncios',title:'Anúncios',subtitle:'Versões e novidades do Terrassic',species:['giganotosaurus','carnotaurus']},
- {key:'novas-especies',title:'Novas espécies',subtitle:'Cada animal refeito, no dia em que chega',species:['parasaurolophus','gallimimus']},
- {key:'builds',title:'Builds',subtitle:'Cada versão nova, avisada na hora',species:['ankylosaurus']},
- {key:'suporte',title:'Suporte',subtitle:'Mande o log: a gente lê',species:['spinosaurus']},
- {key:'bugs',title:'Bugs',subtitle:'Relatos para a equipe corrigir',species:['pachycephalosaurus']},
- {key:'sugestoes',title:'Sugestões',subtitle:'As ideias da comunidade',species:['velociraptor']},
- {key:'mostruario',title:'Mostruário',subtitle:'Bases, domesticações e capturas',species:['tyrannosaurus','triceratops']},
+ {key:'welcome',title:'Welcome',subtitle:'Boas-vindas · Bienvenida',species:['tyrannosaurus','velociraptor']},
+ {key:'rules',title:'Rules',subtitle:'Regras · Reglas',species:['triceratops']},
+ {key:'links',title:'Links',subtitle:'Download · Wiki · Site',species:['pteranodon']},
+ {key:'faq',title:'FAQ',subtitle:'Dúvidas frequentes · Preguntas frecuentes',species:['protoceratops']},
+ {key:'announcements',title:'Announcements',subtitle:'Anúncios · Anuncios',species:['giganotosaurus','tyrannosaurus']},
+ {key:'devlog',title:'Devlog',subtitle:'Diário de desenvolvimento · Diario de desarrollo',species:['carnotaurus']},
+ {key:'new-species',title:'New species',subtitle:'Novas espécies · Nuevas especies',species:['parasaurolophus','gallimimus']},
+ {key:'builds',title:'Builds',subtitle:'Versões novas · Nuevas versiones',species:['ankylosaurus']},
+ {key:'support',title:'Support',subtitle:'Suporte · Soporte',species:['spinosaurus']},
+ {key:'bug-reports',title:'Bug reports',subtitle:'Relatos de bug · Reportes de errores',species:['pachycephalosaurus']},
+ {key:'suggestions',title:'Suggestions',subtitle:'Sugestões · Sugerencias',species:['velociraptor']},
+ {key:'screenshots',title:'Screenshots',subtitle:'Capturas de tela · Capturas de pantalla',species:['tyrannosaurus','triceratops']},
+ {key:'fan-art',title:'Fan art',subtitle:'Arte dos fãs · Arte de fans',species:['gallimimus']},
+ {key:'test-builds',title:'Field lab',subtitle:'Laboratório de campo · Laboratorio de campo',species:['protoceratops','velociraptor']},
 ];

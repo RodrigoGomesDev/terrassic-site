@@ -25,7 +25,8 @@ test('todo aviso cabe nos limites do Discord e só a primeira espécie do push m
   assert.equal(e.image.url,`attachment://${id}.webp`);
   assert.match(e.url,new RegExp(`/wiki/#${id}$`));
   assert.deepEqual(m.allowed_mentions.roles,['123']);
-  const kind=e.fields.find(f=>f.name==='Tipo').value.split(' · ');assert.equal(new Set(kind).size,kind.length,`${id}: tipo repetido`);
+  assert.ok(['Português','Español'].every(n=>e.fields.some(f=>f.name===n)),`${id}: falta um idioma`);
+  const kind=e.fields.find(f=>f.name==='Type').value.split(' · ');assert.equal(new Set(kind).size,kind.length,`${id}: tipo repetido`);
  }
  const s=SPECIES.find(x=>x.id==='triceratops');
  assert.deepEqual(message(s,{role:null}).allowed_mentions.roles,[]);
