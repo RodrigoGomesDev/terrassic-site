@@ -1,0 +1,37 @@
+name: Aviso de espécie nova no Discord
+
+# Dispara a cada push em main que muda src/site-config.js. Só avisa se alguma espécie entrou em models.ready
+# (scripts/announce-species.mjs compara com a lista de antes do push). Um post por espécie, com o cartão de
+# public/assets/cards/<id>.webp (gerado por `npm run cards`) e a ficha do Guia de Campo.
+on:
+  push:
+    branches: [main]
+    paths: [src/site-config.js]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: discord-species-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  announce:
+    name: Anunciar as espécies liberadas
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Testar a lógica antes de avisar
+        run: node --test tests/announce-species.test.js
+      - name: Avisar no Discord
+        env:
+          DISCORD_SPECIES_WEBHOOK: ${{ secrets.DISCORD_SPECIES_WEBHOOK }}
+          DISCORD_SPECIES_ROLE: ${{ vars.DISCORD_SPECIES_ROLE }}
+          BEFORE: ${{ github.event.before }}
+        run: node scripts/announce-species.mjs

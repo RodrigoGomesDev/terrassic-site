@@ -73,6 +73,32 @@ export class Thumbnailer{
  // A chapter card: a slab of the era's blocks, optionally with an animal of that era standing on it.
  eraScene(id,speciesList=[]){return new Promise((resolve,reject)=>{if(!this.renderer)return reject(new Error('webgl'));this.queue.push({era:id,speciesList,resolve,reject});this.next()})}
  request(species,sex='male'){return new Promise((resolve,reject)=>{if(!this.renderer)return reject(new Error('webgl'));this.queue.push({species,sex,resolve,reject});this.next()})}
+ // A big still for the Discord cards (src/cards.js, scripts/bake-cards.mjs): the same light as the thumbnails, any size,
+ // transparent background, framed so the whole animal fills `fill` of the picture. Returns a canvas to draw on.
+ async still(species,{width=1200,height=800,sex='male',animation='idle',time=1.3,fill=.92,dir=[-.78,.32,-.62]}={}){
+  if(!this.renderer)throw new Error('webgl');
+  while(this.busy)await new Promise(r=>setTimeout(r,20));
+  this.busy=true;
+  try{
+   const c=await spawn(species,{sex,merge:true,silhouette:null,animation});c.animator.current.time=0;c.animator.update(time);
+   this.scene.add(c.holder);c.holder.updateMatrixWorld(true);
+   this.renderer.setSize(width,height,false);this.camera.aspect=width/height;this.camera.fov=24;this.camera.clearViewOffset();this.camera.updateProjectionMatrix();
+   const box=new THREE.Box3().setFromObject(c.model.root),center=box.getCenter(new THREE.Vector3()),size=box.getSize(new THREE.Vector3());
+   const view=new THREE.Vector3(...dir).normalize(),corners=[];for(let i=0;i<8;i++)corners.push(new THREE.Vector3(i&1?box.max.x:box.min.x,i&2?box.max.y:box.min.y,i&4?box.max.z:box.min.z));
+   let dist=Math.max(size.x,size.y*1.5,size.z*.8)*2.15,lo,hi;
+   const measure=()=>{this.camera.position.copy(center).addScaledVector(view,dist);this.camera.lookAt(center);this.camera.updateMatrixWorld();
+    lo=new THREE.Vector2(9,9);hi=new THREE.Vector2(-9,-9);for(const k of corners){const v=k.clone().project(this.camera);lo.min(v);hi.max(v)}
+    return Math.max(hi.x-lo.x,hi.y-lo.y)/2};
+   for(let i=0;i<10;i++)dist*=measure()/fill;
+   measure();this.camera.setViewOffset(width,height,(lo.x+hi.x)/2*width/2,-(lo.y+hi.y)/2*height/2,width,height);
+   this.renderer.render(this.scene,this.camera);this.camera.clearViewOffset();
+   const out=document.createElement('canvas');out.width=width;out.height=height;out.getContext('2d').drawImage(this.renderer.domElement,0,0);
+   this.scene.remove(c.holder);c.dispose();
+   return out;
+  }finally{
+   this.renderer.setSize(360,240,false);this.camera.aspect=1.5;this.camera.fov=24;this.camera.updateProjectionMatrix();this.busy=false;this.next();
+  }
+ }
  async next(){
   if(this.busy||!this.queue.length)return;this.busy=true;const job=this.queue.shift();
   try{

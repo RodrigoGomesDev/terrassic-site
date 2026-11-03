@@ -80,3 +80,12 @@ if(new URLSearchParams(location.search).has('bake'))window.__bake=async()=>{
  for(const e of ERAS)out[`era-${e.id}`]=await data(await t.eraScene(e.id,(ERA_ANIMALS[e.id]||[]).map(([id,x,z,r])=>[SPECIES.find(s=>s.id===id),x,z,r])));
  return out;
 };
+// Used by scripts/bake-cards.mjs: Discord release cards for the ready species and the channel banners (src/cards.js).
+if(new URLSearchParams(location.search).has('bake'))window.__cards=async({species=models.ready,banners=true}={})=>{
+ const t=await thumbnailer(),{speciesCard,channelBanner,loadLogo,BANNERS}=await import('./cards.js');
+ const logo=await loadLogo(new URL('assets/letreiro_ambar.png',location.href).href).catch(()=>null);
+ const out={cards:{},banners:{}};
+ for(const id of species){const s=SPECIES.find(x=>x.id===id);if(s)out.cards[id]=(await speciesCard(t,s,{logo})).toDataURL('image/webp',.93)}
+ if(banners)for(const b of BANNERS)out.banners[b.key]=(await channelBanner(t,{...b,logo})).toDataURL('image/png');
+ return out;
+};
