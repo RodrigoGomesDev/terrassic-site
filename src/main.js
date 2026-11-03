@@ -86,6 +86,6 @@ if(new URLSearchParams(location.search).has('bake'))window.__cards=async({specie
  const logo=await loadLogo(new URL('assets/letreiro_ambar.png',location.href).href).catch(()=>null);
  const out={cards:{},banners:{}};
  for(const id of species){const s=SPECIES.find(x=>x.id===id);if(s)out.cards[id]=(await speciesCard(t,s,{logo})).toDataURL('image/webp',.93)}
- if(banners)for(const b of BANNERS)out.banners[b.key]=(await channelBanner(t,{...b,logo})).toDataURL('image/png');
+ if(banners)for(const b of BANNERS){const c=await channelBanner(t,{...b,logo});out.banners[b.key]={png:c.toDataURL('image/png'),webp:c.toDataURL('image/webp',.92)}}
  return out;
 };
