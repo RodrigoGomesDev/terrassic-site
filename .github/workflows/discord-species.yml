@@ -3,10 +3,24 @@ name: Aviso de espécie nova no Discord
 # Dispara a cada push em main que muda src/site-config.js. Só avisa se alguma espécie entrou em models.ready
 # (scripts/announce-species.mjs compara com a lista de antes do push). Um post por espécie, com o cartão de
 # public/assets/cards/<id>.webp (gerado por `npm run cards`) e a ficha do Guia de Campo.
+#
+# Também dá para rodar à mão (aba Actions → Run workflow): "ids" reposição de espécie que entrou em ready antes do
+# canal/webhook existirem e nunca foi anunciada (lista separada por vírgula, ex.: "pteranodon,spinosaurus"); respeita
+# o limite de 5 por chamada do script. "no_ping" não marca @Species Updates, para o segundo lote de uma mesma
+# reposição (o primeiro lote já marcou).
 on:
   push:
     branches: [main]
     paths: [src/site-config.js]
+  workflow_dispatch:
+    inputs:
+      ids:
+        description: 'Ids separados por vírgula (reposição manual, ignora o diff do git)'
+        required: true
+      no_ping:
+        description: 'Não marcar @Species Updates'
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -34,4 +48,6 @@ jobs:
           DISCORD_SPECIES_WEBHOOK: ${{ secrets.DISCORD_SPECIES_WEBHOOK }}
           DISCORD_SPECIES_ROLE: ${{ vars.DISCORD_SPECIES_ROLE }}
           BEFORE: ${{ github.event.before }}
+          IDS: ${{ github.event.inputs.ids }}
+          NO_PING: ${{ github.event.inputs.no_ping }}
         run: node scripts/announce-species.mjs

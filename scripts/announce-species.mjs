@@ -5,6 +5,10 @@
 //
 // Sem DISCORD_SPECIES_WEBHOOK (fork, PR, rodando à mão): só mostra o que mandaria e sai sem erro.
 // Rodar à mão: BEFORE=<commit> node scripts/announce-species.mjs
+// Reposição manual (espécie que entrou em ready antes do canal/webhook existirem, nunca anunciada): IDS=a,b,c
+// ignora o diff do git e usa essa lista direto (ainda vale o limite de MAX_PER_PUSH por chamada); NO_PING=1 não
+// marca o cargo, para não marcar @Species Updates de novo num segundo lote da mesma reposição. Ver
+// "workflow_dispatch" em .github/workflows/discord-species.yml.
 import {execFileSync} from 'node:child_process';
 import {existsSync,readFileSync} from 'node:fs';
 import {fileURLToPath,pathToFileURL} from 'node:url';
@@ -82,11 +86,18 @@ async function post(webhook,payload,file){
 }
 
 export async function main({env=process.env,log=console.log}={}){
- const webhook=(env.DISCORD_SPECIES_WEBHOOK||'').trim(),role=(env.DISCORD_SPECIES_ROLE||'').trim()||null;
- const before=configAt(env.BEFORE||'HEAD~1');
- if(before===null){log('Sem a versão anterior de site-config.js (primeiro push?); nada a avisar.');return 0}
- const now=readFileSync(new URL('../src/site-config.js',import.meta.url),'utf8');
- const fresh=released(readyFrom(before),readyFrom(now));
+ const webhook=(env.DISCORD_SPECIES_WEBHOOK||'').trim();
+ const role=env.NO_PING==='true'||env.NO_PING==='1'?null:(env.DISCORD_SPECIES_ROLE||'').trim()||null;
+ const ids=(env.IDS||'').trim();
+ let fresh;
+ if(ids){
+  fresh=ids.split(',').map(s=>s.trim()).filter(Boolean);
+ }else{
+  const before=configAt(env.BEFORE||'HEAD~1');
+  if(before===null){log('Sem a versão anterior de site-config.js (primeiro push?); nada a avisar.');return 0}
+  const now=readFileSync(new URL('../src/site-config.js',import.meta.url),'utf8');
+  fresh=released(readyFrom(before),readyFrom(now));
+ }
  if(!fresh.length){log('Nenhuma espécie nova em models.ready; nada a avisar.');return 0}
  if(fresh.length>MAX_PER_PUSH){log(`${fresh.length} espécies de uma vez (${fresh.join(', ')}): mais que ${MAX_PER_PUSH}, não aviso para não inundar o canal.`);return 0}
  const {SPECIES}=await import(pathToFileURL(new URL('../src/generated/species.js',import.meta.url).pathname).href);
