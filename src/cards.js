@@ -61,13 +61,20 @@ function trim(c,trimY=true){
 function fitText(text,opts,maxWidth,scales){for(const scale of scales){const c=pixelText(text,{...opts,scale});if(c.width<=maxWidth)return c}return pixelText(text,{...opts,scale:scales.at(-1)})}
 
 // ---- the brand landscape --------------------------------------------------------------------------------------------
-// Sky in bands (posterised sunset), a low pixel sun, far hills in dusk, near ground in basalt. Painted at 1/`px` size.
+// Sky dithered between posterised steps (stippled like a hand-painted pixel sunset, not a smooth digital gradient —
+// an even scanline gradient is the one thing that reads as machine-made at a glance), a low pixel sun, far hills in
+// dusk, near ground in basalt. Painted at 1/`px` size.
+const BAYER4=[[0,8,2,10],[12,4,14,6],[3,11,1,9],[15,7,13,5]].map(row=>row.map(v=>(v+.5)/16));
 export function landscape(width,height,{seed='terrassic',px=8,horizon=.74,sunX=.68,sunR=.17}={}){
  const w=Math.ceil(width/px),h=Math.ceil(height/px),c=canvas(w,h),g=c.getContext('2d'),R=rng(seedOf(seed));
- const stops=[[0,PAL.dusk700],[.38,PAL.dusk500],[.62,'#9A3E4C'],[.82,PAL.rift500],[1,PAL.amber500]],bands=18;
+ const stops=[[0,PAL.dusk700],[.38,PAL.dusk500],[.62,'#9A3E4C'],[.82,PAL.rift500],[1,PAL.amber500]],steps=9;
  const sky=t=>{for(let i=1;i<stops.length;i++)if(t<=stops[i][0]){const [a,ca]=stops[i-1],[b,cb]=stops[i];return mix(ca,cb,(t-a)/(b-a))}return stops.at(-1)[1]};
  const hy=Math.round(h*horizon);
- for(let y=0;y<hy;y++){g.fillStyle=sky(Math.floor(y/hy*bands)/(bands-1));g.fillRect(0,y,w,1)}
+ for(let y=0;y<hy;y++){
+  const pos=(y/Math.max(1,hy-1))*(steps-1),i=Math.floor(pos),frac=pos-i;
+  const a=sky(i/(steps-1)),b=sky(Math.min(i+1,steps-1)/(steps-1));
+  for(let x=0;x<w;x++){g.fillStyle=frac>BAYER4[y&3][x&3]?b:a;g.fillRect(x,y,1,1)}
+ }
  // the sun: two rings, sitting on the horizon
  const cx=Math.round(w*sunX),cy=hy-Math.round(h*sunR*.35),r=Math.round(h*sunR);
  for(const [rr,col] of [[r,PAL.amber500],[Math.round(r*.72),PAL.amber300]])for(let y=-rr;y<=rr;y++)for(let x=-rr;x<=rr;x++)if(x*x+y*y<=rr*rr&&cy+y<hy){g.fillStyle=col;g.fillRect(cx+x,cy+y,1,1)}
@@ -156,7 +163,9 @@ export async function channelBanner(thumbnailer,{title,subtitle='',species=[],wi
  const land=landscape(width,height,{seed:seed||title,horizon:.78,sunX:.74,sunR:.24});g.drawImage(land.canvas,0,0);
  const shade=g.createLinearGradient(0,0,width*.6,0);shade.addColorStop(0,'rgba(20,16,20,.82)');shade.addColorStop(.6,'rgba(20,16,20,.35)');shade.addColorStop(1,'rgba(20,16,20,0)');
  g.fillStyle=shade;g.fillRect(0,0,width,height);
- const list=species.map(id=>SPECIES.find(s=>s.id===id)).filter(Boolean),slots=[[.82,.62,.3],[.67,.42,.22],[.95,.36,.18]];
+ // cx, height share, width share — kept clear of the text block (width*.46) on the left and the canvas edge on the
+ // right (cx + mw/2 never passes .96), so no creature overlaps the title or gets its tail clipped off.
+ const list=species.map(id=>SPECIES.find(s=>s.id===id)).filter(Boolean),slots=[[.66,.62,.32],[.87,.4,.18],[.5,.28,.14]];
  // biggest first, behind; smaller ones in front
  const renders=await Promise.all(list.map(s=>thumbnailer.still(s,{width:1100,height:740}).then(r=>({s,r}))));
  renders.sort((a,b)=>(b.s.hitbox?.[1]??0)-(a.s.hitbox?.[1]??0)).forEach(({r},i)=>{const [cx,hk,mw]=slots[i]||slots[0];stand(g,r,{cx:width*cx,groundY:land.groundY+10,maxW:width*mw,maxH:height*hk*1.2})});
