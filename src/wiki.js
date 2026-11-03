@@ -48,7 +48,7 @@ function install(){
   sub('fabric',w('fabric.t'),list(W.fabric.map(s=>pick(s).replaceAll('{v}',v)),true)),
   sub('neoforge',w('neoforge.t'),list(W.neoforge.map(s=>pick(s).replaceAll('{v}',v)),true)),
   sub('forge',w('forge.t'),list(W.forge.map(s=>pick(s).replaceAll('{v}',v)),true),note(w('forge.warn'))),
-  sub('multiplayer',w('mp.t'),list(W.mp)),
+  sub('multiplayer',w('mp.t'),list([...W.mp,W[story?'mp.story':'mp.progress']])),
   sub('atualizar',w('up.t'),list(W.up,true),note(w('up.warn')))),{id:'instalacao'});
 }
 
