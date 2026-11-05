@@ -18,8 +18,8 @@ export const SITE=(process.env.SITE_URL||'https://terrassic.vercel.app').replace
 const COLOR=0xF2B544;// AMBER_500, the brand accent
 const MAX_PER_PUSH=5;// a push that releases more than this is a mistake or a migration: never flood the channel
 
-// The Discord server is organised in English (the shared language) with Portuguese and Spanish sections, so the post
-// is written the same way: English base, then a short block in Portuguese and in Spanish.
+// The Discord server is organised in English, and #new-species is an English channel: the post is in English only
+// (Rodrigo, 05/11/2026: "todos os conteúdos em inglês"). Portuguese and Spanish live in the language categories.
 const EN={
  group:{predator:'Predator',herbivore:'Herbivore',flyer:'Flyer',water:'Aquatic'},
  diet:{carnivore:'Carnivore',herbivore:'Herbivore',omnivore:'Omnivore',piscivore:'Piscivore'},
@@ -52,17 +52,14 @@ export function message(s,{role=null,image}={}){
    {name:'Riding',value:EN.mount[s.mount]||'—',inline:true},
    {name:'How to tame',value:clip(g.taming?.en||EN.tame[s.tame]||'—',1000)},
    ...(g.utility?.en?[{name:"What it's good for",value:clip(g.utility.en,1000)}]:[]),
-   {name:'Português',value:clip(`**${s.name.pt}**: ${first(g.sci?.pt)}${g.taming?.pt?`\n**Como domar:** ${first(g.taming.pt)}`:''}`,1000)},
-   {name:'Español',value:clip(`**${s.name.es}**: ${first(g.sci?.es)}${g.taming?.es?`\n**Cómo domesticarlo:** ${first(g.taming.es)}`:''}`,1000)},
   ],
   image:{url:`attachment://${image}`},
-  footer:{text:"Full entry in the in-game Field Guide and Rexpert's /dino · Ficha completa no Guia de Campo"},
+  footer:{text:"Full entry in the in-game Bestiaries and Rexpert's /dino"},
   timestamp:new Date().toISOString(),
  };
- const names=[...new Set([s.name.pt,s.name.es].filter(n=>n!==s.name.en))];
  return {
   username:'Terrassic',avatar_url:`${SITE}/assets/monograma_256.png`,
-  content:`${role?`<@&${role}> `:''}**${s.name.en}**${names.length?` (${names.join(' · ')})`:''} is here, redesigned · chegou refeito · llegó rehecho.`,
+  content:`${role?`<@&${role}> `:''}**${s.name.en}** is here, redesigned.`,
   embeds:[embed],
   allowed_mentions:{roles:role?[role]:[]},
  };

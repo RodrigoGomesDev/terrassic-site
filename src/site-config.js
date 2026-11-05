@@ -5,7 +5,7 @@ export const links={
  wiki:'./wiki/', // a wiki do próprio site (wiki/index.html); no CurseForge e no Modrinth use o endereço completo, terminado em /wiki/.
  report:'./wiki/#reportar', // onde se reporta um bug; no CurseForge e no Modrinth ("Issues") use o endereço completo.
  donate:'https://ko-fi.com/terrassic',
- version:'1.1.4',
+ version:'1.8.0',
  discord:'https://discord.gg/ymRsGgUnWW', // Convite permanente (Configurações do servidor › Convites › "Nunca expira"). Aparece no rodapé, na instalação e em "Reportar um problema".
  trailer:null,
 };
@@ -13,7 +13,7 @@ export const links={
 // Espécies cujo modelo novo (estudo próprio, aprovado pelo Rodrigo) já está pronto. As outras aparecem no site
 // como silhueta com "Em breve": no bestiário, nas miniaturas e na abertura. Ex.: ready:['carnotaurus'].
 export const models={
- ready:['velociraptor','spinosaurus','pteranodon','tyrannosaurus','carnotaurus','giganotosaurus','protoceratops','triceratops','gallimimus','pachycephalosaurus','parasaurolophus','ankylosaurus'],
+ ready:['velociraptor','spinosaurus','pteranodon','tyrannosaurus','carnotaurus','giganotosaurus','protoceratops','triceratops','gallimimus','pachycephalosaurus','parasaurolophus','ankylosaurus','styracosaurus','deinosuchus','elasmosaurus'],
 };
 export const isReady=id=>models.ready.includes(id);
 

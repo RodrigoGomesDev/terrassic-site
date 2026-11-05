@@ -25,7 +25,8 @@ test('todo aviso cabe nos limites do Discord e só a primeira espécie do push m
   assert.equal(e.image.url,`attachment://${id}.webp`);
   assert.match(e.url,new RegExp(`/wiki/#${id}$`));
   assert.deepEqual(m.allowed_mentions.roles,['123']);
-  assert.ok(['Português','Español'].every(n=>e.fields.some(f=>f.name===n)),`${id}: falta um idioma`);
+  assert.ok(!e.fields.some(f=>/Português|Español/.test(f.name)),`${id}: o canal é em inglês, sem blocos de outros idiomas`);
+  assert.doesNotMatch(m.content+e.footer.text,/chegou|llegó|Ficha|Guia de Campo/,`${id}: texto em português ou espanhol`);
   const kind=e.fields.find(f=>f.name==='Type').value.split(' · ');assert.equal(new Set(kind).size,kind.length,`${id}: tipo repetido`);
  }
  const s=SPECIES.find(x=>x.id==='triceratops');
@@ -37,12 +38,20 @@ test('cada espécie pronta tem cartão (npm run cards) ou ao menos miniatura', (
  for(const id of models.ready){const f=imageFor(id);assert.ok(f,`${id} sem imagem nenhuma`)}
 });
 
-test('sem webhook, mostra o aviso e sai sem erro', async (t) => {
- if(configAt('e229ea0')===null)return t.skip('histórico raso (CI): o commit de exemplo não está disponível');
+test('sem webhook, mostra o aviso e sai sem erro', async () => {
  const lines=[];
- const code=await main({env:{BEFORE:'e229ea0'},log:(...a)=>lines.push(a.join(' '))});
+ const code=await main({env:{IDS:'styracosaurus,deinosuchus,elasmosaurus'},log:(...a)=>lines.push(a.join(' '))});
  assert.equal(code,0);
  const out=lines.join('\n');
- for(const id of ['pachycephalosaurus','parasaurolophus','ankylosaurus'])assert.match(out,new RegExp(`o aviso de ${id} seria`));
- assert.doesNotMatch(out,/o aviso de triceratops seria/,'quem já estava pronto não é anunciado de novo');
+ for(const id of ['styracosaurus','deinosuchus','elasmosaurus'])assert.match(out,new RegExp(`o aviso de ${id} seria`));
+ assert.equal((out.match(/<@&/g)||[]).length,0,'sem cargo configurado, ninguém é marcado');
+});
+
+test('push que libera mais de 5 espécies de uma vez não inunda o canal', async (t) => {
+ if(configAt('e229ea0')===null)return t.skip('histórico raso (CI): o commit de exemplo não está disponível');
+ const lines=[];
+ const code=await main({env:{BEFORE:'e229ea0'},log:(...a)=>lines.push(a.join(' '))}); // de lá para cá: mais de 5
+ assert.equal(code,0);
+ assert.match(lines.join('\n'),/mais que 5, não aviso/);
+ assert.doesNotMatch(lines.join('\n'),/seria:/);
 });

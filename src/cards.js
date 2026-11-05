@@ -65,7 +65,11 @@ function fitText(text,opts,maxWidth,scales){for(const scale of scales){const c=p
 // an even scanline gradient is the one thing that reads as machine-made at a glance), a low pixel sun, far hills in
 // dusk, near ground in basalt. Painted at 1/`px` size.
 const BAYER4=[[0,8,2,10],[12,4,14,6],[3,11,1,9],[15,7,13,5]].map(row=>row.map(v=>(v+.5)/16));
-export function landscape(width,height,{seed='terrassic',px=8,horizon=.74,sunX=.68,sunR=.17}={}){
+// Animais que vivem só no mar: o cartão deles é no mar (os de beira de rio, como o Espinossauro e o Deinossuco,
+// ficam em terra).
+export const SEA=new Set(['elasmosaurus','mosasaurus','tylosaurus','xiphactinus','archelon']);
+
+export function landscape(width,height,{seed='terrassic',px=8,horizon=.74,sunX=.68,sunR=.17,sea=false}={}){
  const w=Math.ceil(width/px),h=Math.ceil(height/px),c=canvas(w,h),g=c.getContext('2d'),R=rng(seedOf(seed));
  const stops=[[0,PAL.dusk700],[.38,PAL.dusk500],[.62,'#9A3E4C'],[.82,PAL.rift500],[1,PAL.amber500]],steps=9;
  const sky=t=>{for(let i=1;i<stops.length;i++)if(t<=stops[i][0]){const [a,ca]=stops[i-1],[b,cb]=stops[i];return mix(ca,cb,(t-a)/(b-a))}return stops.at(-1)[1]};
@@ -80,11 +84,34 @@ export function landscape(width,height,{seed='terrassic',px=8,horizon=.74,sunX=.
  for(const [rr,col] of [[r,PAL.amber500],[Math.round(r*.72),PAL.amber300]])for(let y=-rr;y<=rr;y++)for(let x=-rr;x<=rr;x++)if(x*x+y*y<=rr*rr&&cy+y<hy){g.fillStyle=col;g.fillRect(cx+x,cy+y,1,1)}
  // far hills (dusk) and a near ridge (basalt), stepped like blocks
  const ridge=(base,amp,step,col)=>{g.fillStyle=col;let y=base;for(let x=0;x<w;x+=step){y=Math.max(base-amp,Math.min(base+amp,y+Math.round((R()-.5)*amp)));g.fillRect(x,y,step,h-y)}};
- ridge(hy-Math.round(h*.05),Math.max(2,Math.round(h*.05)),2,mix(PAL.dusk500,PAL.dusk700,.55));
- ridge(hy+1,Math.max(1,Math.round(h*.025)),3,PAL.basalt700);
- g.fillStyle=PAL.basalt800;g.fillRect(0,hy+Math.round(h*.06),w,h);
+ if(sea){
+  // the open sea: a far island on the horizon, then water darkening toward the viewer (dithered like the sky) and
+  // the sun's reflection in broken bands that widen as they come closer
+  ridge(hy-Math.round(h*.02),Math.max(1,Math.round(h*.015)),2,mix(PAL.dusk500,PAL.dusk700,.55));
+  // the water reflects the sunset near the horizon and goes to deep teal close by (muted, never neon)
+  const wstops=[[0,mix(PAL.dusk500,PAL.rift500,.4)],[.3,'#5A4866'],[.62,'#2E4654'],[1,'#16232C']],bands=7;
+  const water=t=>{for(let i=1;i<wstops.length;i++)if(t<=wstops[i][0]){const [a,ca]=wstops[i-1],[b,cb]=wstops[i];return mix(ca,cb,(t-a)/(b-a))}return wstops.at(-1)[1]};
+  for(let y=hy;y<h;y++){
+   const pos=((y-hy)/Math.max(1,h-hy-1))*(bands-1),i=Math.floor(pos),frac=pos-i;
+   const a=water(i/(bands-1)),b=water(Math.min(i+1,bands-1)/(bands-1));
+   for(let x=0;x<w;x++){g.fillStyle=frac>BAYER4[y&3][x&3]?b:a;g.fillRect(x,y,1,1)}
+  }
+  // ripples: short light strokes scattered over the water, longer as they come closer
+  for(let y=hy+2;y<h;y+=2)for(let n=0;n<Math.round(w/14);n++){
+   const k=(y-hy)/(h-hy);g.fillStyle=mix(water(k),PAL.bone100,.22);g.fillRect(Math.floor(R()*w),y,1+Math.floor(R()*(2+k*5)),1);
+  }
+  for(let y=hy+1;y<h;y+=2){
+   const k=(y-hy)/(h-hy),half=Math.round(r*(.35+k*.9)),n=1+Math.floor(R()*3);
+   for(let j=0;j<n;j++){const x0=cx-half+Math.floor(R()*half*2),len=1+Math.floor(R()*Math.max(2,half*.5));g.fillStyle=k<.35?PAL.amber300:PAL.amber500;g.globalAlpha=.85-k*.6;g.fillRect(x0,y,len,1)}
+   g.globalAlpha=1;
+  }
+ }else{
+  ridge(hy-Math.round(h*.05),Math.max(2,Math.round(h*.05)),2,mix(PAL.dusk500,PAL.dusk700,.55));
+  ridge(hy+1,Math.max(1,Math.round(h*.025)),3,PAL.basalt700);
+  g.fillStyle=PAL.basalt800;g.fillRect(0,hy+Math.round(h*.06),w,h);
+ }
  const out=canvas(width,height),o=out.getContext('2d');o.imageSmoothingEnabled=false;o.drawImage(c,0,0,w*px,h*px);
- return {canvas:out,groundY:(hy+1)*px};
+ return {canvas:out,groundY:(hy+1)*px,waterY:hy*px};
 }
 
 // Where the opaque pixels of a render are (the animal, without the empty margin).
@@ -102,6 +129,26 @@ function stand(g,render,{cx,groundY,maxW,maxH,shadow=true}){
  g.imageSmoothingEnabled=true;g.imageSmoothingQuality='high';g.drawImage(render,ink.x,ink.y,ink.w,ink.h,x,y,w,h);
  return {x,y,w,h};
 }
+// The animal swimming at the surface: the part under the waterline takes the colour of the water, with a pixel foam
+// line where it breaks the surface.
+function swim(g,render,{cx,waterY,maxW,maxH,under=.38}){
+ const ink=inkBox(render),k=Math.min(maxW/ink.w,maxH/ink.h),w=ink.w*k,h=ink.h*k,x=cx-w/2,y=waterY-h*(1-under);
+ const layer=canvas(g.canvas.width,g.canvas.height),l=layer.getContext('2d');
+ l.imageSmoothingEnabled=true;l.imageSmoothingQuality='high';l.drawImage(render,ink.x,ink.y,ink.w,ink.h,x,y,w,h);
+ const row=l.getImageData(0,Math.round(waterY),layer.width,1).data;
+ l.globalCompositeOperation='source-atop';l.fillStyle='rgba(22,35,44,.6)';l.fillRect(0,waterY,layer.width,layer.height);
+ g.drawImage(layer,0,0);
+ // foam where the water meets the body: a few pixel strokes just past each end of the part that breaks the surface
+ // (along the whole body it reads as a seam drawn over the animal)
+ const px=6,R=rng(seedOf(String(Math.round(cx)))),wy=Math.round(waterY),spans=[];
+ let start=-1;
+ for(let fx=0;fx<=layer.width;fx++){const on=fx<layer.width&&row[fx*4+3]>40;if(on&&start<0)start=fx;if(!on&&start>=0){if(fx-start>px*2)spans.push([start,fx]);start=-1}}
+ for(const [s0,s1] of spans)for(const [edge,dir] of [[s0,-1],[s1,1]]){
+  for(let n=0;n<4;n++){const fx=edge+dir*(n*px*1.5+R()*px);g.fillStyle=n<2?PAL.bone100:PAL.stone300;g.fillRect(Math.round(fx/px)*px,wy-px+(n%2)*px,px*(n<2?2:1),px)}
+ }
+ return {x,y,w,h};
+}
+
 // A flat silhouette of the render (for the scale figure).
 function silhouette(render,color){const ink=inkBox(render),c=canvas(ink.w,ink.h),g=c.getContext('2d');g.drawImage(render,ink.x,ink.y,ink.w,ink.h,0,0,ink.w,ink.h);g.globalCompositeOperation='source-in';g.fillStyle=color;g.fillRect(0,0,c.width,c.height);return c}
 
@@ -125,12 +172,14 @@ async function fonts(){await Promise.all(['12px Entalhe','8px Sedimento'].map(f=
 export async function speciesCard(thumbnailer,species,{width=1600,height=900,sex='male',label='NEW IN TERRASSIC',site='terrassic.vercel.app/wiki',logo}={}){
  await fonts();
  const out=canvas(width,height),g=out.getContext('2d');
- const land=landscape(width,height,{seed:species.id,sunX:.66});g.drawImage(land.canvas,0,0);
+ const sea=SEA.has(species.id);
+ const land=landscape(width,height,{seed:species.id,sunX:.66,sea,horizon:sea?.66:.74});g.drawImage(land.canvas,0,0);
  // left shade, so the text always reads over the sky
  const shade=g.createLinearGradient(0,0,width*.62,0);shade.addColorStop(0,'rgba(20,16,20,.88)');shade.addColorStop(.55,'rgba(20,16,20,.55)');shade.addColorStop(1,'rgba(20,16,20,0)');
  g.fillStyle=shade;g.fillRect(0,0,width,height);
- const render=await thumbnailer.still(species,{width:1500,height:1000,sex});
- stand(g,render,{cx:width*.72,groundY:land.groundY+18,maxW:width*.52,maxH:height*.6});
+ const render=await thumbnailer.still(species,{width:1500,height:1000,sex,...(sea?{animation:'breathe',time:1.2}:{})}); // no mar: subindo para respirar, corpo reto na superfície
+ if(sea)swim(g,render,{cx:width*.68,waterY:land.waterY+96,maxW:width*.58,maxH:height*.32,under:.3});
+ else stand(g,render,{cx:width*.72,groundY:land.groundY+18,maxW:width*.52,maxH:height*.6});
 
  const left=84;let y=96;
  const lab=pixelText(label,{scale:3,color:PAL.amber500,spacing:2});g.drawImage(lab,left,y);y+=lab.height+34;
