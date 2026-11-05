@@ -1,8 +1,9 @@
 name: Aviso de espécie nova no Discord
 
-# Dispara a cada push em main que muda src/site-config.js. Só avisa se alguma espécie entrou em models.ready
-# (scripts/announce-species.mjs compara com a lista de antes do push). Um post por espécie, com o cartão de
-# public/assets/cards/<id>.webp (gerado por `npm run cards`) e a ficha do Guia de Campo.
+# Dispara a cada push em main que ADICIONA uma imagem aprovada em public/assets/announce/<id>.webp|png|jpg: a arte de
+# anúncio feita e aprovada à mão (não o cartão automático). Pôr a imagem é o passo de "publicar": marcar a espécie em
+# models.ready só atualiza o site. Um post por espécie nova, com a imagem aprovada e a ficha do Guia de Campo; trocar
+# uma imagem que já existe não posta de novo (scripts/announce-species.mjs).
 #
 # Também dá para rodar à mão (aba Actions → Run workflow): "ids" reposição de espécie que entrou em ready antes do
 # canal/webhook existirem e nunca foi anunciada (lista separada por vírgula, ex.: "pteranodon,spinosaurus"); respeita
@@ -11,7 +12,7 @@ name: Aviso de espécie nova no Discord
 on:
   push:
     branches: [main]
-    paths: [src/site-config.js]
+    paths: ['public/assets/announce/**']
   workflow_dispatch:
     inputs:
       ids:

@@ -1,7 +1,11 @@
 // Release announcements (scripts/announce-species.mjs): no network, no Discord.
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {readyFrom,released,message,imageFor,configAt,main} from '../scripts/announce-species.mjs';
+import {readyFrom,released,message,imageFor,addedIds,main} from '../scripts/announce-species.mjs';
+import {mkdtempSync,mkdirSync,writeFileSync,rmSync} from 'node:fs';
+import {tmpdir} from 'node:os';
+import {join} from 'node:path';
+import {pathToFileURL} from 'node:url';
 import {SPECIES} from '../src/generated/species.js';
 import {models} from '../src/site-config.js';
 
@@ -34,24 +38,32 @@ test('todo aviso cabe nos limites do Discord e só a primeira espécie do push m
  assert.doesNotMatch(message(s,{role:null}).content,/<@&/);
 });
 
-test('cada espécie pronta tem cartão (npm run cards) ou ao menos miniatura', () => {
- for(const id of models.ready){const f=imageFor(id);assert.ok(f,`${id} sem imagem nenhuma`)}
+test('só a imagem aprovada serve, e só imagem ADICIONADA conta como anúncio', () => {
+ const root=mkdtempSync(join(tmpdir(),'announce-'));
+ try{
+  const base=pathToFileURL(root+'/');
+  assert.equal(imageFor('styracosaurus',base),null,'sem a arte aprovada: nada (nunca o cartão automático)');
+  mkdirSync(join(root,'public/assets/announce'),{recursive:true});
+  writeFileSync(join(root,'public/assets/announce/styracosaurus.png'),'x');
+  const f=imageFor('styracosaurus',base);
+  assert.equal(f.name,'styracosaurus.png');assert.equal(f.type,'image/png');
+ }finally{rmSync(root,{recursive:true,force:true})}
+ assert.deepEqual(addedIds(['public/assets/announce/styracosaurus.webp','public/assets/announce/deinosuchus.png','public/assets/cards/elasmosaurus.webp','public/assets/announce/notas.txt']),['styracosaurus','deinosuchus']);
 });
 
-test('sem webhook, mostra o aviso e sai sem erro', async () => {
+test('sem a imagem aprovada, não avisa (e sem webhook só mostra o que mandaria)', async () => {
  const lines=[];
  const code=await main({env:{IDS:'styracosaurus,deinosuchus,elasmosaurus'},log:(...a)=>lines.push(a.join(' '))});
  assert.equal(code,0);
  const out=lines.join('\n');
- for(const id of ['styracosaurus','deinosuchus','elasmosaurus'])assert.match(out,new RegExp(`o aviso de ${id} seria`));
- assert.equal((out.match(/<@&/g)||[]).length,0,'sem cargo configurado, ninguém é marcado');
+ for(const id of ['styracosaurus','deinosuchus','elasmosaurus']){
+  if(imageFor(id))assert.match(out,new RegExp(`o aviso de ${id} seria`));
+  else assert.match(out,new RegExp(`${id}: sem a imagem aprovada`));
+ }
 });
 
-test('push que libera mais de 5 espécies de uma vez não inunda o canal', async (t) => {
- if(configAt('e229ea0')===null)return t.skip('histórico raso (CI): o commit de exemplo não está disponível');
+test('mais de 5 espécies de uma vez não inunda o canal', async () => {
  const lines=[];
- const code=await main({env:{BEFORE:'e229ea0'},log:(...a)=>lines.push(a.join(' '))}); // de lá para cá: mais de 5
- assert.equal(code,0);
+ await main({env:{IDS:'a,b,c,d,e,f'},log:(...a)=>lines.push(a.join(' '))});
  assert.match(lines.join('\n'),/mais que 5, não aviso/);
- assert.doesNotMatch(lines.join('\n'),/seria:/);
 });
