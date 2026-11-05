@@ -6,6 +6,8 @@
 // brand fonts at their native size (Sedimento 8 px, Entalhe 12 px) and are enlarged in whole steps, so they stay as
 // crisp as the TERRASSIC sign. The animal is the game model, lit like the site thumbnails.
 import {SPECIES} from './generated/species.js';
+import {SEA} from './habitat.js';
+export {SEA};
 
 export const PAL={
  basalt950:'#0E0B0E',basalt900:'#141014',basalt800:'#1C181E',basalt700:'#2A2329',basalt600:'#3A3036',
@@ -65,9 +67,6 @@ function fitText(text,opts,maxWidth,scales){for(const scale of scales){const c=p
 // an even scanline gradient is the one thing that reads as machine-made at a glance), a low pixel sun, far hills in
 // dusk, near ground in basalt. Painted at 1/`px` size.
 const BAYER4=[[0,8,2,10],[12,4,14,6],[3,11,1,9],[15,7,13,5]].map(row=>row.map(v=>(v+.5)/16));
-// Animais que vivem só no mar: o cartão deles é no mar (os de beira de rio, como o Espinossauro e o Deinossuco,
-// ficam em terra).
-export const SEA=new Set(['elasmosaurus','mosasaurus','tylosaurus','xiphactinus','archelon']);
 
 export function landscape(width,height,{seed='terrassic',px=8,horizon=.74,sunX=.68,sunR=.17,sea=false}={}){
  const w=Math.ceil(width/px),h=Math.ceil(height/px),c=canvas(w,h),g=c.getContext('2d'),R=rng(seedOf(seed));

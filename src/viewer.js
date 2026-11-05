@@ -2,6 +2,26 @@ import * as THREE from 'three';
 import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
 import {spawn,QualityGuard} from './rig.js';
 import {plinth,eraSlab} from './blocks.js';
+import {SEA} from './habitat.js';
+
+// A square tank of water over a square sea floor, from y = -depth to 0: the top of every 1 m column and walls only on
+// the outer edge. Square, so the walls are flat: a round (stepped) wall seen edge-on stacks its translucent steps
+// into stripes.
+function waterTank(radius,depth){
+ const inside=(x,z)=>Math.abs(x)<=radius&&Math.abs(z)<=radius,pos=[],quad=(a,b,c,d)=>pos.push(...a,...b,...c,...a,...c,...d);
+ for(let x=-radius;x<=radius;x++)for(let z=-radius;z<=radius;z++){
+  if(!inside(x,z))continue;const x0=x-.5,x1=x+.5,z0=z-.5,z1=z+.5,y0=-depth,y1=0;
+  quad([x0,y1,z0],[x0,y1,z1],[x1,y1,z1],[x1,y1,z0]);
+  if(!inside(x+1,z))quad([x1,y0,z0],[x1,y1,z0],[x1,y1,z1],[x1,y0,z1]);
+  if(!inside(x-1,z))quad([x0,y0,z1],[x0,y1,z1],[x0,y1,z0],[x0,y0,z0]);
+  if(!inside(x,z+1))quad([x1,y0,z1],[x1,y1,z1],[x0,y1,z1],[x0,y0,z1]);
+  if(!inside(x,z-1))quad([x0,y0,z0],[x0,y1,z0],[x1,y1,z0],[x1,y0,z0]);
+ }
+ const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));g.computeVertexNormals();
+ // an even tint, without light: lit faces would turn every 1 m step of the wall into a stripe
+ const m=new THREE.Mesh(g,new THREE.MeshBasicMaterial({color:0x2e5664,transparent:true,opacity:.3,depthWrite:false,side:THREE.DoubleSide}));
+ m.renderOrder=2;return m;
+}
 const damp=THREE.MathUtils.damp,ease=t=>t*t*(3-2*t);
 
 export class SpecimenViewer{
@@ -27,18 +47,26 @@ export class SpecimenViewer{
  async show(species,sex='male'){
   if(!this.renderer)return;const req=++this.request;
   try{
-   const c=await spawn(species,{sex,shadows:true,animation:this.current?.animator.current.name||'idle'});
+   // Sea animals swim in a tank instead of standing on the plinth (on a plinth the lowest point, often the head of a
+   // long neck, would lie on the stone and the body hang in the air).
+   const sea=SEA.has(species.id)&&species.anims?.includes('swim');
+   const c=await spawn(species,{sex,shadows:true,animation:sea?'swim':this.current?.animator.current.name||'idle'});
    if(req!==this.request){c.dispose();return}
    c.model.material.transparent=true;c.model.material.opacity=0;c.fade=0;
    if(this.current){this.current.out=0;this.leaving.push(this.current)}
    this.current=c;this.scene.add(c.holder);
    // Frame the animal by its measured size; small ones get a closer camera so they fill the stage.
    c.holder.updateMatrixWorld(true);const box=new THREE.Box3().setFromObject(c.model.root),size=box.getSize(new THREE.Vector3()),center=box.getCenter(new THREE.Vector3());
-   c.holder.position.y=-box.min.y;const span=Math.max(size.x,size.y*1.3,size.z,2.2);
-   this.frame.target.set(center.x,size.y*.45,center.z);this.frame.distance=span*1.5+2.2;this.size=size;
-   // A plinth of the mod's own flagstones; each block is 1 m, so it doubles as a scale grid.
-   if(this.plinth)this.scene.remove(this.plinth);
-   this.plinth=plinth(Math.ceil(Math.max(size.x,size.z)*.62+2));this.plinth.position.set(-.5,0,-.5);this.scene.add(this.plinth);
+   const span=Math.max(size.x,size.y*1.3,size.z,2.2),radius=Math.ceil(Math.max(size.x,size.z)*.62+2);
+   const depth=sea?Math.max(3,Math.ceil(size.y*1.8+1.5)):0;
+   if(sea){c.holder.position.y=-depth*.5-center.y;this.frame.target.set(center.x,-depth*.5,center.z)}
+   else{c.holder.position.y=-box.min.y;this.frame.target.set(center.x,size.y*.45,center.z)}
+   this.frame.distance=span*1.5+2.2;this.size=size;
+   // A plinth of the mod's own flagstones; each block is 1 m, so it doubles as a scale grid. For sea animals it is the
+   // sea floor (chalk, the rock the Cretaceous seas left behind) under a tank of water.
+   if(this.plinth)this.scene.remove(this.plinth);if(this.water){this.scene.remove(this.water);this.water.geometry.dispose();this.water=null}
+   this.plinth=plinth(radius,sea?'chalk':'flagstone',{square:sea});this.plinth.position.set(-.5,-depth,-.5);this.scene.add(this.plinth);
+   if(sea){this.water=waterTank(radius,depth);this.water.position.set(-.5,0,-.5);this.scene.add(this.water)}
    const k=span*1.2;Object.assign(this.key.shadow.camera,{left:-k,right:k,top:k,bottom:-k,near:.5,far:k*6});this.key.shadow.camera.updateProjectionMatrix();
    this.key.position.set(-k*.9,k*1.6,-k*1.4);this.key.target.position.copy(this.frame.target);
    if(!this.placed){this.placed=true;this.controls.target.copy(this.frame.target);this.camera.position.set(-span*1.1,span*.55,-span*1.5).setLength(this.frame.distance).add(this.frame.target);this.distance=this.frame.distance}

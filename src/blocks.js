@@ -109,8 +109,9 @@ export function floatingIsland({radius=11,seed=1203}={}){
 }
 
 // A square plinth for the bestiary: flagstones on top, stacked stone on the sides.
-export function plinth(radius){
- const v=new Voxels();for(let x=-radius;x<=radius;x++)for(let z=-radius;z<=radius;z++){if(Math.hypot(x,z)>radius+.4)continue;v.set(x,-1,z,'flagstone');if(Math.hypot(x,z)>radius-1.2)v.set(x,-2,z,'stone')}
+export function plinth(radius,top='flagstone',{square=false}={}){
+ const d=square?(x,z)=>Math.max(Math.abs(x),Math.abs(z)):Math.hypot;
+ const v=new Voxels();for(let x=-radius;x<=radius;x++)for(let z=-radius;z<=radius;z++){if(d(x,z)>radius+.4)continue;v.set(x,-1,z,top);if(d(x,z)>radius-1.2)v.set(x,-2,z,'stone')}
  return v.build();
 }
 
