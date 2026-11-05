@@ -9,7 +9,8 @@
     "preview": "vite preview --host 127.0.0.1",
     "check": "for f in src/*.js src/generated/*.js; do node --check \"$f\" || exit 1; done && node --test tests/*.test.js",
     "thumbs": "node scripts/bake-thumbs.mjs",
-    "cards": "node scripts/bake-cards.mjs"
+    "cards": "node scripts/bake-cards.mjs",
+    "inspect": "node scripts/inspect-model.mjs"
   },
   "dependencies": {
     "three": "^0.180.0"

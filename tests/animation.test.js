@@ -44,6 +44,13 @@ test('merged rigs keep one mesh per bone and every bone',()=>{
  assert.equal(merged.bones.size,loose.bones.size);assert.ok(merged.meshes.length<=merged.bones.size&&merged.meshes.length<loose.meshes.length);
  loose.dispose();merged.dispose();
 });
+test('the model is drawn like the game: both sides of every face (GeckoLib entityCutoutNoCull)',()=>{
+ // Penas de espessura zero (braços do Velociraptor) e caixas abertas (mandíbula do Deinossuco) só aparecem dos dois
+ // lados se as duas faces forem desenhadas, como no jogo. Com FrontSide elas somem de um lado.
+ const m=createModel(species('velociraptor'),new THREE.Texture());
+ assert.equal(m.material.side,THREE.DoubleSide);
+ m.dispose();
+});
 test('the web roar starts and ends at rest and keeps the jaw inside the authored limits',()=>{
  const clip=compileClip(json('../public/assets/species/tyrannosaurus.roar.json'));
  for(let t=0;t<=clip.length;t+=1/120){const angle=sampleTrack(clip.bones.jaw.rotation,t,clip.length)[0];assert.ok(angle>=-.5&&angle<=46,`jaw ${angle} at ${t}`)}

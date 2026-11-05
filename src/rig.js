@@ -31,7 +31,9 @@ export function addClip(id,name,raw){return loadSpecies(id).then(d=>{Object.defi
 // merge: one draw call per bone (for scenes with many creatures); the per-cube depth bias becomes a tiny inflate.
 export function createModel(data,texture,sex='male',{shadows=false,merge=false,bias=true}={}){
  const model=data.model??data,root=new THREE.Group(),bones=new Map(),[w,h]=model.res;
- const material=new THREE.MeshStandardMaterial({map:texture,roughness:1,metalness:0,alphaTest:.3,side:THREE.FrontSide,polygonOffset:true,polygonOffsetFactor:0,polygonOffsetUnits:0});
+ // Both sides of every face, like the game (GeckoLib draws entities with entityCutoutNoCull): zero-thickness feathers
+ // and open boxes (faces the model leaves out on purpose) would otherwise vanish from one side.
+ const material=new THREE.MeshStandardMaterial({map:texture,roughness:1,metalness:0,alphaTest:.3,side:THREE.DoubleSide,polygonOffset:true,polygonOffsetFactor:0,polygonOffsetUnits:0});
  const meshes=[];
  function cube(index,parent,pivot){
   const [name,from,to,origin,rotation,inflate,faces]=model.cubes[index];
