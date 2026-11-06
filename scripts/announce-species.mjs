@@ -28,6 +28,8 @@ const EN={
  mount:{ride:'Rideable',platform:'Platform saddle',shoulder:'Shoulder pet',none:'Not rideable'},
 };
 const meters=n=>new Intl.NumberFormat('en-US',{maximumFractionDigits:1}).format(n);
+// The mod draws the player as a 1.70 m person in a 1.8-block body (gen_species.METRE, 1.8.1): hitboxes are in blocks.
+const BLOCKS_PER_METRE=1.8/1.7;
 const clip=(s,n)=>(s.length>n?`${s.slice(0,n-1).trimEnd()}…`:s);
 
 // The ids inside `ready:[...]` of a site-config.js text (the code line, not the example in the comment above it).
@@ -41,7 +43,7 @@ export function configAt(ref){if(!ref||/^0+$/.test(ref))return null;try{return g
 // The Discord message for one species: a short ping line, one embed with the card as its big image.
 export function message(s,{role=null,image}={}){
  const g=s.guide||{},first=t=>(t||'').split(/(?<=[.!?])\s/)[0];
- const tall=s.hitbox?.[1];
+ const tall=s.hitbox?.[1]&&s.hitbox[1]/BLOCKS_PER_METRE;// metres
  const embed={
   color:COLOR,
   author:{name:'New species · Terrassic',icon_url:`${SITE}/assets/monograma_64.png`},
