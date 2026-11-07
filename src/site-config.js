@@ -5,7 +5,7 @@ export const links={
  wiki:'./wiki/', // a wiki do próprio site (wiki/index.html); no CurseForge e no Modrinth use o endereço completo, terminado em /wiki/.
  report:'./wiki/#reportar', // onde se reporta um bug; no CurseForge e no Modrinth ("Issues") use o endereço completo.
  donate:'https://ko-fi.com/terrassic',
- version:'1.9.0',
+ version:'1.9.1',
  discord:'https://discord.gg/ymRsGgUnWW', // Convite permanente (Configurações do servidor › Convites › "Nunca expira"). Aparece no rodapé, na instalação e em "Reportar um problema".
  trailer:null,
 };
